@@ -3,15 +3,12 @@ backend:
   repo: protungtq/new8
   branch: main
 
-site_url: https://news.so1.asia
-
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
 publish_mode: editorial_workflow
 
 collections:
-
   - name: "posts"
     label: "Posts"
 
@@ -43,7 +40,7 @@ collections:
         }
 
       - {
-          label: "Featured Image",
+          label: "Image",
           name: "image",
           widget: "image"
         }
