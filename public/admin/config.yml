@@ -1,61 +1,16 @@
 backend:
-  name: github
-  repo: protungtq/new8
-  branch: main
-
-site_url: https://news.so1.asia
+  name: test-repo
 
 media_folder: "public/uploads"
 public_folder: "/uploads"
 
-publish_mode: editorial_workflow
-
 collections:
-
   - name: "posts"
     label: "Posts"
-
     folder: "src/content/posts"
-
     create: true
-    delete: true
-
-    slug: "{{slug}}"
 
     fields:
+      - { label: "Title", name: "title", widget: "string" }
 
-      - {
-          label: "Title",
-          name: "title",
-          widget: "string"
-        }
-
-      - {
-          label: "Description",
-          name: "description",
-          widget: "text"
-        }
-
-      - {
-          label: "Date",
-          name: "date",
-          widget: "datetime"
-        }
-
-      - {
-          label: "Featured Image",
-          name: "image",
-          widget: "image"
-        }
-
-      - {
-          label: "Tags",
-          name: "tags",
-          widget: "list"
-        }
-
-      - {
-          label: "Body",
-          name: "body",
-          widget: "markdown"
-        }
+      - { label: "Body", name: "body", widget: "markdown" }
