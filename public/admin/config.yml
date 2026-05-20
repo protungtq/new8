@@ -1,10 +1,7 @@
 backend:
   name: github
-
   repo: protungtq/new8
-
   branch: main
-
   base_url: https://decap-auth.mobitungtq.workers.dev
 media_folder: "public/uploads"
 
