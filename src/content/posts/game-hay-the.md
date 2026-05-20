@@ -1,6 +1,6 @@
 ---
 title: Game hay thế
-description: "## chơi ngon không"
+description: Chơi ngon không
 date: 2026-05-20
 image: /images/monkey-hq720.jpg
 ---
