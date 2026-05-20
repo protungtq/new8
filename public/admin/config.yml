@@ -5,10 +5,9 @@ backend:
 
   branch: main
 
-  base_url: https://decap-auth.mobitungtq.workers.dev/
+  base_url: https://decap-auth.mobitungtq.workers.dev
 
   auth_endpoint: auth
-
 media_folder: "public/uploads"
 
 public_folder: "/uploads"
