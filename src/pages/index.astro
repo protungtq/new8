@@ -1,0 +1,131 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ArticleItem from "../components/ArticleItem.astro";
+
+const POSTS_PER_PAGE = 10;
+
+const rawPosts = Object.entries(
+  import.meta.glob('../content/posts/*.md', {
+    eager: true
+  })
+);
+const posts = rawPosts
+  .map(([path, post]) => {
+
+    if (!post || !post.frontmatter) {
+      return null;
+    }
+
+    const slug = path
+      .split('/')
+      .pop()
+      .replace('.md', '');
+
+    return {
+      slug,
+      frontmatter: post.frontmatter
+    };
+
+  })
+  .filter(Boolean);
+
+posts.sort((a, b) => {
+
+  const dateA =
+    a.frontmatter?.date || "2000-01-01";
+
+  const dateB =
+    b.frontmatter?.date || "2000-01-01";
+
+  return new Date(dateB) - new Date(dateA);
+
+});
+
+const visiblePosts = posts.slice(0, POSTS_PER_PAGE);
+---
+
+<BaseLayout title="Game News">
+
+  <main class="max-w-[1180px] mx-auto bg-white min-h-screen px-3 md:px-5 py-5">
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- Feed -->
+      <section class="lg:col-span-8">
+
+        {
+          visiblePosts.map((post) => (
+            <ArticleItem post={post} />
+          ))
+        }
+
+        {
+          posts.length > POSTS_PER_PAGE && (
+
+            <div class="mt-6 flex justify-center">
+
+              <a
+                href="/page/2"
+                class="bg-[#e5e5e5] px-16 py-4 font-semibold"
+              >
+                Xem thêm
+              </a>
+
+            </div>
+
+          )
+        }
+
+      </section>
+
+      <!-- Sidebar -->
+      <aside class="hidden lg:block lg:col-span-4 mt-8 lg:mt-0">
+
+        <div class="border-l-4 border-red-600 pl-3 mb-5">
+
+          <h2 class="font-bold text-[22px] md:text-[28px]">
+            Đọc nhiều
+          </h2>
+
+        </div>
+
+        <div class="space-y-4">
+
+          {
+            posts.slice(0, 5).map((post, index) => (
+
+              <a
+                href={`/posts/${post.slug}`}
+                class="flex gap-3 border-b pb-3"
+              >
+
+                <div class="text-red-600 font-bold text-2xl w-6">
+                  {index + 1}
+                </div>
+
+                <div>
+
+                  <h3 class="font-bold leading-6 text-[17px]">
+                    {post.frontmatter.title}
+                  </h3>
+
+                  <p class="text-sm text-gray-500 mt-1">
+                    {post.frontmatter.date}
+                  </p>
+
+                </div>
+
+              </a>
+
+            ))
+          }
+
+        </div>
+
+      </aside>
+
+    </div>
+
+  </main>
+
+</BaseLayout>

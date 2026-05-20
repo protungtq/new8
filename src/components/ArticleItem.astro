@@ -1,0 +1,57 @@
+---
+const { post } = Astro.props;
+---
+
+<a
+  href={`/posts/${post.slug}`}
+  class="flex gap-3 py-4 border-b border-gray-300"
+>
+
+  <img
+    src={post.frontmatter.image}
+    alt={post.frontmatter.title}
+    loading="lazy"
+    class="
+      w-[120px]
+      h-[72px]
+      md:w-[220px]
+      md:h-[124px]
+      object-cover
+      flex-shrink-0
+    "
+  />
+
+  <div class="min-w-0">
+
+    <h2
+      class="
+        font-bold
+        text-[20px]
+        leading-6
+        md:text-[28px]
+        md:leading-[36px]
+      "
+    >
+      {post.frontmatter.title}
+    </h2>
+
+    <p class="text-[12px] text-gray-500 mt-1">
+      {post.frontmatter.date}
+    </p>
+
+    <p
+      class="
+        hidden
+        md:block
+        text-[14px]
+        leading-6
+        text-gray-700
+        mt-2
+      "
+    >
+      {post.frontmatter.description}
+    </p>
+
+  </div>
+
+</a>
