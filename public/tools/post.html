@@ -40,17 +40,17 @@
     #description { min-height: 90px; resize: vertical; }
     .editor { min-height: 420px; overflow-y: auto; line-height: 1.7; }
     .editor img { max-width: 100%; height: auto; display: block; margin: 10px 0; border-radius: 8px; }
-    .editor img.uploading { opacity: 0.4; filter: blur(3px); border: 2px dashed #6366f1; animation: pulse 1.5s infinite; }
     .editor iframe { max-width: 100%; margin: 10px 0; }
     .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
-    .toolbar button {
+    .toolbar button, .btn-upload-label {
       border: none; background: #111827; color: white; padding: 10px 14px;
       border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s ease; font-size: 14px;
+      display: inline-flex; align-items: center; justify-content: center;
     }
-    .toolbar button:hover { transform: translateY(-1px); opacity: 0.95; }
-    /* Nút xóa link nhanh cho màu đặc biệt */
+    .toolbar button:hover, .btn-upload-label:hover { transform: translateY(-1px); opacity: 0.95; }
     .toolbar button.btn-danger { background: #ef4444; }
     .toolbar button.btn-success { background: #10b981; }
+    .toolbar button.btn-blue { background: #3b82f6; }
     
     .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
     .actions button { border: none; padding: 14px 18px; border-radius: 14px; cursor: pointer; font-size: 15px; font-weight: 600; transition: 0.2s ease; }
@@ -63,12 +63,8 @@
       font-family: Consolas, monospace; font-size: 14px;
     }
     .config-box { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-bottom: 18px; }
-    
-    @keyframes pulse {
-      0% { opacity: 0.4; }
-      50% { opacity: 0.7; }
-      100% { opacity: 0.4; }
-    }
+    .upload-group { display: flex; gap: 8px; margin-top: 6px; }
+    .upload-status { font-size: 13px; color: #4b5563; font-weight: 500; margin-top: 4px; display: block; }
   </style>
 </head>
 <body>
@@ -108,7 +104,14 @@
 
     <div class="field">
       <label>Thumbnail image</label>
-      <input type="text" id="image" oninput="saveToStorage()" />
+      <div class="upload-group">
+        <input type="text" id="image" oninput="saveToStorage()" placeholder="Link ảnh thumbnail..." />
+        <label class="btn-upload-label">
+          📤 Tải ảnh lên
+          <input type="file" accept="image/*" style="display:none;" onchange="uploadFileToFreeImage(this.files[0], 'image')" />
+        </label>
+      </div>
+      <span id="status-thumb" class="upload-status"></span>
     </div>
 
     <div class="field">
@@ -117,7 +120,7 @@
     </div>
 
     <div class="field">
-      <label>Nội dung bài viết (Tự động Rehost ảnh khi paste)</label>
+      <label>Nội dung bài viết</label>
       <div class="toolbar">
         <button onclick="execCmd('bold')">Bold</button>
         <button onclick="execCmd('italic')">Italic</button>
@@ -125,9 +128,16 @@
         <button onclick="execFormat('h3')">H3</button>
         <button onclick="handleHyperlink()" class="btn-success">🔗 Thêm/Sửa Link</button>
         <button onclick="clearAllHyperlinks()" class="btn-danger">🧹 Xóa sạch Link ẩn</button>
-        <button onclick="insertImage()">Chèn ảnh</button>
+        
+        <label class="btn-upload-label" style="background:#3b82f6;">
+          🖼️ Tải ảnh lên bài
+          <input type="file" accept="image/*" style="display:none;" onchange="uploadFileToFreeImage(this.files[0], 'editor')" />
+        </label>
+        <button onclick="insertImageFromUrl()" class="btn-blue">🌐 Up ảnh từ URL</button>
+        
         <button onclick="insertYoutube()">YouTube</button>
       </div>
+      <div id="status-editor" style="font-size:13px; color:#3b82f6; font-weight:600; margin-bottom:8px;"></div>
       <div id="content" class="editor" contenteditable="true" oninput="saveToStorage()"></div>
     </div>
 
@@ -166,64 +176,133 @@ function execFormat(tag) {
   contentBox.focus();
 }
 
-// CHỨC NĂNG 1: THÊM HOẶC CẬP NHẬT HYPERLINK ĐANG CHỌN
 function handleHyperlink() {
   const selection = window.getSelection();
   let selectedNode = selection.anchorNode;
-  
   if (!selectedNode) return;
-  if (selectedNode.nodeType === 3) {
-    selectedNode = selectedNode.parentNode;
-  }
+  if (selectedNode.nodeType === 3) selectedNode = selectedNode.parentNode;
 
-  // Kiểm tra xem đoạn chữ đang chọn có nằm trong một thẻ <a> cũ không
   const existingLink = selectedNode.closest('a');
-  let defaultUrl = "";
-  if (existingLink) {
-    defaultUrl = existingLink.getAttribute('href');
-  }
+  let defaultUrl = existingLink ? existingLink.getAttribute('href') : "";
 
   const url = prompt("Nhập hoặc sửa liên kết URL:", defaultUrl || "https://");
-  if (url === null) return; // Nhấn Cancel
+  if (url === null) return;
 
   if (url.trim() === "") {
-    // Nếu xóa hết chữ trong prompt, gỡ bỏ link cũ luôn
-    if (existingLink) {
-      existingLink.outerHTML = existingLink.innerHTML;
-    }
+    if (existingLink) existingLink.outerHTML = existingLink.innerHTML;
   } else {
-    // Thực hiện chèn hoặc ghi đè link mới
     document.execCommand("createLink", false, url);
   }
-  
   saveToStorage();
   generatePreview();
   contentBox.focus();
 }
 
-// CHỨC NĂNG 2: XÓA SẠCH LINK ẨN CỦA BÀI BÁO GỐC KHI PASTE
 function clearAllHyperlinks() {
-  if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ liên kết (Hyperlink) ẩn trong bài viết không? (Chữ vẫn được giữ nguyên)")) return;
-  
-  const links = contentBox.querySelectorAll('a');
-  links.forEach(link => {
-    // Thay thế thẻ <a> bằng nội dung chữ thuần bên trong của chính nó
-    link.outerHTML = link.innerHTML;
-  });
-  
+  if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ liên kết (Hyperlink) ẩn trong bài viết không?")) return;
+  contentBox.querySelectorAll('a').forEach(link => link.outerHTML = link.innerHTML);
   saveToStorage();
   generatePreview();
   contentBox.focus();
 }
 
-function insertImage() {
-  const url = prompt('Nhập link ảnh:');
-  if (!url) return;
-  const alt = prompt('Nhập ALT ảnh:', 'Image') || 'Image';
-  const imgHtml = `<img src="${url}" alt="${alt}" title="${alt}" />`;
-  document.execCommand('insertHTML', false, imgHtml);
-  saveToStorage();
-  rehostAllImagesInEditor();
+// HÀM CHỦ ĐỘNG XỬ LÝ UPLOAD FILE ẢNH THÔ (DÙNG CHUNG CHO THUMBNAIL VÀ EDITOR)
+async function uploadFileToFreeImage(file, target) {
+  if (!file) return;
+  const apiKey = document.getElementById('fiApiKey').value.trim();
+  
+  const statusEl = target === 'image' ? document.getElementById('status-thumb') : document.getElementById('status-editor');
+  statusEl.textContent = "⏳ Đang tải ảnh lên hệ thống FreeImage...";
+
+  try {
+    const form = new FormData();
+    form.append("key", apiKey);
+    form.append("action", "upload");
+    form.append("format", "json");
+    form.append("source", file);
+
+    const res = await fetch("https://freeimage.host/api/1/upload", { method: "POST", body: form });
+    const result = await res.json();
+
+    if (result && result.status_code === 200) {
+      const newUrl = result.image?.url || result.image?.display_url;
+      
+      if (target === 'image') {
+        document.getElementById('image').value = newUrl;
+        statusEl.textContent = "✅ Tải ảnh thumbnail thành công!";
+      } else {
+        const imgHtml = `<img src="${newUrl}" alt="Image" title="Image" />`;
+        contentBox.focus();
+        document.execCommand('insertHTML', false, imgHtml);
+        statusEl.textContent = "✅ Đã chèn ảnh thành công vào bài viết!";
+        setTimeout(() => statusEl.textContent = "", 3000);
+      }
+      saveToStorage();
+      generatePreview();
+    } else {
+      statusEl.textContent = "❌ Lỗi: " + (result?.status_txt || "API không phản hồi");
+    }
+  } catch (err) {
+    statusEl.textContent = "❌ Lỗi kết nối mạng hoặc API.";
+    console.error(err);
+  }
+}
+
+// CHỨC NĂNG CHỦ ĐỘNG UP ẢNH TỪ URL BÁO KHÁC LÊN FREEIMAGE
+async function insertImageFromUrl() {
+  const originalSrc = prompt('Nhập hoặc dán link ảnh gốc (Ví dụ link từ GameK...):');
+  if (!originalSrc) return;
+
+  const statusEl = document.getElementById('status-editor');
+  statusEl.textContent = "⏳ Đang xử lý bóc tách và chuyển hướng ảnh...";
+
+  const apiKey = document.getElementById('fiApiKey').value.trim();
+
+  try {
+    let imgBlob = null;
+    const proxies = [
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(originalSrc)}`,
+      `https://corsproxy.io/?${encodeURIComponent(originalSrc)}`
+    ];
+
+    for (let proxy of proxies) {
+      try {
+        const imgRes = await fetch(proxy);
+        if (imgRes.ok) { imgBlob = await imgRes.blob(); break; }
+      } catch (e) {}
+    }
+
+    if (!imgBlob) throw new Error("Chặn cào ảnh");
+
+    let mimeType = imgBlob.type || "image/jpeg";
+    let extension = mimeType.split("/")[1] || "jpg";
+
+    const form = new FormData();
+    form.append("key", apiKey);
+    form.append("action", "upload");
+    form.append("format", "json");
+    form.append("source", new File([imgBlob], `image.${extension}`, { type: mimeType }));
+
+    const res = await fetch("https://freeimage.host/api/1/upload", { method: "POST", body: form });
+    const result = await res.json();
+
+    if (result && result.status_code === 200) {
+      const newUrl = result.image?.url || result.image?.display_url;
+      const imgHtml = `<img src="${newUrl}" alt="Image" title="Image" />`;
+      contentBox.focus();
+      document.execCommand('insertHTML', false, imgHtml);
+      statusEl.textContent = "✅ Đã Rehost từ URL thành công!";
+      setTimeout(() => statusEl.textContent = "", 3000);
+      saveToStorage();
+      generatePreview();
+    } else {
+      statusEl.textContent = "❌ API báo lỗi, tự động chèn link gốc làm phương án dự phòng.";
+      document.execCommand('insertHTML', false, `<img src="${originalSrc}" alt="Image" />`);
+    }
+  } catch (err) {
+    statusEl.textContent = "⚠️ Proxy lỗi, tự động chèn link gốc để không gián đoạn bài viết.";
+    document.execCommand('insertHTML', false, `<img src="${originalSrc}" alt="Image" />`);
+  }
 }
 
 function extractYoutubeId(url) {
@@ -240,83 +319,6 @@ function insertYoutube() {
   const iframeHtml = `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
   document.execCommand('insertHTML', false, iframeHtml);
   saveToStorage();
-}
-
-contentBox.addEventListener('paste', () => {
-  setTimeout(() => {
-    saveToStorage();
-    rehostAllImagesInEditor();
-  }, 100);
-});
-
-async function rehostAllImagesInEditor() {
-  const apiKey = document.getElementById('fiApiKey').value.trim();
-  if (!apiKey) return;
-
-  const images = contentBox.querySelectorAll('img:not(.uploaded)');
-  
-  for (let img of images) {
-    const originalSrc = img.getAttribute('src');
-    
-    if (!originalSrc || originalSrc.startsWith('data:') || originalSrc.includes('freeimage.host')) {
-      img.classList.add('uploaded');
-      continue;
-    }
-
-    img.classList.add('uploading');
-
-    try {
-      let imgBlob = null;
-      const proxies = [
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(originalSrc)}`,
-        `https://corsproxy.io/?${encodeURIComponent(originalSrc)}`
-      ];
-
-      for (let proxy of proxies) {
-        try {
-          const imgRes = await fetch(proxy);
-          if (imgRes.ok) {
-            imgBlob = await imgRes.blob();
-            break; 
-          }
-        } catch (e) {
-          console.warn("Proxy lỗi, chuyển đổi dự phòng...");
-        }
-      }
-
-      if (!imgBlob) throw new Error("Lỗi fetch proxy");
-
-      let mimeType = imgBlob.type || "image/jpeg";
-      let extension = mimeType.split("/")[1] || "jpg";
-
-      const form = new FormData();
-      form.append("key", apiKey);
-      form.append("action", "upload");
-      form.append("format", "json");
-      form.append("source", new File([imgBlob], `image.${extension}`, { type: mimeType }));
-
-      const res = await fetch("https://freeimage.host/api/1/upload", {
-        method: "POST",
-        body: form
-      });
-      
-      const result = await res.json();
-
-      if (result && result.status_code === 200) {
-        const newUrl = result.image?.url || result.image?.display_url;
-        img.setAttribute('src', newUrl);
-        img.classList.remove('uploading');
-        img.classList.add('uploaded');
-        
-        saveToStorage();
-        generatePreview();
-      } else {
-        img.classList.remove('uploading');
-      }
-    } catch (err) {
-      img.classList.remove('uploading');
-    }
-  }
 }
 
 function htmlToMarkdown(html) {
