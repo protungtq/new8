@@ -39,12 +39,8 @@
     }
     #description { min-height: 90px; resize: vertical; }
     .editor { min-height: 420px; overflow-y: auto; line-height: 1.7; }
-    .editor img { max-width: 100%; height: auto; display: block; margin: 10px 0; border-radius: 8px; transition: all 0.3s ease; }
-    
-    /* Hiệu ứng mờ và viền nhấp nháy báo hiệu ảnh đang được Rehost ngầm */
-    .editor img.uploading { opacity: 0.3; filter: blur(2px); border: 2px dashed #3b82f6; animation: pulse 1.5s infinite; }
+    .editor img { max-width: 100%; height: auto; display: block; margin: 10px 0; border-radius: 8px; }
     .editor iframe { max-width: 100%; margin: 10px 0; }
-    
     .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
     .toolbar button, .btn-upload-label {
       border: none; background: #111827; color: white; padding: 10px 14px;
@@ -69,12 +65,6 @@
     .config-box { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-bottom: 18px; }
     .upload-group { display: flex; gap: 8px; margin-top: 6px; }
     .upload-status { font-size: 13px; color: #4b5563; font-weight: 500; margin-top: 4px; display: block; }
-    
-    @keyframes pulse {
-      0% { opacity: 0.3; }
-      50% { opacity: 0.6; }
-      100% { opacity: 0.3; }
-    }
   </style>
 </head>
 <body>
@@ -91,6 +81,7 @@
         <label>GitHub Personal Access Token (Lưu cục bộ tại trình duyệt của bạn)</label>
         <input type="password" id="ghToken" placeholder="github_pat_..." oninput="saveConfig()" />
         <input type="hidden" id="fiApiKey" value="6d207e02198a847aa98d0a2a901485a5" />
+        
         <input type="hidden" id="workerProxyUrl" value="https://tq-upload-proxy.mobitungtq.workers.dev/" />
       </div>
     </div>
@@ -131,7 +122,7 @@
     </div>
 
     <div class="field">
-      <label>Nội dung bài viết (Tự động cào và Rehost toàn bộ ảnh khi paste)</label>
+      <label>Nội dung bài viết</label>
       <div class="toolbar">
         <button onclick="execCmd('bold')">Bold</button>
         <button onclick="execCmd('italic')">Italic</button>
@@ -217,92 +208,19 @@ function clearAllHyperlinks() {
   contentBox.focus();
 }
 
-// ==========================================
-// SIÊU LOGIC: TỰ ĐỘNG QUÉT VÀ REHOST TOÀN BỘ ẢNH KHI PASTE NỘI DUNG BÀI VIẾT
-// ==========================================
+// BẮT SỰ KIỆN PASTE FILE ẢNH
 contentBox.addEventListener('paste', async (e) => {
-  // Kiểm tra nếu người dùng paste file ảnh thô trực tiếp từ bộ nhớ tạm
   const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-  let hasFileImage = false;
   for (let item of items) {
     if (item.type.indexOf("image") === 0) {
       e.preventDefault();
       const file = item.getAsFile();
       await uploadViaWorker(file, 'editor');
-      hasFileImage = true;
     }
-  }
-
-  // Nếu không phải paste file ảnh thô, tức là dán văn bản HTML có lẫn thẻ img (Copy nguyên bài báo)
-  if (!hasFileImage) {
-    setTimeout(async () => {
-      saveToStorage();
-      await autoScanAndRehostImages();
-    }, 200);
   }
 });
 
-// Hàm quét toàn bộ bài viết, tìm các ảnh chưa được rehost để tự động xử lý hàng loạt
-async function autoScanAndRehostImages() {
-  const proxyUrl = document.getElementById('workerProxyUrl').value;
-  const apiKey = document.getElementById('fiApiKey').value;
-  const statusEl = document.getElementById('status-editor');
-
-  // Tìm tất cả các thẻ img chưa có class 'uploaded' và không nằm trên freeimage.host
-  const images = contentBox.querySelectorAll('img:not(.uploaded)');
-  let scanCount = 0;
-
-  for (let img of images) {
-    const originalSrc = img.getAttribute('src');
-
-    // Bỏ qua ảnh trống, ảnh Base64 hoặc ảnh đã thuộc hệ thống freeimage sẵn rồi
-    if (!originalSrc || originalSrc.startsWith('data:') || originalSrc.includes('freeimage.host')) {
-      img.classList.add('uploaded');
-      continue;
-    }
-
-    // Đánh dấu hiệu ứng đang xử lý lên tấm ảnh cụ thể đó
-    img.classList.add('uploading');
-    scanCount++;
-    statusEl.textContent = `⏳ Hệ thống đang tự động Rehost ngầm ${scanCount} ảnh phát hiện trong bài...`;
-
-    try {
-      const form = new FormData();
-      form.append("key", apiKey);
-      form.append("action", "upload");
-      form.append("format", "json");
-      form.append("source", originalSrc.trim()); // Gửi URL qua Cloudflare Worker để lách luật CORS
-
-      const res = await fetch(proxyUrl, { method: "POST", body: form });
-      const result = await res.json();
-
-      if (result && result.status_code === 200) {
-        const newUrl = result.image?.url || result.image?.display_url;
-        
-        // Thay thế link gốc bằng link FreeImage sạch sẽ
-        img.setAttribute('src', newUrl);
-        img.classList.remove('uploading');
-        img.classList.add('uploaded'); // Đánh dấu hoàn thành để không bao giờ quét lại
-        
-        saveToStorage();
-        generatePreview();
-      } else {
-        // Nếu lỗi, trả lại trạng thái thường để không bị treo hiệu ứng làm mờ
-        img.classList.remove('uploading');
-      }
-    } catch (err) {
-      img.classList.remove('uploading');
-      console.error("Lỗi tự động rehost ảnh:", err);
-    }
-  }
-
-  if (scanCount > 0) {
-    statusEl.textContent = "✅ Toàn bộ hệ thống ảnh cũ đã được Rehost thành công vĩnh viễn!";
-    setTimeout(() => statusEl.textContent = "", 3000);
-  }
-}
-
-// 1. TẢI FILE ẢNH THÔ QUA PROXY WORKER
+// TÙY CHỌN 1: TẢI FILE ẢNH THÔ QUA PROXY CLOUDFLARE WORKER
 async function uploadViaWorker(file, target) {
   if (!file) return;
   const proxyUrl = document.getElementById('workerProxyUrl').value;
@@ -328,7 +246,7 @@ async function uploadViaWorker(file, target) {
         document.getElementById('image').value = newUrl;
         statusEl.textContent = "✅ Nạp ảnh đại diện bài viết thành công!";
       } else {
-        const imgHtml = `<img src="${newUrl}" class="uploaded" alt="Image" title="Image" />`;
+        const imgHtml = `<img src="${newUrl}" alt="Image" title="Image" />`;
         contentBox.focus();
         document.execCommand('insertHTML', false, imgHtml);
         statusEl.textContent = "✅ Đã tải và chèn ảnh thành công!";
@@ -345,7 +263,7 @@ async function uploadViaWorker(file, target) {
   }
 }
 
-// 2. UP ẢNH TỪ ĐƯỜNG LINK URL THẲNG LÊN FREEIMAGE QUA WORKER
+// TÙY CHỌN 2: UP ẢNH TỪ ĐƯỜNG LINK URL THẲNG LÊN FREEIMAGE QUA WORKER (NÉ HOÀN TOÀN CORS)
 async function uploadUrlViaWorker() {
   const imageUrl = prompt("Nhập hoặc dán link ảnh nguồn cần Rehost (Ví dụ link GameK, Kênh14...):");
   if (!imageUrl || imageUrl.trim() === "") return;
@@ -361,14 +279,14 @@ async function uploadUrlViaWorker() {
     form.append("key", apiKey);
     form.append("action", "upload");
     form.append("format", "json");
-    form.append("source", imageUrl.trim());
+    form.append("source", imageUrl.trim()); // Đóng gói dạng chuỗi ký tự văn bản
 
     const res = await fetch(proxyUrl, { method: "POST", body: form });
     const result = await res.json();
 
     if (result && result.status_code === 200) {
       const newUrl = result.image?.url || result.image?.display_url;
-      const imgHtml = `<img src="${newUrl}" class="uploaded" alt="Image" title="Image" />`;
+      const imgHtml = `<img src="${newUrl}" alt="Image" title="Image" />`;
       contentBox.focus();
       document.execCommand('insertHTML', false, imgHtml);
       statusEl.textContent = "✅ Đã Rehost từ đường link URL thành công!";
