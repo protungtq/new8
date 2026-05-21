@@ -50,6 +50,7 @@
     .toolbar button:hover, .btn-upload-label:hover { transform: translateY(-1px); opacity: 0.95; }
     .toolbar button.btn-danger { background: #ef4444; }
     .toolbar button.btn-success { background: #10b981; }
+    .toolbar button.btn-blue { background: #3b82f6; }
     
     .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
     .actions button { border: none; padding: 14px 18px; border-radius: 14px; cursor: pointer; font-size: 15px; font-weight: 600; transition: 0.2s ease; }
@@ -81,7 +82,7 @@
         <input type="password" id="ghToken" placeholder="github_pat_..." oninput="saveConfig()" />
         <input type="hidden" id="fiApiKey" value="6d207e02198a847aa98d0a2a901485a5" />
         
-        <input type="text" id="workerProxyUrl" oninput="saveConfig()" placeholder="https://my-freeimage-proxy.xxxx.workers.dev" style="margin-top: 10px;" />
+        <input type="hidden" id="workerProxyUrl" value="https://tq-upload-proxy.mobitungtq.workers.dev/" />
       </div>
     </div>
   </div>
@@ -106,7 +107,7 @@
     <div class="field">
       <label>Thumbnail image</label>
       <div class="upload-group">
-        <input type="text" id="image" oninput="saveToStorage()" placeholder="Link ảnh từ hệ thống..." />
+        <input type="text" id="image" oninput="saveToStorage()" placeholder="Link ảnh thumbnail..." />
         <label class="btn-upload-label">
           📤 Tải ảnh lên
           <input type="file" accept="image/*" style="display:none;" onchange="uploadViaWorker(this.files[0], 'image')" />
@@ -131,9 +132,10 @@
         <button onclick="clearAllHyperlinks()" class="btn-danger">🧹 Xóa sạch Link ẩn</button>
         
         <label class="btn-upload-label" style="background:#3b82f6;">
-          🖼️ Tải ảnh vào bài
+          🖼️ Tải ảnh từ máy
           <input type="file" accept="image/*" style="display:none;" onchange="uploadViaWorker(this.files[0], 'editor')" />
         </label>
+        <button onclick="uploadUrlViaWorker()" class="btn-blue">🌐 Up ảnh từ URL</button>
         
         <button onclick="insertYoutube()">YouTube</button>
       </div>
@@ -218,18 +220,13 @@ contentBox.addEventListener('paste', async (e) => {
   }
 });
 
-// LUỒNG TẢI ẢNH QUA PROXY CLOUDFLARE WORKER ĐỘC LẬP
+// TÙY CHỌN 1: TẢI FILE ẢNH THÔ QUA PROXY CLOUDFLARE WORKER
 async function uploadViaWorker(file, target) {
   if (!file) return;
-  const proxyUrl = document.getElementById('workerProxyUrl').value.trim();
-  const apiKey = document.getElementById('fiApiKey').value.trim();
+  const proxyUrl = document.getElementById('workerProxyUrl').value;
+  const apiKey = document.getElementById('fiApiKey').value;
   const statusEl = target === 'image' ? document.getElementById('status-thumb') : document.getElementById('status-editor');
   
-  if (!proxyUrl) {
-    alert("Vui lòng cấu hình đường dẫn Cloudflare Worker Proxy ở phía trên!");
-    return;
-  }
-
   statusEl.textContent = "⏳ Đang tải ảnh lên FreeImage qua Cloudflare Worker Tunnel...";
 
   try {
@@ -239,11 +236,7 @@ async function uploadViaWorker(file, target) {
     form.append("format", "json");
     form.append("source", file);
 
-    const res = await fetch(proxyUrl, {
-      method: "POST",
-      body: form
-    });
-    
+    const res = await fetch(proxyUrl, { method: "POST", body: form });
     const result = await res.json();
 
     if (result && result.status_code === 200) {
@@ -262,10 +255,49 @@ async function uploadViaWorker(file, target) {
       saveToStorage();
       generatePreview();
     } else {
-      statusEl.textContent = "❌ Lỗi: " + (result?.error || "Server từ chối xử lý");
+      statusEl.textContent = "❌ Lỗi: Không thể đẩy ảnh lên kho lưu trữ.";
     }
   } catch (err) {
-    statusEl.textContent = "❌ Lỗi kết nối đến Cloudflare Worker. Hãy kiểm tra lại link proxy.";
+    statusEl.textContent = "❌ Lỗi kết nối thông qua Cloudflare Worker.";
+    console.error(err);
+  }
+}
+
+// TÙY CHỌN 2: UP ẢNH TỪ ĐƯỜNG LINK URL THẲNG LÊN FREEIMAGE QUA WORKER (NÉ HOÀN TOÀN CORS)
+async function uploadUrlViaWorker() {
+  const imageUrl = prompt("Nhập hoặc dán link ảnh nguồn cần Rehost (Ví dụ link GameK, Kênh14...):");
+  if (!imageUrl || imageUrl.trim() === "") return;
+
+  const proxyUrl = document.getElementById('workerProxyUrl').value;
+  const apiKey = document.getElementById('fiApiKey').value;
+  const statusEl = document.getElementById('status-editor');
+
+  statusEl.textContent = "⏳ Đang gửi link ảnh sang hệ thống xử lý Rehost...";
+
+  try {
+    const form = new FormData();
+    form.append("key", apiKey);
+    form.append("action", "upload");
+    form.append("format", "json");
+    form.append("source", imageUrl.trim()); // Đóng gói dạng chuỗi ký tự văn bản
+
+    const res = await fetch(proxyUrl, { method: "POST", body: form });
+    const result = await res.json();
+
+    if (result && result.status_code === 200) {
+      const newUrl = result.image?.url || result.image?.display_url;
+      const imgHtml = `<img src="${newUrl}" alt="Image" title="Image" />`;
+      contentBox.focus();
+      document.execCommand('insertHTML', false, imgHtml);
+      statusEl.textContent = "✅ Đã Rehost từ đường link URL thành công!";
+      setTimeout(() => statusEl.textContent = "", 3000);
+      saveToStorage();
+      generatePreview();
+    } else {
+      statusEl.textContent = "⚠️ Link ảnh lỗi hoặc Server nguồn chặn cào dữ liệu.";
+    }
+  } catch (err) {
+    statusEl.textContent = "❌ Gặp lỗi kết nối đường truyền proxy Worker.";
     console.error(err);
   }
 }
@@ -445,7 +477,6 @@ async function pushToGitHub() {
 
 function saveConfig() {
   localStorage.setItem('gh_studio_token', document.getElementById('ghToken').value);
-  localStorage.setItem('cf_worker_proxy_url', document.getElementById('workerProxyUrl').value);
 }
 
 function saveToStorage() {
@@ -468,9 +499,6 @@ function clearStorage() { localStorage.removeItem('md_studio_data'); }
 function loadFromStorage() {
   const savedToken = localStorage.getItem('gh_studio_token');
   if (savedToken) document.getElementById('ghToken').value = savedToken;
-
-  const savedWorker = localStorage.getItem('cf_worker_proxy_url');
-  if (savedWorker) document.getElementById('workerProxyUrl').value = savedWorker;
 
   const savedData = localStorage.getItem('md_studio_data');
   if (savedData) {
