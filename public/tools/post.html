@@ -233,29 +233,29 @@
 
       <div class="field">
         <label>Title</label>
-        <input type="text" id="title" />
+        <input type="text" id="title" oninput="saveToStorage()" />
       </div>
 
       <div class="field">
         <label>Date</label>
-        <input type="date" id="date" />
+        <input type="date" id="date" oninput="saveToStorage()" />
       </div>
 
     </div>
 
     <div class="field">
       <label>Description</label>
-      <textarea id="description"></textarea>
+      <textarea id="description" oninput="saveToStorage()"></textarea>
     </div>
 
     <div class="field">
       <label>Thumbnail image</label>
-      <input type="text" id="image" />
+      <input type="text" id="image" oninput="saveToStorage()" />
     </div>
 
     <div class="field">
       <label>Tags</label>
-      <input type="text" id="tags" placeholder="Fortnite, Epic Games, Apple" />
+      <input type="text" id="tags" placeholder="Fortnite, Epic Games, Apple" oninput="saveToStorage()" />
     </div>
 
     <div class="field">
@@ -270,7 +270,7 @@
         <button onclick="insertYoutube()">YouTube</button>
       </div>
 
-      <div id="content" class="editor" contenteditable="true"></div>
+      <div id="content" class="editor" contenteditable="true" oninput="saveToStorage()"></div>
     </div>
 
     <div class="actions">
@@ -294,11 +294,13 @@ const contentBox = document.getElementById('content');
 
 function execCmd(command) {
   document.execCommand(command, false, null);
+  saveToStorage();
   contentBox.focus();
 }
 
 function execFormat(tag) {
   document.execCommand('formatBlock', false, `<${tag}>`);
+  saveToStorage();
   contentBox.focus();
 }
 
@@ -309,6 +311,7 @@ function insertImage() {
   
   const imgHtml = `<img src="${url}" alt="${alt}" title="${alt}" />`;
   document.execCommand('insertHTML', false, imgHtml);
+  saveToStorage();
 }
 
 function extractYoutubeId(url) {
@@ -329,9 +332,9 @@ function insertYoutube() {
 
   const iframeHtml = `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
   document.execCommand('insertHTML', false, iframeHtml);
+  saveToStorage();
 }
 
-// BỘ CHUYỂN ĐỔI HTML -> MARKDOWN NÂNG CẤP (XỬ LÝ LỖI KHỬ THẺ LINK BỌC ẢNH)
 function htmlToMarkdown(html) {
   let div = document.createElement('div');
   div.innerHTML = html;
@@ -347,9 +350,7 @@ function htmlToMarkdown(html) {
 
     const tag = node.tagName.toLowerCase();
 
-    // CHỦ ĐỘNG XỬ LÝ THẺ BỌC LINK <a> (ví dụ ảnh copy từ báo thường nằm trong thẻ <a>)
     if (tag === 'a') {
-      // Nếu bên trong thẻ link có chứa thẻ ảnh img, bóc tách lấy nguyên ảnh, bỏ qua link text trùng lặp
       if (node.querySelector('img')) {
         let internalImgMarkdown = '';
         node.childNodes.forEach(child => {
@@ -359,7 +360,6 @@ function htmlToMarkdown(html) {
         });
         return internalImgMarkdown;
       }
-      // Nếu là thẻ link text bình thường thì đưa về cấu trúc link markdown [Text](URL)
       const href = node.getAttribute('href') || '';
       let linkText = '';
       node.childNodes.forEach(child => { linkText += convert(child); });
@@ -385,10 +385,9 @@ function htmlToMarkdown(html) {
       case 'img':
         const src = node.getAttribute('src') || '';
         let alt = node.getAttribute('alt') || 'Image';
-        // Chuẩn hóa xóa bỏ các ký tự dấu ngoặc vuông vuông bị lỗi nếu có trong alt bài cũ
         alt = alt.replace(/[\[\]]/g, '');
         let title = node.getAttribute('title') || alt;
-        title = title.replace(/"/g, '\\"'); // Tránh lỗi nháy kép trong thuộc tính title ảnh
+        title = title.replace(/"/g, '\\"');
         return `\n\n![${alt}](${src} "${title}")\n\n`;
       case 'iframe':
         return `\n\n${node.outerHTML}\n\n`;
@@ -403,7 +402,7 @@ function htmlToMarkdown(html) {
 
   return md.join('')
     .replace(/\n{3,}/g, '\n\n')
-    .replace(/\!\[(.*?)\]\((.*?)\)\s*\"(.*?)\"/g, '![$1]($2 "$3")') // Dọn dẹp khoảng cách thừa cú pháp ảnh
+    .replace(/\!\[(.*?)\]\((.*?)\)\s*\"(.*?)\"/g, '![$1]($2 "$3")')
     .trim();
 }
 
@@ -467,24 +466,56 @@ function exportMarkdown() {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  
+  // Xuất file thành công thì xóa bộ nhớ tạm để sẵn sàng cho bài sau
+  localStorage.removeItem('md_studio_data');
 }
 
+// HÀM LƯU DỮ LIỆU TẠM THỜI VÀO STORAGE
+function saveToStorage() {
+  const data = {
+    title: document.getElementById('title').value,
+    date: document.getElementById('date').value,
+    description: document.getElementById('description').value,
+    image: document.getElementById('image').value,
+    tags: document.getElementById('tags').value,
+    content: contentBox.innerHTML
+  };
+  localStorage.setItem('md_studio_data', JSON.stringify(data));
+}
+
+// HÀM KHÔI PHỤC DỮ LIỆU KHI CHẲNG MAY F5
+function loadFromStorage() {
+  const savedData = localStorage.getItem('md_studio_data');
+  if (savedData) {
+    const data = JSON.parse(savedData);
+    document.getElementById('title').value = data.title || '';
+    document.getElementById('date').value = data.date || formattedToday;
+    document.getElementById('description').value = data.description || '';
+    document.getElementById('image').value = data.image || '';
+    document.getElementById('tags').value = data.tags || '';
+    contentBox.innerHTML = data.content || '';
+  } else {
+    // Nếu không có dữ liệu cũ thì hiển thị bộ dữ liệu mẫu (Sample data)
+    document.getElementById('title').value = 'Hà Phi Yến chẳng cần bikini, một nụ cười đủ "gây bão" mạng.';
+    document.getElementById('description').value = 'Khoảnh khắc rạng rỡ của cô nàng đang nhận được "bão like" từ cộng đồng mạng.';
+    document.getElementById('date').value = formattedToday;
+    document.getElementById('image').value = 'https://gamek.mediacdn.vn/133514250583805952/2026/5/19/img8121-131017-1779176195578-1779176208135180404093.jpeg';
+    document.getElementById('tags').value = 'Hà Phi Yến, Hot Girl, Đời sống';
+    contentBox.innerHTML = '<div>Cộng đồng mạng mới đây lại một lần nữa đổ rầm rầm trước loạt ảnh mới nhất của cô nàng. Không cần trang phục quá cầu kỳ, chỉ một nụ cười tỏa nắng là đủ chiếm trọn mọi ánh nhìn.</div>';
+  }
+  generatePreview();
+}
+
+// Định dạng ngày hiện tại mặc định
 const today = new Date();
 const yyyy = today.getFullYear();
 const mm = String(today.getMonth() + 1).padStart(2, '0');
 const dd = String(today.getDate()).padStart(2, '0');
 const formattedToday = `${yyyy}-${mm}-${dd}`;
 
-/* SAMPLE DATA */
-document.getElementById('title').value = 'Hà Phi Yến chẳng cần bikini, một nụ cười đủ "gây bão" mạng.';
-document.getElementById('description').value = 'Khoảnh khắc rạng rỡ của cô nàng đang nhận được "bão like" từ cộng đồng mạng.';
-document.getElementById('date').value = formattedToday;
-document.getElementById('image').value = 'https://gamek.mediacdn.vn/133514250583805952/2026/5/19/img8121-131017-1779176195578-1779176208135180404093.jpeg';
-document.getElementById('tags').value = 'Hà Phi Yến, Hot Girl, Đời sống';
-
-contentBox.innerHTML = '<div>Cộng đồng mạng mới đây lại một lần nữa đổ rầm rầm trước loạt ảnh mới nhất của cô nàng. Không cần trang phục quá cầu kỳ, chỉ một nụ cười tỏa nắng là đủ chiếm trọn mọi ánh nhìn.</div>';
-
-generatePreview();
+// Gọi hàm chạy khôi phục dữ liệu ngay khi trang tải xong
+loadFromStorage();
 </script>
 
 </body>
