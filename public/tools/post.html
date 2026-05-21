@@ -72,7 +72,8 @@
     }
 
     input,
-    textarea {
+    textarea,
+    .editor {
       width: 100%;
       border: 1px solid #dbe3ee;
       background: white;
@@ -85,7 +86,8 @@
     }
 
     input:focus,
-    textarea:focus {
+    textarea:focus,
+    .editor:focus {
       border-color: #6366f1;
       box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
     }
@@ -95,11 +97,24 @@
       resize: vertical;
     }
 
-    #content {
+    /* Định dạng ô soạn thảo kiểu Blogger */
+    .editor {
       min-height: 420px;
-      resize: vertical;
+      overflow-y: auto;
       line-height: 1.7;
-      font-family: Consolas, monospace;
+    }
+    
+    .editor img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 10px 0;
+      border-radius: 8px;
+    }
+    
+    .editor iframe {
+      max-width: 100%;
+      margin: 10px 0;
     }
 
     .toolbar {
@@ -198,7 +213,7 @@
         white-space: nowrap;
       }
 
-      #content {
+      .editor {
         min-height: 320px;
       }
     }
@@ -248,15 +263,15 @@
       <label>Nội dung bài viết</label>
 
       <div class="toolbar">
-        <button onclick="insertText('**','**')">Bold</button>
-        <button onclick="insertText('*','*')">Italic</button>
-        <button onclick="insertPrefix('## ')">H2</button>
-        <button onclick="insertPrefix('### ')">H3</button>
+        <button onclick="execCmd('bold')">Bold</button>
+        <button onclick="execCmd('italic')">Italic</button>
+        <button onclick="execFormat('h2')">H2</button>
+        <button onclick="execFormat('h3')">H3</button>
         <button onclick="insertImage()">Chèn ảnh</button>
         <button onclick="insertYoutube()">YouTube</button>
       </div>
 
-      <textarea id="content"></textarea>
+      <div id="content" class="editor" contenteditable="true"></div>
     </div>
 
     <div class="actions">
@@ -276,124 +291,131 @@
 </div>
 
 <script>
-
 const contentBox = document.getElementById('content');
 
-function insertText(before, after) {
-  const start = contentBox.selectionStart;
-  const end = contentBox.selectionEnd;
-
-  const selected = contentBox.value.substring(start, end);
-  const replacement = before + selected + after;
-
-  contentBox.setRangeText(replacement);
+// Các hàm định dạng trực quan kiểu Word/Blogger
+function execCmd(command) {
+  document.execCommand(command, false, null);
   contentBox.focus();
 }
 
-function insertPrefix(prefix) {
-  const start = contentBox.selectionStart;
-  const end = contentBox.selectionEnd;
-
-  const selected = contentBox.value.substring(start, end);
-
-  contentBox.setRangeText(prefix + selected);
+function execFormat(tag) {
+  document.execCommand('formatBlock', false, `<${tag}>`);
   contentBox.focus();
 }
 
 function insertImage() {
-
   const url = prompt('Nhập link ảnh:');
-
   if (!url) return;
-
   const alt = prompt('Nhập ALT ảnh:', 'Image') || 'Image';
-
-  const title = prompt('Nhập TITLE ảnh:', alt) || alt;
-
-  const markdown = `\n![${alt}](${url} "${title}")\n`;
-
-  const start = contentBox.selectionStart;
-  const end = contentBox.selectionEnd;
-
-  const text = contentBox.value;
-
-  contentBox.value =
-    text.substring(0, start) +
-    markdown +
-    text.substring(end);
-
-  contentBox.focus();
+  
+  const imgHtml = `<img src="${url}" alt="${alt}" title="${alt}" />`;
+  document.execCommand('insertHTML', false, imgHtml);
 }
 
 function extractYoutubeId(url) {
-  const regExp =
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/;
-
+  const regExp = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
   const match = url.match(regExp);
-
   return match ? match[1] : null;
 }
 
 function insertYoutube() {
-
   const url = prompt('Dán link YouTube:');
-
   if (!url) return;
 
   const videoId = extractYoutubeId(url);
-
   if (!videoId) {
     alert('Link YouTube không hợp lệ');
     return;
   }
 
-  const iframe =
-`\n<iframe width="100%" height="500" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>\n`;
+  const iframeHtml = `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
+  document.execCommand('insertHTML', false, iframeHtml);
+}
 
-  const start = contentBox.selectionStart;
-  const end = contentBox.selectionEnd;
+// Bộ chuyển đổi cấu trúc HTML trong ô soạn thảo thành cú pháp Markdown chuẩn
+function htmlToMarkdown(html) {
+  let div = document.createElement('div');
+  div.innerHTML = html;
 
-  const text = contentBox.value;
+  let md = [];
 
-  contentBox.value =
-    text.substring(0, start) +
-    iframe +
-    text.substring(end);
+  function convert(node) {
+    if (node.nodeType === 3) { // Text node
+      return node.nodeValue;
+    }
+    
+    if (node.nodeType !== 1) return ''; // Không phải element
 
-  contentBox.focus();
+    let childText = '';
+    node.childNodes.forEach(child => {
+      childText += convert(child);
+    });
+
+    const tag = node.tagName.toLowerCase();
+
+    switch (tag) {
+      case 'h2': return `\n\n## ${childText.trim()}\n\n`;
+      case 'h3': return `\n\n### ${childText.trim()}\n\n`;
+      case 'strong':
+      case 'b': return `**${childText}**`;
+      case 'em':
+      case 'i': return `*${childText}*`;
+      case 'p':
+      case 'div': 
+        return childText.trim() ? `\n\n${childText.trim()}\n\n` : '';
+      case 'br': return '\n';
+      case 'img':
+        const src = node.getAttribute('src') || '';
+        const alt = node.getAttribute('alt') || 'Image';
+        const title = node.getAttribute('title') || alt;
+        return `\n\n![${alt}](${src} "${title}")\n\n`;
+      case 'iframe':
+        // Giữ nguyên thẻ iframe cho video Youtube trong file markdown
+        return `\n\n${node.outerHTML}\n\n`;
+      default:
+        return childText;
+    }
+  }
+
+  div.childNodes.forEach(node => {
+    md.push(convert(node));
+  });
+
+  // Dọn dẹp các khoảng trắng và dòng trống dư thừa
+  return md.join('')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
 }
 
 function generateMarkdown() {
-
   const title = document.getElementById('title').value.trim();
   const description = document.getElementById('description').value.trim();
   const date = document.getElementById('date').value;
   const image = document.getElementById('image').value.trim();
   const tagsInput = document.getElementById('tags').value.trim();
-  const content = document.getElementById('content').value.trim();
+  
+  // Lấy toàn bộ HTML của ô nhập nội dung và chuyển sang Markdown
+  const contentHtml = contentBox.innerHTML;
+  const contentMarkdown = htmlToMarkdown(contentHtml);
 
   const tags = tagsInput
     .split(',')
     .map(tag => tag.trim())
     .filter(tag => tag.length > 0);
 
-  const tagLines = tags
-    .map(tag => `  - ${tag}`)
-    .join('\n');
+  const tagLines = tags.length > 0 
+    ? '\ntags:\n' + tags.map(tag => `  - ${tag}`).join('\n') 
+    : '';
 
   return `---
 title: "${title}"
 description: "${description}"
 date: "${date}"
-
-image: "${image}"
-
-tags:
-${tagLines}
+image: "${image}"${tagLines}
 ---
 
-${content}
-`;
+${contentMarkdown}`;
 }
 
 function generatePreview() {
@@ -412,17 +434,11 @@ function slugify(text) {
 }
 
 function exportMarkdown() {
-
   const markdown = generateMarkdown();
-
   const title = document.getElementById('title').value.trim();
-
   const filename = slugify(title) || 'article';
 
-  const blob = new Blob([markdown], {
-    type: 'text/markdown'
-  });
-
+  const blob = new Blob([markdown], { type: 'text/markdown' });
   const link = document.createElement('a');
 
   link.href = URL.createObjectURL(blob);
@@ -433,31 +449,20 @@ function exportMarkdown() {
   document.body.removeChild(link);
 }
 
-/* SAMPLE */
-
-document.getElementById('title').value =
-  'Fortnite chính thức quay trở lại App Store toàn cầu';
-
-
-document.getElementById('description').value =
-  'Epic Games xác nhận Fortnite đã quay trở lại App Store trên iPhone và iPad sau nhiều năm vắng bóng.';
-
-
+/* SAMPLE DATA */
+document.getElementById('title').value = 'Fortnite chính thức quay trở lại App Store toàn cầu';
+document.getElementById('description').value = 'Epic Games xác nhận Fortnite đã quay trở lại App Store trên iPhone và iPad sau nhiều năm vắng bóng.';
 document.getElementById('date').value = '2026-05-20';
+document.getElementById('image').value = 'https://game8.vn/media/202307/images/2007-Fortnite-1.jpg';
+document.getElementById('tags').value = 'Fortnite, Epic Games, Apple, iOS';
 
-
-document.getElementById('image').value =
-  'https://game8.vn/media/202307/images/2007-Fortnite-1.jpg';
-
-
-document.getElementById('tags').value =
-  'Fortnite, Epic Games, Apple, iOS';
-
+// Thêm nội dung mẫu trực quan
+contentBox.innerHTML = '<div>Epic Games xác nhận trò chơi sinh tồn nổi tiếng <strong>Fortnite</strong> đã chính thức quay trở lại nền tảng iOS thông qua cửa hàng ứng dụng bên thứ ba tại khu vực Châu Âu và các giải pháp đám mây trên toàn cầu.</div>' +
+  '<img src="https://game8.vn/media/202307/images/2007-Fortnite-1.jpg" alt="Fortnite Quay Trở Lại" title="Fortnite iOS" />' +
+  '<div>Đây là bước ngoặt lớn sau cuộc chiến pháp lý kéo dài nhiều năm giữa Epic và Apple.</div>';
 
 generatePreview();
-
 </script>
 
 </body>
 </html>
-
