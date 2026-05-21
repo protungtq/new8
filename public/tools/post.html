@@ -38,7 +38,7 @@
       border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
     }
     #description { min-height: 90px; resize: vertical; }
-    .editor { min-height: 420px; overflow-y: auto; line-height: 1.7; }
+    .editor { min-height: 420px; overflow-y: auto; line-height: 1.7; white-space: pre-wrap; }
     .editor img { max-width: 100%; height: auto; display: block; margin: 10px 0; border-radius: 8px; transition: all 0.3s ease; }
     .editor img.uploading { opacity: 0.3; filter: blur(2px); border: 2px dashed #3b82f6; animation: pulse 1.5s infinite; }
     .editor iframe { max-width: 100%; margin: 10px 0; }
@@ -204,6 +204,7 @@ function handleHyperlink() {
   contentBox.focus();
 }
 
+// Xóa sạch các thẻ link ẩn
 function clearAllHyperlinks() {
   if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ liên kết (Hyperlink) ẩn trong bài viết không?")) return;
   contentBox.querySelectorAll('a').forEach(link => link.outerHTML = link.innerHTML);
@@ -212,7 +213,7 @@ function clearAllHyperlinks() {
   contentBox.focus();
 }
 
-// HÀM TIỆN ÍCH: CHUYỂN ĐỔI CHUỖI BASE64 SANG FILE NHỊ PHÂN VẬT LÝ (BLOB)
+// Hàm hỗ trợ chuyển đổi chuỗi mã hóa Base64 sang File vật lý nhị phân
 function base64ToBlob(base64Data, contentType) {
   contentType = contentType || '';
   const sliceSize = 1024;
@@ -231,7 +232,7 @@ function base64ToBlob(base64Data, contentType) {
   return new Blob(byteArrays, {type: contentType});
 }
 
-// THEO DÕI SỰ KIỆN PASTE
+// LẮNG NGHE SỰ KIỆN PASTE
 contentBox.addEventListener('paste', async (e) => {
   const items = (e.clipboardData || e.originalEvent.clipboardData).items;
   let hasFileImage = false;
@@ -244,34 +245,78 @@ contentBox.addEventListener('paste', async (e) => {
     }
   }
 
-  if (!hasFileImage) {
-    setTimeout(async () => {
-      saveToStorage();
-      await autoScanAndRehostImages();
-    }, 200);
-  }
+  // Chờ dữ liệu chữ/HTML đổ vào ô nhập liệu ổn định rồi tiến hành xử lý quét sâu
+  setTimeout(async () => {
+    saveToStorage();
+    await deepScanAndRehostAllImages();
+  }, 300);
 });
 
-// HÀM TỰ ĐỘNG QUÉT VÀ REHOST (NÂNG CẤP XỬ LÝ ĐƯỢC CẢ ẢNH BASE64 TRONG NỘI DUNG)
-async function autoScanAndRehostImages() {
+// ==========================================
+// CƠ CHẾ SỬA LỖI ĐỘC QUYỀN: QUÉT CẢ THẺ HTML <img> LẪN CHUỖI VĂN BẢN MARKDOWN BASE64
+// ==========================================
+async function deepScanAndRehostAllImages() {
   const proxyUrl = document.getElementById('workerProxyUrl').value;
   const apiKey = document.getElementById('fiApiKey').value;
   const statusEl = document.getElementById('status-editor');
-
-  const images = contentBox.querySelectorAll('img:not(.uploaded)');
+  
+  let contentHtml = contentBox.innerHTML;
   let scanCount = 0;
 
-  for (let img of images) {
-    const originalSrc = img.getAttribute('src');
+  // PHẦN 1: Dùng biểu thức chính quy (RegEx) quét sạch văn bản có cấu trúc Markdown chứa chuỗi Base64
+  // Khớp chính xác cụm: ![Image](data:image/jpeg;base64,xxxx "Image") hoặc dạng tương đương
+  const markdownBase64Regex = /!\[.*?\]\((data:image\/(jpeg|png|gif|jpg|webp);base64,([^"\s\)]+))([^\)]*)\)/g;
+  let match;
+  
+  // Tạo danh sách lưu các chuỗi text cần thay thế để xử lý tuần tự không bị chồng chéo
+  const tasks = [];
+  while ((match = markdownBase64Regex.exec(contentHtml)) !== null) {
+    const fullMarkdownText = match[0]; // Toàn bộ cụm chữ văn bản Markdown
+    const mimeType = `image/${match[2]}`;
+    const base64Str = match[3];
+    const extension = match[2];
+    
+    tasks.push({
+      type: 'text',
+      rawText: fullMarkdownText,
+      mimeType: mimeType,
+      base64Str: base64Str,
+      extension: extension
+    });
+  }
 
-    if (!originalSrc || originalSrc.includes('freeimage.host')) {
+  // PHẦN 2: Quét song song các thẻ HTML <img> truyền thống chưa được xử lý
+  const htmlImages = contentBox.querySelectorAll('img:not(.uploaded)');
+  for (let img of htmlImages) {
+    const src = img.getAttribute('src');
+    if (!src || src.includes('freeimage.host')) {
       img.classList.add('uploaded');
       continue;
     }
+    
+    if (src.startsWith('data:image')) {
+      const parts = src.split(',');
+      const mimeType = parts[0].match(/:(.*?);/)[1];
+      const base64Str = parts[1];
+      const extension = mimeType.split('/')[1] || 'jpg';
+      tasks.push({ type: 'html', element: img, mimeType: mimeType, base64Str: base64Str, extension: extension });
+    } else {
+      tasks.push({ type: 'html', element: img, srcUrl: src.trim() });
+    }
+  }
 
-    img.classList.add('uploading');
+  // PHẦN 3: Thực thi chạy luồng đồng bộ xử lý upload hàng loạt qua Worker Tunnel
+  if (tasks.length === 0) return;
+
+  statusEl.textContent = `⏳ Hệ thống phát hiện ${tasks.length} dữ liệu ảnh chưa Rehost. Đang tiến hành xử lý...`;
+
+  for (let task of tasks) {
     scanCount++;
-    statusEl.textContent = `⏳ Hệ thống đang tự động Rehost ngầm ${scanCount} ảnh phát hiện trong bài...`;
+    
+    // Nếu là phần tử HTML, gắn hiệu ứng nhấp nháy làm mờ
+    if (task.type === 'html' && task.element) {
+      task.element.classList.add('uploading');
+    }
 
     try {
       const form = new FormData();
@@ -279,20 +324,12 @@ async function autoScanAndRehostImages() {
       form.append("action", "upload");
       form.append("format", "json");
 
-      // KIỂM TRA NẾU ẢNH LÀ LOẠI MÃ HÓA BASE64 ĐƯỢC CHÈN SẴN TRONG HTML
-      if (originalSrc.startsWith('data:image')) {
-        // Tách chuỗi lấy kiểu dữ liệu (MimeType) và chuỗi mã hóa thực tế
-        const parts = originalSrc.split(',');
-        const mimeType = parts[0].match(/:(.*?);/)[1];
-        const base64Str = parts[1];
-        const extension = mimeType.split('/')[1] || 'jpg';
-        
-        // Chuyển chuỗi chữ thô thành file nhị phân vật lý ngay trên trình duyệt
-        const imageBlob = base64ToBlob(base64Str, mimeType);
-        form.append("source", new File([imageBlob], `rehost_base64.${extension}`, { type: mimeType }));
-      } else {
-        // Nếu là URL ảnh bình thường (GameK, Kênh14...), gửi chuỗi URL chữ thô như cũ
-        form.append("source", originalSrc.trim());
+      // Đóng gói tệp tin gửi đi dựa trên cấu trúc ảnh đầu vào
+      if (task.base64Str) {
+        const imageBlob = base64ToBlob(task.base64Str, task.mimeType);
+        form.append("source", new File([imageBlob], `rehost.${task.extension}`, { type: task.mimeType }));
+      } else if (task.srcUrl) {
+        form.append("source", task.srcUrl);
       }
 
       const res = await fetch(proxyUrl, { method: "POST", body: form });
@@ -300,27 +337,35 @@ async function autoScanAndRehostImages() {
 
       if (result && result.status_code === 200) {
         const newUrl = result.image?.url || result.image?.display_url;
-        img.setAttribute('src', newUrl);
-        img.classList.remove('uploading');
-        img.classList.add('uploaded');
+        
+        if (task.type === 'text') {
+          // Xử lý thay thế chữ văn bản Markdown bằng thẻ ảnh HTML sạch có class 'uploaded'
+          contentHtml = contentBox.innerHTML; // Đồng bộ lại HTML mới nhất trước khi replace
+          const freshImgHtml = `<img src="${newUrl}" class="uploaded" alt="Image" title="Image" />`;
+          contentHtml = contentHtml.replace(task.rawText, freshImgHtml);
+          contentBox.innerHTML = contentHtml;
+        } else if (task.type === 'html' && task.element) {
+          task.element.setAttribute('src', newUrl);
+          task.element.classList.remove('uploading');
+          task.element.classList.add('uploaded');
+        }
         
         saveToStorage();
         generatePreview();
       } else {
-        img.classList.remove('uploading');
+        if (task.type === 'html' && task.element) task.element.classList.remove('uploading');
       }
     } catch (err) {
-      img.classList.remove('uploading');
-      console.error("Lỗi tự động rehost ảnh:", err);
+      if (task.type === 'html' && task.element) task.element.classList.remove('uploading');
+      console.error("Lỗi luồng cào ảnh ngầm:", err);
     }
   }
 
-  if (scanCount > 0) {
-    statusEl.textContent = "✅ Toàn bộ hệ thống ảnh (bao gồm ảnh nhúng Base64) đã được Rehost thành công vĩnh viễn!";
-    setTimeout(() => statusEl.textContent = "", 3000);
-  }
+  statusEl.textContent = "✅ Đã quét và Rehost thành công toàn bộ ảnh!";
+  setTimeout(() => statusEl.textContent = "", 3000);
 }
 
+// TẢI FILE ẢNH THÔ QUA PROXY WORKER (KHI CHỌN FILE HOẶC KÉO THẢ)
 async function uploadViaWorker(file, target) {
   if (!file) return;
   const proxyUrl = document.getElementById('workerProxyUrl').value;
@@ -363,6 +408,7 @@ async function uploadViaWorker(file, target) {
   }
 }
 
+// UP ẢNH TỪ ĐƯỜNG LINK URL THẲNG LÊN FREEIMAGE QUA WORKER
 async function uploadUrlViaWorker() {
   const imageUrl = prompt("Nhập hoặc dán link ảnh nguồn cần Rehost:");
   if (!imageUrl || imageUrl.trim() === "") return;
