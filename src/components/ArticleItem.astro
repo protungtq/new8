@@ -1,42 +1,58 @@
 ---
 const { post } = Astro.props;
+
+// Hàm định dạng ngày tháng hiển thị sang kiểu Việt Nam (DD/MM/YYYY)
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric"
+    });
+  } catch (e) {
+    return dateString;
+  }
+};
+
+const displayDate = formatDate(post.frontmatter.date);
 ---
 
 <a
   href={`/posts/${post.slug}`}
-  class="flex gap-3 py-4 border-b border-gray-300"
+  class="group flex gap-4 py-5 border-b border-gray-100 last:border-0 transition-all duration-300"
 >
+  <div class="w-[120px] h-[72px] md:w-[220px] md:h-[124px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 border border-gray-100">
+    <img
+      src={post.frontmatter.image}
+      alt={post.frontmatter.title}
+      loading="lazy"
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+    />
+  </div>
 
-  <img
-    src={post.frontmatter.image}
-    alt={post.frontmatter.title}
-    loading="lazy"
-    class="
-      w-[120px]
-      h-[72px]
-      md:w-[220px]
-      md:h-[124px]
-      object-cover
-      flex-shrink-0
-    "
-  />
-
-  <div class="min-w-0">
-
+  <div class="min-w-0 flex flex-col justify-center">
     <h2
       class="
         font-bold
-        text-[20px]
-        leading-6
-        md:text-[28px]
-        md:leading-[36px]
+        text-[16px]
+        leading-snug
+        md:text-[22px]
+        md:leading-[30px]
+        text-gray-900
+        group-hover:text-red-600
+        transition-colors
+        duration-200
+        line-clamp-2
       "
     >
       {post.frontmatter.title}
     </h2>
 
-    <p class="text-[12px] text-gray-500 mt-1">
-      {post.frontmatter.date}
+    <p class="text-[12px] text-gray-400 mt-1.5 flex items-center gap-1.5">
+      <span class="inline-block w-1.5 h-1.5 rounded-full bg-gray-200 group-hover:bg-red-400 transition-colors"></span>
+      {displayDate}
     </p>
 
     <p
@@ -44,14 +60,13 @@ const { post } = Astro.props;
         hidden
         md:block
         text-[14px]
-        leading-6
-        text-gray-700
+        leading-relaxed
+        text-gray-500
         mt-2
+        line-clamp-2
       "
     >
       {post.frontmatter.description}
     </p>
-
   </div>
-
 </a>
