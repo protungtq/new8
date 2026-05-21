@@ -61,9 +61,9 @@
       padding: 22px; overflow-x: auto; white-space: pre-wrap; line-height: 1.8;
       font-family: Consolas, monospace; font-size: 14px;
     }
-    .config-box { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-bottom: 18px; }
+    .config-box { background: #f1f5f9; border: 1px solid #e2e2e0; border-radius: 16px; padding: 16px; margin-bottom: 18px; }
     .upload-group { display: flex; gap: 8px; margin-top: 6px; }
-    .upload-status { font-size: 13px; color: #10b981; font-weight: 600; margin-top: 4px; display: block; }
+    .upload-status { font-size: 13px; color: #4b5563; font-weight: 500; margin-top: 4px; display: block; }
   </style>
 </head>
 <body>
@@ -79,6 +79,7 @@
       <div>
         <label>GitHub Personal Access Token (Lưu cục bộ tại trình duyệt của bạn)</label>
         <input type="password" id="ghToken" placeholder="github_pat_..." oninput="saveConfig()" />
+        <input type="hidden" id="uploadServerUrl" value="https://upanh.tuoitreit.vn/upload.php" />
       </div>
     </div>
   </div>
@@ -103,10 +104,10 @@
     <div class="field">
       <label>Thumbnail image</label>
       <div class="upload-group">
-        <input type="text" id="image" oninput="saveToStorage()" placeholder="Link hoặc mã Base64 ảnh thumbnail..." />
+        <input type="text" id="image" oninput="saveToStorage()" placeholder="Link ảnh từ hệ thống upanh..." />
         <label class="btn-upload-label">
           📤 Tải ảnh lên
-          <input type="file" accept="image/*" style="display:none;" onchange="processLocalFile(this.files[0], 'image')" />
+          <input type="file" accept="image/*" style="display:none;" onchange="uploadToBackend(this.files[0], 'image')" />
         </label>
       </div>
       <span id="status-thumb" class="upload-status"></span>
@@ -129,12 +130,12 @@
         
         <label class="btn-upload-label" style="background:#3b82f6;">
           🖼️ Tải ảnh vào bài
-          <input type="file" accept="image/*" style="display:none;" onchange="processLocalFile(this.files[0], 'editor')" />
+          <input type="file" accept="image/*" style="display:none;" onchange="uploadToBackend(this.files[0], 'editor')" />
         </label>
         
         <button onclick="insertYoutube()">YouTube</button>
       </div>
-      <div id="status-editor" style="font-size:13px; color:#10b981; font-weight:600; margin-bottom:8px;"></div>
+      <div id="status-editor" style="font-size:13px; color:#3b82f6; font-weight:600; margin-bottom:8px;"></div>
       <div id="content" class="editor" contenteditable="true" oninput="saveToStorage()"></div>
     </div>
 
@@ -203,44 +204,62 @@ function clearAllHyperlinks() {
   contentBox.focus();
 }
 
-// BẮT SỰ KIỆN PASTE FILE ẢNH THÔ TỪ CLIPBOARD (BẤM COPY IMAGE Ở TRANG KHÁC RỒI PASTE)
-contentBox.addEventListener('paste', (e) => {
+// BẮT SỰ KIỆN PASTE FILE ẢNH TỪ CLIPBOARD (PASTE ẢNH THÔ)
+contentBox.addEventListener('paste', async (e) => {
   const items = (e.clipboardData || e.originalEvent.clipboardData).items;
   for (let item of items) {
     if (item.type.indexOf("image") === 0) {
       e.preventDefault();
       const file = item.getAsFile();
-      processLocalFile(file, 'editor');
+      await uploadToBackend(file, 'editor');
     }
   }
 });
 
-// CƠ CHẾ CHUYỂN ĐỔI ẢNH CỤC BỘ SANG BASE64 ĐỂ NÉ TOÀN BỘ LỖI CORS VÀ X-FRAME
-function processLocalFile(file, target) {
+// HÀM ĐẨY ẢNH QUA SERVER BACKEND TRUNG CHUYỂN HOÀN TOÀN KHÔNG LỖI CORS
+async function uploadToBackend(file, target) {
   if (!file) return;
-  
+  const serverUrl = document.getElementById('uploadServerUrl').value;
   const statusEl = target === 'image' ? document.getElementById('status-thumb') : document.getElementById('status-editor');
-  statusEl.textContent = "⚡ Đang mã hóa và chèn ảnh cục bộ...";
+  
+  statusEl.textContent = "⏳ Đang chuyển tiếp ảnh lên cổng lưu trữ tuoitreit...";
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const base64Url = e.target.result;
+  try {
+    const form = new FormData();
+    // Đóng gói theo chuẩn cấu trúc tham số mà file upload.php yêu cầu
+    form.append("type", "upload");
+    form.append("fileupload[]", file); // Tên trường nhận file mảng của jQuery FileUpload
+
+    const res = await fetch(serverUrl, {
+      method: "POST",
+      body: form
+    });
     
-    if (target === 'image') {
-      document.getElementById('image').value = base64Url;
-      statusEl.textContent = "✅ Đã nạp ảnh Thumbnail!";
+    const result = await res.json();
+
+    // Hệ thống tuoitreit trả về mảng kết quả hoặc object chứa url trực tiếp
+    if (result && (result.url || (result.files && result.files[0]?.url))) {
+      const directUrl = result.url || result.files[0].url;
+      
+      if (target === 'image') {
+        document.getElementById('image').value = directUrl;
+        statusEl.textContent = "✅ Nạp ảnh đại diện bài viết thành công!";
+      } else {
+        const imgHtml = `<img src="${directUrl}" alt="Image" title="Image" />`;
+        contentBox.focus();
+        document.execCommand('insertHTML', false, imgHtml);
+        statusEl.textContent = "✅ Đã Rehost ảnh thành công!";
+        setTimeout(() => statusEl.textContent = "", 3000);
+      }
+      saveToStorage();
+      generatePreview();
     } else {
-      contentBox.focus();
-      const imgHtml = `<img src="${base64Url}" alt="Embedded Image" title="Embedded Image" />`;
-      document.execCommand('insertHTML', false, imgHtml);
-      statusEl.textContent = "✅ Đã chèn ảnh vào bài viết!";
-      setTimeout(() => statusEl.textContent = "", 3000);
+      statusEl.textContent = "❌ Lỗi cấu hình tham số truyền tải từ Server.";
     }
-    
-    saveToStorage();
-    generatePreview();
-  };
-  reader.readAsDataURL(file);
+  } catch (err) {
+    statusEl.textContent = "❌ Lỗi: Server tuoitreit chưa bật cấu hình CORS mở rộng cho tên miền này.";
+    console.error(err);
+  }
 }
 
 function insertYoutube() {

@@ -1,6 +1,4 @@
 {
-  "frontMatter.git.enabled": true,
-
   "emeraldwalk.runonsave": {
     "commands": [
       {
