@@ -40,7 +40,6 @@
     }
     #description { min-height: 80px; resize: vertical; font-size: 13.5px; line-height: 1.5; }
     
-    /* FIX LỖI KÉO DÀI: Khóa chiều cao cố định và bật thanh cuộn nội bộ tự động */
     .editor { 
       height: 550px; 
       max-height: 550px; 
@@ -68,7 +67,6 @@
     .toolbar button.btn-blue { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
     .toolbar button.btn-blue:hover { background: #bfdbfe; }
     
-    /* Nút căn lề */
     .toolbar button.btn-align { background: #f8fafc; color: #475569; }
     .toolbar button.btn-align:hover { background: #e2e8f0; }
     
@@ -120,8 +118,8 @@
         <input type="text" id="title" placeholder="Nhập tiêu đề bài viết..." oninput="saveToStorage()" />
       </div>
       <div class="field">
-        <label>Ngày xuất bản (Date)</label>
-        <input type="date" id="date" oninput="saveToStorage()" />
+        <label>Ngày & Giờ xuất bản (Date & Time)</label>
+        <input type="datetime-local" id="date" oninput="saveToStorage()" />
       </div>
     </div>
 
@@ -185,15 +183,17 @@
 </div>
 
 <script>
+// Tự động khởi tạo cấu trúc Ngày giờ mặc định chính xác từng giây theo múi giờ hệ thống
 const today = new Date();
 const yyyy = today.getFullYear();
 const mm = String(today.getMonth() + 1).padStart(2, '0');
 const dd = String(today.getDate()).padStart(2, '0');
-const formattedToday = `${yyyy}-${mm}-${dd}`;
+const hh = String(today.getHours()).padStart(2, '0');
+const min = String(today.getMinutes()).padStart(2, '0');
+const ss = String(today.getSeconds()).padStart(2, '0');
 
-let currentHours = String(today.getHours()).padStart(2, '0');
-let currentMinutes = String(today.getMinutes()).padStart(2, '0');
-let currentSeconds = String(today.getSeconds()).padStart(2, '0');
+// Định dạng chuẩn cho input datetime-local là YYYY-MM-DDTHH:mm
+const formattedTodayWithTime = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
 
 const contentBox = document.getElementById('content');
 
@@ -524,6 +524,7 @@ function htmlToMarkdown(html) {
   return md.join('').replace(/\n{3,}/g, '\n\n').trim();
 }
 
+// ĐÃ NÂNG CẤP: Chuyển đổi dữ liệu datetime-local thành cấu trúc chuỗi ISO chuẩn chỉnh cho frontmatter
 function generateMarkdown() {
   const rawTitle = document.getElementById('title').value.trim();
   const title = rawTitle.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -531,23 +532,15 @@ function generateMarkdown() {
   const rawDescription = document.getElementById('description').value.trim();
   const description = rawDescription.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   
-  const dateInput = document.getElementById('date').value;
+  const dateTimeInput = document.getElementById('date').value;
   const image = document.getElementById('image').value.trim();
   const tagsInput = document.getElementById('tags').value.trim();
   
-  let finalDateTime = dateInput;
-  if (dateInput) {
-    const now = new Date();
-    const inputDateObj = new Date(dateInput);
-    
-    let h = currentHours, m = currentMinutes, s = currentSeconds;
-    if (now.toDateString() === inputDateObj.toDateString()) {
-      h = String(now.getHours()).padStart(2, '0');
-      m = String(now.getMinutes()).padStart(2, '0');
-      s = String(now.getSeconds()).padStart(2, '0');
-      currentHours = h; currentMinutes = m; currentSeconds = s;
-    }
-    finalDateTime = `${dateInput}T${h}:${m}:${s}+07:00`;
+  let finalDateTime = "";
+  if (dateTimeInput) {
+    // dateTimeInput có dạng "YYYY-MM-DDTHH:mm"
+    // Bổ sung thêm giây ":00" và múi giờ Việt Nam "+07:00" để Astro thực hiện sort
+    finalDateTime = `${dateTimeInput}:00+07:00`;
   }
   
   const contentHtml = contentBox.innerHTML;
@@ -639,14 +632,11 @@ function saveConfig() {
 function saveToStorage() {
   const data = {
     title: document.getElementById('title').value,
-    date: document.getElementById('date').value,
+    date: document.getElementById('date').value, // Lưu chuỗi datetime-local cục bộ
     description: document.getElementById('description').value,
     image: document.getElementById('image').value,
     tags: document.getElementById('tags').value,
-    content: contentBox.innerHTML,
-    hours: currentHours,
-    minutes: currentMinutes,
-    seconds: currentSeconds
+    content: contentBox.innerHTML
   };
   localStorage.setItem('md_studio_data', JSON.stringify(data));
 }
@@ -661,18 +651,13 @@ function loadFromStorage() {
   if (savedData) {
     const data = JSON.parse(savedData);
     document.getElementById('title').value = data.title || '';
-    document.getElementById('date').value = data.date || formattedToday;
+    document.getElementById('date').value = data.date || formattedTodayWithTime;
     document.getElementById('description').value = data.description || '';
     document.getElementById('image').value = data.image || '';
     document.getElementById('tags').value = data.tags || '';
     contentBox.innerHTML = data.content || '';
-    if (data.hours) {
-      currentHours = data.hours;
-      currentMinutes = data.minutes;
-      currentSeconds = data.seconds;
-    }
   } else {
-    document.getElementById('date').value = formattedToday;
+    document.getElementById('date').value = formattedTodayWithTime;
   }
   generatePreview();
 }
