@@ -10,277 +10,104 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
+      margin: 0; font-family: 'Inter', sans-serif;
       background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
-      color: #111827;
-      padding: 20px;
+      color: #111827; padding: 20px;
     }
-
-    .container {
-      max-width: 1200px;
-      margin: auto;
-    }
-
-    .header {
-      margin-bottom: 20px;
-    }
-
-    .header h1 {
-      margin: 0;
-      font-size: 32px;
-      font-weight: 700;
-      color: #111827;
-    }
-
-    .header p {
-      margin-top: 8px;
-      color: #6b7280;
-      font-size: 15px;
-    }
-
+    .container { max-width: 1200px; margin: auto; }
+    .header { margin-bottom: 20px; }
+    .header h1 { margin: 0; font-size: 32px; font-weight: 700; color: #111827; }
+    .header p { margin-top: 8px; color: #6b7280; font-size: 15px; }
     .card {
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(10px);
-      border-radius: 24px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-      border: 1px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+      border-radius: 24px; padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 1px solid rgba(255,255,255,0.5);
       margin-bottom: 20px;
     }
-
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .field { margin-bottom: 18px; }
+    label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #374151; }
+    input, textarea, .editor {
+      width: 100%; border: 1px solid #dbe3ee; background: white;
+      border-radius: 14px; padding: 14px 16px; font-size: 15px;
+      transition: 0.2s ease; outline: none; font-family: inherit;
     }
-
-    .field {
-      margin-bottom: 18px;
+    input:focus, textarea:focus, .editor:focus {
+      border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
     }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #374151;
-    }
-
-    input,
-    textarea,
-    .editor {
-      width: 100%;
-      border: 1px solid #dbe3ee;
-      background: white;
-      border-radius: 14px;
-      padding: 14px 16px;
-      font-size: 15px;
-      transition: 0.2s ease;
-      outline: none;
-      font-family: inherit;
-    }
-
-    input:focus,
-    textarea:focus,
-    .editor:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
-    }
-
-    #description {
-      min-height: 90px;
-      resize: vertical;
-    }
-
-    .editor {
-      min-height: 420px;
-      overflow-y: auto;
-      line-height: 1.7;
-    }
-    
-    .editor img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 10px 0;
-      border-radius: 8px;
-    }
-    
-    .editor iframe {
-      max-width: 100%;
-      margin: 10px 0;
-    }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
-
+    #description { min-height: 90px; resize: vertical; }
+    .editor { min-height: 420px; overflow-y: auto; line-height: 1.7; }
+    .editor img { max-width: 100%; height: auto; display: block; margin: 10px 0; border-radius: 8px; }
+    .editor img.uploading { opacity: 0.4; filter: blur(2px); border: 2px solid #6366f1; }
+    .editor iframe { max-width: 100%; margin: 10px 0; }
+    .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
     .toolbar button {
-      border: none;
-      background: #111827;
-      color: white;
-      padding: 10px 14px;
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: 0.2s ease;
-      font-size: 14px;
+      border: none; background: #111827; color: white; padding: 10px 14px;
+      border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s ease; font-size: 14px;
     }
-
-    .toolbar button:hover {
-      transform: translateY(-1px);
-      opacity: 0.95;
-    }
-
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-
-    .actions button {
-      border: none;
-      padding: 14px 18px;
-      border-radius: 14px;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: 600;
-      transition: 0.2s ease;
-    }
-
-    .preview-btn {
-      background: #111827;
-      color: white;
-    }
-
-    .export-btn {
-      background: #4b5563;
-      color: white;
-    }
-
-    .github-btn {
-      background: linear-gradient(135deg, #24292e, #444d56);
-      color: white;
-    }
-
-    .actions button:hover {
-      transform: translateY(-1px);
-    }
-
+    .toolbar button:hover { transform: translateY(-1px); opacity: 0.95; }
+    .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+    .actions button { border: none; padding: 14px 18px; border-radius: 14px; cursor: pointer; font-size: 15px; font-weight: 600; transition: 0.2s ease; }
+    .preview-btn { background: #111827; color: white; }
+    .export-btn { background: #4b5563; color: white; }
+    .github-btn { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; }
     .preview {
-      margin-top: 24px;
-      background: #0f172a;
-      color: #e2e8f0;
-      border-radius: 18px;
-      padding: 22px;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      line-height: 1.8;
-      font-family: Consolas, monospace;
-      font-size: 14px;
+      margin-top: 24px; background: #0f172a; color: #e2e8f0; border-radius: 18px;
+      padding: 22px; overflow-x: auto; white-space: pre-wrap; line-height: 1.8;
+      font-family: Consolas, monospace; font-size: 14px;
     }
-
-    /* CSS cho vùng thiết lập GitHub */
-    .github-config {
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 18px;
-    }
-
-    @media (max-width: 768px) {
-      body {
-        padding: 12px;
-      }
-
-      .card {
-        padding: 18px;
-        border-radius: 18px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .header h1 {
-        font-size: 24px;
-      }
-
-      .toolbar {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-        padding-bottom: 6px;
-      }
-
-      .toolbar button {
-        white-space: nowrap;
-      }
-
-      .editor {
-        min-height: 320px;
-      }
-    }
+    .config-box { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-bottom: 18px; }
   </style>
 </head>
 <body>
 
 <div class="container">
-
   <div class="header">
     <h1>Markdown studio</h1>
     <p>Tạo bài viết markdown nhanh chóng, tối ưu cho blog và CMS.</p>
   </div>
 
-  <div class="github-config">
-    <label style="margin-bottom: 4px;">GitHub Personal Access Token (Lưu cục bộ trên trình duyệt của bạn)</label>
-    <input type="password" id="ghToken" placeholder="github_pat_..." oninput="saveToken()" style="padding: 10px 14px; font-size: 14px;" />
+  <div class="config-box">
+    <div class="grid" style="grid-template-columns: 1fr;">
+      <div>
+        <label>GitHub Personal Access Token (Lưu cục bộ tại trình duyệt của bạn)</label>
+        <input type="password" id="ghToken" placeholder="github_pat_..." oninput="saveConfig()" />
+        <input type="hidden" id="fiApiKey" value="6d207e02198a847aa98d0a2a901485a5" />
+      </div>
+    </div>
   </div>
 
   <div class="card">
-
     <div class="grid">
-
       <div class="field">
         <label>Title</label>
-        <input type="text" id="title" oninput="saveToStorage()" />
+        <input type="text" id="title" />
       </div>
-
       <div class="field">
         <label>Date</label>
-        <input type="date" id="date" oninput="saveToStorage()" />
+        <input type="date" id="date" />
       </div>
-
     </div>
 
     <div class="field">
       <label>Description</label>
-      <textarea id="description" oninput="saveToStorage()"></textarea>
+      <textarea id="description"></textarea>
     </div>
 
     <div class="field">
       <label>Thumbnail image</label>
-      <input type="text" id="image" oninput="saveToStorage()" />
+      <input type="text" id="image" />
     </div>
 
     <div class="field">
       <label>Tags</label>
-      <input type="text" id="tags" placeholder="Fortnite, Epic Games, Apple" oninput="saveToStorage()" />
+      <input type="text" id="tags" placeholder="Fortnite, Epic Games, Apple" />
     </div>
 
     <div class="field">
-      <label>Nội dung bài viết</label>
-
+      <label>Nội dung bài viết (Tự động Rehost ảnh khi paste)</label>
       <div class="toolbar">
         <button onclick="execCmd('bold')">Bold</button>
         <button onclick="execCmd('italic')">Italic</button>
@@ -289,28 +116,17 @@
         <button onclick="insertImage()">Chèn ảnh</button>
         <button onclick="insertYoutube()">YouTube</button>
       </div>
-
-      <div id="content" class="editor" contenteditable="true" oninput="saveToStorage()"></div>
+      <div id="content" class="editor" contenteditable="true"></div>
     </div>
 
     <div class="actions">
-      <button class="preview-btn" onclick="generatePreview()">
-        Xem markdown
-      </button>
-
-      <button class="github-btn" onclick="pushToGitHub()">
-        🚀 Đăng thẳng lên GitHub
-      </button>
-
-      <button class="export-btn" onclick="exportMarkdown()">
-        Tải file .md
-      </button>
+      <button class="preview-btn" onclick="generatePreview()">Xem markdown</button>
+      <button class="github-btn" onclick="pushToGitHub()">🚀 Đăng thẳng lên GitHub</button>
+      <button class="export-btn" onclick="exportMarkdown()">Tải file .md</button>
     </div>
 
     <div class="preview" id="preview"></div>
-
   </div>
-
 </div>
 
 <script>
@@ -332,10 +148,10 @@ function insertImage() {
   const url = prompt('Nhập link ảnh:');
   if (!url) return;
   const alt = prompt('Nhập ALT ảnh:', 'Image') || 'Image';
-  
   const imgHtml = `<img src="${url}" alt="${alt}" title="${alt}" />`;
   document.execCommand('insertHTML', false, imgHtml);
   saveToStorage();
+  rehostAllImagesInEditor();
 }
 
 function extractYoutubeId(url) {
@@ -347,40 +163,82 @@ function extractYoutubeId(url) {
 function insertYoutube() {
   const url = prompt('Dán link YouTube:');
   if (!url) return;
-
   const videoId = extractYoutubeId(url);
-  if (!videoId) {
-    alert('Link YouTube không hợp lệ');
-    return;
-  }
-
+  if (!videoId) { alert('Link YouTube không hợp lệ'); return; }
   const iframeHtml = `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
   document.execCommand('insertHTML', false, iframeHtml);
   saveToStorage();
 }
 
+contentBox.addEventListener('paste', () => {
+  setTimeout(() => {
+    rehostAllImagesInEditor();
+  }, 100);
+});
+
+async function rehostAllImagesInEditor() {
+  const apiKey = document.getElementById('fiApiKey').value.trim();
+  if (!apiKey) return;
+
+  const images = contentBox.querySelectorAll('img:not(.uploaded)');
+  
+  for (let img of images) {
+    const originalSrc = img.getAttribute('src');
+    
+    if (!originalSrc || originalSrc.startsWith('data:') || originalSrc.includes('freeimage.host')) {
+      img.classList.add('uploaded');
+      continue;
+    }
+
+    img.classList.add('uploading');
+
+    try {
+      const form = new FormData();
+      form.append("key", apiKey);
+      form.append("action", "upload");
+      form.append("format", "json");
+      form.append("source", originalSrc); 
+
+      const res = await fetch("https://freeimage.host/api/1/upload", {
+        method: "POST",
+        body: form
+      });
+      
+      const result = await res.json();
+
+      if (result && result.status_code === 200) {
+        const newUrl = result.image?.url || result.image?.display_url;
+        img.setAttribute('src', newUrl);
+        img.classList.remove('uploading');
+        img.classList.add('uploaded');
+        saveToStorage();
+        generatePreview();
+      } else {
+        img.classList.remove('uploading');
+        console.error("API FreeImage báo lỗi:", result?.status_txt);
+      }
+    } catch (err) {
+      img.classList.remove('uploading');
+      console.error("Lỗi kết nối API:", err);
+    }
+  }
+}
+
 function htmlToMarkdown(html) {
   let div = document.createElement('div');
   div.innerHTML = html;
-
   let md = [];
 
   function convert(node) {
-    if (node.nodeType === 3) {
-      return node.nodeValue;
-    }
-    
+    if (node.nodeType === 3) return node.nodeValue;
     if (node.nodeType !== 1) return '';
-
     const tag = node.tagName.toLowerCase();
 
     if (tag === 'a') {
       if (node.querySelector('img')) {
         let internalImgMarkdown = '';
         node.childNodes.forEach(child => {
-          if (child.tagName && child.tagName.toLowerCase() === 'img') {
-            internalImgMarkdown += convert(child);
-          }
+          if (child.tagName && child.tagName.toLowerCase() === 'img') internalImgMarkdown += convert(child);
         });
         return internalImgMarkdown;
       }
@@ -391,9 +249,7 @@ function htmlToMarkdown(html) {
     }
 
     let childText = '';
-    node.childNodes.forEach(child => {
-      childText += convert(child);
-    });
+    node.childNodes.forEach(child => { childText += convert(child); });
 
     switch (tag) {
       case 'h2': return `\n\n## ${childText.trim()}\n\n`;
@@ -403,8 +259,7 @@ function htmlToMarkdown(html) {
       case 'em':
       case 'i': return `*${childText}*`;
       case 'p':
-      case 'div': 
-        return childText.trim() ? `\n\n${childText.trim()}\n\n` : '';
+      case 'div': return childText.trim() ? `\n\n${childText.trim()}\n\n` : '';
       case 'br': return '\n';
       case 'img':
         const src = node.getAttribute('src') || '';
@@ -413,28 +268,19 @@ function htmlToMarkdown(html) {
         let title = node.getAttribute('title') || alt;
         title = title.replace(/"/g, '\\"');
         return `\n\n![${alt}](${src} "${title}")\n\n`;
-      case 'iframe':
-        return `\n\n${node.outerHTML}\n\n`;
-      default:
-        return childText;
+      case 'iframe': return `\n\n${node.outerHTML}\n\n`;
+      default: return childText;
     }
   }
 
-  div.childNodes.forEach(node => {
-    md.push(convert(node));
-  });
-
-  return md.join('')
-    .replace(/\n{3,}/g, '\n\n')
-    .replace(/\!\[(.*?)\]\((.*?)\)\s*\"(.*?)\"/g, '![$1]($2 "$3")')
-    .trim();
+  div.childNodes.forEach(node => { md.push(convert(node)); });
+  return md.join('').replace(/\n{3,}/g, '\n\n').trim();
 }
 
 function generateMarkdown() {
   const rawTitle = document.getElementById('title').value.trim();
   const title = rawTitle.replace(/"/g, '\\"');
   const description = document.getElementById('description').value.trim().replace(/"/g, '\\"');
-  
   const date = document.getElementById('date').value;
   const image = document.getElementById('image').value.trim();
   const tagsInput = document.getElementById('tags').value.trim();
@@ -442,14 +288,8 @@ function generateMarkdown() {
   const contentHtml = contentBox.innerHTML;
   const contentMarkdown = htmlToMarkdown(contentHtml);
 
-  const tags = tagsInput
-    .split(',')
-    .map(tag => tag.trim())
-    .filter(tag => tag.length > 0);
-
-  const tagLines = tags.length > 0 
-    ? '\ntags:\n' + tags.map(tag => `  - ${tag}`).join('\n') 
-    : '';
+  const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+  const tagLines = tags.length > 0 ? '\ntags:\n' + tags.map(tag => `  - ${tag}`).join('\n') : '';
 
   return `---
 title: "${title}"
@@ -465,108 +305,70 @@ function generatePreview() {
   document.getElementById('preview').textContent = generateMarkdown();
 }
 
-// Chuyển đổi tên bài viết thành slug không dấu làm tên file
 function slugify(text) {
-  return text
-    .toLowerCase()
-    .trim()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+  return text.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
 function exportMarkdown() {
   const markdown = generateMarkdown();
   const rawTitle = document.getElementById('title').value.trim();
   const filename = slugify(rawTitle) || 'article';
-
   const blob = new Blob([markdown], { type: 'text/markdown' });
   const link = document.createElement('a');
-
   link.href = URL.createObjectURL(blob);
   link.download = filename + '.md';
-
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-  
   clearStorage();
 }
 
-// LOGIC KẾT NỐI VÀ ĐẨY FILE THẲNG LÊN GITHUB API
 async function pushToGitHub() {
   const token = document.getElementById('ghToken').value.trim();
-  if (!token) {
-    alert('Vui lòng nhập GitHub Personal Access Token ở ô phía trên trước!');
-    return;
-  }
-
+  if (!token) { alert('Vui lòng nhập GitHub Token!'); return; }
   const rawTitle = document.getElementById('title').value.trim();
-  if (!rawTitle) {
-    alert('Vui lòng nhập Tiêu đề bài viết để khởi tạo tên file!');
-    return;
-  }
+  if (!rawTitle) { alert('Vui lòng nhập Tiêu đề!'); return; }
 
   const filename = (slugify(rawTitle) || 'article') + '.md';
-  // ĐÚNG ĐƯỜNG DẪN THƯ MỤC KIỂU TRANG ASTRO CỦA BẠN
   const path = `src/content/posts/${filename}`; 
   const markdownContent = generateMarkdown();
-
-  // Mã hóa nội dung file sang Base64 theo chuẩn API GitHub
   const b64Content = btoa(unescape(encodeURIComponent(markdownContent)));
-
   const url = `https://api.github.com/repos/protungtq/new8/contents/${path}`;
 
-  if(!confirm(`Bạn có chắc chắn muốn đẩy file bài viết "${filename}" thẳng lên mục src/content/posts/ không?`)) return;
+  if(!confirm(`Đăng thẳng bài viết "${filename}" lên GitHub?`)) return;
 
   try {
-    // Bước 1: Kiểm tra xem file này đã tồn tại trên GitHub chưa (để lấy mã sha nếu ghi đè)
     let sha = null;
-    const checkRes = await fetch(url, {
-      headers: { 'Authorization': `token ${token}` }
-    });
-    
+    const checkRes = await fetch(url, { headers: { 'Authorization': `token ${token}` } });
     if (checkRes.status === 200) {
       const fileData = await checkRes.json();
-      sha = fileData.sha; // Lấy mã SHA nếu file đã tồn tại để thực hiện update
+      sha = fileData.sha;
     }
 
-    // Bước 2: Tiến hành commit push file lên GitHub
-    const bodyData = {
-      message: `cms: tu dong dang bai "${rawTitle}"`,
-      content: b64Content,
-      branch: "main"
-    };
+    const bodyData = { message: `cms: dang bai "${rawTitle}"`, content: b64Content, branch: "main" };
     if (sha) bodyData.sha = sha;
 
     const pushRes = await fetch(url, {
       method: 'PUT',
-      headers: {
-        'Authorization': `token ${token}`,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(bodyData)
     });
 
     if (pushRes.status === 201 || pushRes.status === 200) {
-      alert(`🚀 Thành công! Bài viết đã được đẩy thẳng lên src/content/posts/${filename}. Đợi Cloudflare Pages tự động build nhé!`);
+      alert(`🚀 Đăng thành công lên GitHub!`);
       clearStorage();
-      location.reload(); // Reset lại trang để chuẩn bị viết bài mới
+      location.reload();
     } else {
       const errData = await pushRes.json();
-      alert(`Lỗi khi đẩy lên GitHub: ${errData.message}`);
+      alert(`Lỗi: ${errData.message}`);
     }
   } catch (error) {
-    console.error(error);
-    alert('Không thể kết nối đến GitHub API. Kiểm tra mạng hoặc token của bạn.');
+    alert('Lỗi kết nối API GitHub.');
   }
 }
 
-function saveToken() {
-  const token = document.getElementById('ghToken').value;
-  localStorage.setItem('gh_studio_token', token);
+function saveConfig() {
+  localStorage.setItem('gh_studio_token', document.getElementById('ghToken').value);
 }
 
 function saveToStorage() {
@@ -581,12 +383,9 @@ function saveToStorage() {
   localStorage.setItem('md_studio_data', JSON.stringify(data));
 }
 
-function clearStorage() {
-  localStorage.removeItem('md_studio_data');
-}
+function clearStorage() { localStorage.removeItem('md_studio_data'); }
 
 function loadFromStorage() {
-  // Khôi phục Token cũ nếu có
   const savedToken = localStorage.getItem('gh_studio_token');
   if (savedToken) document.getElementById('ghToken').value = savedToken;
 
@@ -599,13 +398,6 @@ function loadFromStorage() {
     document.getElementById('image').value = data.image || '';
     document.getElementById('tags').value = data.tags || '';
     contentBox.innerHTML = data.content || '';
-  } else {
-    document.getElementById('title').value = 'Hà Phi Yến chẳng cần bikini, một nụ cười đủ "gây bão" mạng.';
-    document.getElementById('description').value = 'Khoảnh khắc rạng rỡ của cô nàng đang nhận được "bão like" từ cộng đồng mạng.';
-    document.getElementById('date').value = formattedToday;
-    document.getElementById('image').value = 'https://gamek.mediacdn.vn/133514250583805952/2026/5/19/img8121-131017-1779176195578-1779176208135180404093.jpeg';
-    document.getElementById('tags').value = 'Hà Phi Yến, Hot Girl, Đời sống';
-    contentBox.innerHTML = '<div>Cộng đồng mạng mới đây lại một lần nữa đổ rầm rầm trước loạt ảnh mới nhất của cô nàng. Không cần trang phục quá cầu kỳ, chỉ một nụ cười tỏa nắng là đủ chiếm trọn mọi ánh nhìn.</div>';
   }
   generatePreview();
 }
@@ -617,7 +409,12 @@ const dd = String(today.getDate()).padStart(2, '0');
 const formattedToday = `${yyyy}-${mm}-${dd}`;
 
 loadFromStorage();
+contentBox.addEventListener('input', saveToStorage);
+document.getElementById('title').addEventListener('input', saveToStorage);
+document.getElementById('date').addEventListener('input', saveToStorage);
+document.getElementById('description').addEventListener('input', saveToStorage);
+document.getElementById('image').addEventListener('input', saveToStorage);
+document.getElementById('tags').addEventListener('input', saveToStorage);
 </script>
-
 </body>
 </html>
