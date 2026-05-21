@@ -2,7 +2,7 @@
 title: "Hà Phi Yến chẳng cần bikini, một nụ cười đủ \"gây bão\" mạng."
 description: "Khoảnh khắc rạng rỡ của cô nàng đang nhận được \"bão like\" từ cộng đồng mạng."
 date: "2026-05-21"
-image: "https://gamek.mediacdn.vn/133514250583805952/2026/5/19/img8121-131017-1779176195578-1779176208135180404093.jpeg"
+image: "https://iili.io/C9Eb9EB.webp"
 tags:
   - Hà Phi Yến
   - Hot Girl
@@ -17,7 +17,7 @@ Nụ cười của Hà Phi Yến là một nguồn [năng lượng](https://game
 
 ![Hà Phi Yến chẳng cần bikini, một nụ cười đủ "gây bão" mạng- Ảnh 1.](https://gamek.mediacdn.vn/133514250583805952/2026/5/19/img8121-131017-1779176195578-1779176208135180404093.jpeg "Hà Phi Yến chẳng cần bikini, một nụ cười đủ \"gây bão\" mạng- Ảnh 1.")
 
- 
+ 
 
 ![Hà Phi Yến chẳng cần bikini, một nụ cười đủ "gây bão" mạng- Ảnh 2.](https://gamek.mediacdn.vn/133514250583805952/2026/5/19/img8120-131017-1779176209198-17791762094701687801869.jpeg "Hà Phi Yến chẳng cần bikini, một nụ cười đủ \"gây bão\" mạng- Ảnh 2.")
 
@@ -25,10 +25,10 @@ Nụ cười của Hà Phi Yến là một nguồn [năng lượng](https://game
 
 ![Hà Phi Yến chẳng cần bikini, một nụ cười đủ "gây bão" mạng- Ảnh 3.](https://gamek.mediacdn.vn/133514250583805952/2026/5/19/img8117-131412-1779176210340-17791762105541478960460.jpeg "Hà Phi Yến chẳng cần bikini, một nụ cười đủ \"gây bão\" mạng- Ảnh 3.")
 
- 
+ 
 
 ![Hà Phi Yến chẳng cần bikini, một nụ cười đủ "gây bão" mạng- Ảnh 4.](https://gamek.mediacdn.vn/133514250583805952/2026/5/19/img8118-131410-1779176211354-17791762115781796794034.jpeg "Hà Phi Yến chẳng cần bikini, một nụ cười đủ \"gây bão\" mạng- Ảnh 4.")
 
- 
+ 
 
 ![Hà Phi Yến chẳng cần bikini, một nụ cười đủ "gây bão" mạng- Ảnh 5.](https://gamek.mediacdn.vn/133514250583805952/2026/5/19/img8119-131410-1779176212113-17791762122811185599118.jpeg "Hà Phi Yến chẳng cần bikini, một nụ cười đủ \"gây bão\" mạng- Ảnh 5.")
