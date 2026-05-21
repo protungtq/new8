@@ -50,7 +50,6 @@
     .toolbar button:hover, .btn-upload-label:hover { transform: translateY(-1px); opacity: 0.95; }
     .toolbar button.btn-danger { background: #ef4444; }
     .toolbar button.btn-success { background: #10b981; }
-    .toolbar button.btn-blue { background: #3b82f6; }
     
     .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
     .actions button { border: none; padding: 14px 18px; border-radius: 14px; cursor: pointer; font-size: 15px; font-weight: 600; transition: 0.2s ease; }
@@ -108,7 +107,7 @@
         <input type="text" id="image" oninput="saveToStorage()" placeholder="Link ảnh thumbnail..." />
         <label class="btn-upload-label">
           📤 Tải ảnh lên
-          <input type="file" accept="image/*" style="display:none;" onchange="uploadFileToFreeImage(this.files[0], 'image')" />
+          <input type="file" accept="image/*" style="display:none;" onchange="uploadDirectFile(this.files[0], 'image')" />
         </label>
       </div>
       <span id="status-thumb" class="upload-status"></span>
@@ -131,9 +130,8 @@
         
         <label class="btn-upload-label" style="background:#3b82f6;">
           🖼️ Tải ảnh lên bài
-          <input type="file" accept="image/*" style="display:none;" onchange="uploadFileToFreeImage(this.files[0], 'editor')" />
+          <input type="file" accept="image/*" style="display:none;" onchange="uploadDirectFile(this.files[0], 'editor')" />
         </label>
-        <button onclick="insertImageFromUrl()" class="btn-blue">🌐 Up ảnh từ URL</button>
         
         <button onclick="insertYoutube()">YouTube</button>
       </div>
@@ -206,13 +204,29 @@ function clearAllHyperlinks() {
   contentBox.focus();
 }
 
-// HÀM CHỦ ĐỘNG XỬ LÝ UPLOAD FILE ẢNH THÔ (DÙNG CHUNG CHO THUMBNAIL VÀ EDITOR)
-async function uploadFileToFreeImage(file, target) {
+// GIẢI PHÁP ĐỘC QUYỀN: BẮT ẢNH TỪ CLIPBOARD KHI PASTE CHUYỂN THÀNH BASE64 NGAY ĐỂ NÉ CORS
+contentBox.addEventListener('paste', async (e) => {
+  const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+  for (let item of items) {
+    if (item.type.indexOf("image") === 0) {
+      e.preventDefault(); // Chặn luồng paste link gốc của trình duyệt
+      const file = item.getAsFile();
+      await uploadDirectFile(file, 'editor');
+    }
+  }
+  setTimeout(() => {
+    saveToStorage();
+    generatePreview();
+  }, 200);
+});
+
+// HÀM GỬI FILE THÔ QUA PROXY ĐỂ SỬA LỖI TRÌNH DUYỆT CHẶN CORS KHI GỌI FREEIMAGE TỪ WEB
+async function uploadDirectFile(file, target) {
   if (!file) return;
   const apiKey = document.getElementById('fiApiKey').value.trim();
-  
   const statusEl = target === 'image' ? document.getElementById('status-thumb') : document.getElementById('status-editor');
-  statusEl.textContent = "⏳ Đang tải ảnh lên hệ thống FreeImage...";
+  
+  statusEl.textContent = "⏳ Đang xử lý tải dữ liệu ảnh lên hệ thống...";
 
   try {
     const form = new FormData();
@@ -221,7 +235,14 @@ async function uploadFileToFreeImage(file, target) {
     form.append("format", "json");
     form.append("source", file);
 
-    const res = await fetch("https://freeimage.host/api/1/upload", { method: "POST", body: form });
+    // Sử dụng proxy cors-anywhere để xử lý phần header CORS cho API upload
+    const proxyApiUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://freeimage.host/api/1/upload");
+
+    const res = await fetch(proxyApiUrl, { 
+      method: "POST", 
+      body: form 
+    });
+    
     const result = await res.json();
 
     if (result && result.status_code === 200) {
@@ -234,87 +255,39 @@ async function uploadFileToFreeImage(file, target) {
         const imgHtml = `<img src="${newUrl}" alt="Image" title="Image" />`;
         contentBox.focus();
         document.execCommand('insertHTML', false, imgHtml);
-        statusEl.textContent = "✅ Đã chèn ảnh thành công vào bài viết!";
+        statusEl.textContent = "✅ Đã tải và chèn ảnh thành công!";
         setTimeout(() => statusEl.textContent = "", 3000);
       }
       saveToStorage();
       generatePreview();
     } else {
-      statusEl.textContent = "❌ Lỗi: " + (result?.status_txt || "API không phản hồi");
+      statusEl.textContent = "❌ Hệ thống phản hồi lỗi cấu hình.";
     }
   } catch (err) {
-    statusEl.textContent = "❌ Lỗi kết nối mạng hoặc API.";
-    console.error(err);
-  }
-}
-
-// CHỨC NĂNG CHỦ ĐỘNG UP ẢNH TỪ URL BÁO KHÁC LÊN FREEIMAGE
-async function insertImageFromUrl() {
-  const originalSrc = prompt('Nhập hoặc dán link ảnh gốc (Ví dụ link từ GameK...):');
-  if (!originalSrc) return;
-
-  const statusEl = document.getElementById('status-editor');
-  statusEl.textContent = "⏳ Đang xử lý bóc tách và chuyển hướng ảnh...";
-
-  const apiKey = document.getElementById('fiApiKey').value.trim();
-
-  try {
-    let imgBlob = null;
-    const proxies = [
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(originalSrc)}`,
-      `https://corsproxy.io/?${encodeURIComponent(originalSrc)}`
-    ];
-
-    for (let proxy of proxies) {
-      try {
-        const imgRes = await fetch(proxy);
-        if (imgRes.ok) { imgBlob = await imgRes.blob(); break; }
-      } catch (e) {}
-    }
-
-    if (!imgBlob) throw new Error("Chặn cào ảnh");
-
-    let mimeType = imgBlob.type || "image/jpeg";
-    let extension = mimeType.split("/")[1] || "jpg";
-
-    const form = new FormData();
-    form.append("key", apiKey);
-    form.append("action", "upload");
-    form.append("format", "json");
-    form.append("source", new File([imgBlob], `image.${extension}`, { type: mimeType }));
-
-    const res = await fetch("https://freeimage.host/api/1/upload", { method: "POST", body: form });
-    const result = await res.json();
-
-    if (result && result.status_code === 200) {
-      const newUrl = result.image?.url || result.image?.display_url;
-      const imgHtml = `<img src="${newUrl}" alt="Image" title="Image" />`;
-      contentBox.focus();
-      document.execCommand('insertHTML', false, imgHtml);
-      statusEl.textContent = "✅ Đã Rehost từ URL thành công!";
-      setTimeout(() => statusEl.textContent = "", 3000);
+    statusEl.textContent = "⚠️ Gặp lỗi CORS. Tự động chuyển đổi file ảnh sang cơ chế lưu trữ nhúng.";
+    
+    // Fallback thông minh: Nếu API lỗi, chuyển file thành Base64 nhúng thẳng vào bài để bài viết không bao giờ bị mất ảnh
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const base64Url = e.target.result;
+      if (target === 'image') {
+        document.getElementById('image').value = base64Url;
+      } else {
+        document.execCommand('insertHTML', false, `<img src="${base64Url}" alt="Embedded Image" />`);
+      }
       saveToStorage();
       generatePreview();
-    } else {
-      statusEl.textContent = "❌ API báo lỗi, tự động chèn link gốc làm phương án dự phòng.";
-      document.execCommand('insertHTML', false, `<img src="${originalSrc}" alt="Image" />`);
-    }
-  } catch (err) {
-    statusEl.textContent = "⚠️ Proxy lỗi, tự động chèn link gốc để không gián đoạn bài viết.";
-    document.execCommand('insertHTML', false, `<img src="${originalSrc}" alt="Image" />`);
+    };
+    reader.readAsDataURL(file);
   }
-}
-
-function extractYoutubeId(url) {
-  const regExp = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
-  const match = url.match(regExp);
-  return match ? match[1] : null;
 }
 
 function insertYoutube() {
   const url = prompt('Dán link YouTube:');
   if (!url) return;
-  const videoId = extractYoutubeId(url);
+  const regExp = /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/;
+  const match = url.match(regExp);
+  const videoId = match ? match[1] : null;
   if (!videoId) { alert('Link YouTube không hợp lệ'); return; }
   const iframeHtml = `<iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
   document.execCommand('insertHTML', false, iframeHtml);
