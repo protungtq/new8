@@ -16,7 +16,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/node-env@v3
+        # SỬA LỖI TẠI ĐÂY: Thay đổi actions/node-env thành actions/setup-node
+        uses: actions/setup-node@v4
         with:
           node-version: 18
 
