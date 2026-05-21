@@ -4,7 +4,7 @@ description: "Nhìn hot girl này, ai cũng muốn \"xách balo lên và đi\" n
 date: "2026-05-21T14:00:50+07:00"
 image: "https://iili.io/C9WY9rG.webp"
 tags:
-  - "Hotgirl"
+  - "Hot Girl"
   - "Gái Xinh"
 ---
 

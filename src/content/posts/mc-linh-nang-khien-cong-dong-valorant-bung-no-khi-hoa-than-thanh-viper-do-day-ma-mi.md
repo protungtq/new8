@@ -7,6 +7,8 @@ tags:
   - "MC Linh Nắng"
   - "Valorant"
   - "Viper Đỏ"
+  - "Hot Girl"
+  - "Gái Xinh"
 ---
 
 ## Màn tái xuất "bùng nổ" và tạo hình Viper Đỏ đầy ma mị
