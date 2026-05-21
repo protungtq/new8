@@ -136,12 +136,17 @@
 </div>
 
 <script>
-// 1. KHỞI TẠO NGÀY HỆ THỐNG TRÊN ĐẦU FILE ĐỂ ĐỒNG BỘ TRƯỚC
+// Khởi tạo ngày tháng hệ thống (chỉ lấy phần YYYY-MM-DD để đưa vào input date ban đầu)
 const today = new Date();
 const yyyy = today.getFullYear();
 const mm = String(today.getMonth() + 1).padStart(2, '0');
 const dd = String(today.getDate()).padStart(2, '0');
 const formattedToday = `${yyyy}-${mm}-${dd}`;
+
+// Lưu trữ biến kiểm soát giờ phút giây ban đầu của phiên làm việc (nếu cần đồng bộ)
+let currentHours = String(today.getHours()).padStart(2, '0');
+let currentMinutes = String(today.getMinutes()).padStart(2, '0');
+let currentSeconds = String(today.getSeconds()).padStart(2, '0');
 
 const contentBox = document.getElementById('content');
 
@@ -183,7 +188,6 @@ function insertYoutube() {
   saveToStorage();
 }
 
-// THEO DÕI SỰ KIỆN PASTE
 contentBox.addEventListener('paste', () => {
   setTimeout(() => {
     saveToStorage();
@@ -209,8 +213,6 @@ async function rehostAllImagesInEditor() {
 
     try {
       let imgBlob = null;
-      
-      // HỆ THỐNG PROXY CORS DỰ PHÒNG 2 LỚP ĐỂ KHÔNG BỊ CHẶN HOTLINK
       const proxies = [
         `https://api.allorigins.win/raw?url=${encodeURIComponent(originalSrc)}`,
         `https://corsproxy.io/?${encodeURIComponent(originalSrc)}`
@@ -224,11 +226,11 @@ async function rehostAllImagesInEditor() {
             break; 
           }
         } catch (e) {
-          console.warn("Proxy thất bại, đang chuyển hướng sang lớp dự phòng...");
+          console.warn("Proxy lỗi, chuyển sang proxy dự phòng...");
         }
       }
 
-      if (!imgBlob) throw new Error("Tất cả hệ thống proxy đều bị server ảnh chặn tải");
+      if (!imgBlob) throw new Error("Không thể tải file ảnh");
 
       let mimeType = imgBlob.type || "image/jpeg";
       let extension = mimeType.split("/")[1] || "jpg";
@@ -252,16 +254,13 @@ async function rehostAllImagesInEditor() {
         img.classList.remove('uploading');
         img.classList.add('uploaded');
         
-        // ĐỒNG BỘ LƯU TRỮ VÀ RENDER NGAY LẬP TỨC
         saveToStorage();
         generatePreview();
       } else {
         img.classList.remove('uploading');
-        console.error("API FreeImage lỗi:", result?.status_txt);
       }
     } catch (err) {
       img.classList.remove('uploading');
-      console.error("Lỗi luồng xử lý Rehost:", err);
     }
   }
 }
@@ -321,22 +320,43 @@ function htmlToMarkdown(html) {
 
 function generateMarkdown() {
   const rawTitle = document.getElementById('title').value.trim();
-  const title = rawTitle.replace(/"/g, '\\"');
-  const description = document.getElementById('description').value.trim().replace(/"/g, '\\"');
-  const date = document.getElementById('date').value;
+  const title = rawTitle.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  
+  const rawDescription = document.getElementById('description').value.trim();
+  const description = rawDescription.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  
+  const dateInput = document.getElementById('date').value;
   const image = document.getElementById('image').value.trim();
   const tagsInput = document.getElementById('tags').value.trim();
+  
+  // TÍNH TOÁN GIỜ PHÚT GIÂY ĐỂ ĐƯA VÀO FRONTMATTER ISO 8601
+  let finalDateTime = dateInput;
+  if (dateInput) {
+    // Nếu ngày chọn trùng ngày hôm nay, lấy giờ hiện hành thực tế. Nếu chọn ngày khác, dùng giờ được lưu hoặc mặc định 12:00:00
+    const now = new Date();
+    const inputDateObj = new Date(dateInput);
+    
+    let h = currentHours, m = currentMinutes, s = currentSeconds;
+    if (now.toDateString() === inputDateObj.toDateString()) {
+      h = String(now.getHours()).padStart(2, '0');
+      m = String(now.getMinutes()).padStart(2, '0');
+      s = String(now.getSeconds()).padStart(2, '0');
+      // Cập nhật lại biến phiên để đồng bộ tạm thời
+      currentHours = h; currentMinutes = m; currentSeconds = s;
+    }
+    finalDateTime = `${dateInput}T${h}:${m}:${s}+07:00`;
+  }
   
   const contentHtml = contentBox.innerHTML;
   const contentMarkdown = htmlToMarkdown(contentHtml);
 
   const tags = tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
-  const tagLines = tags.length > 0 ? '\ntags:\n' + tags.map(tag => `  - ${tag}`).join('\n') : '';
+  const tagLines = tags.length > 0 ? '\ntags:\n' + tags.map(tag => `  - "${tag.replace(/"/g, '\\"')}"`).join('\n') : '';
 
   return `---
 title: "${title}"
 description: "${description}"
-date: "${date}"
+date: "${finalDateTime}"
 image: "${image}"${tagLines}
 ---
 
@@ -420,7 +440,11 @@ function saveToStorage() {
     description: document.getElementById('description').value,
     image: document.getElementById('image').value,
     tags: document.getElementById('tags').value,
-    content: contentBox.innerHTML
+    content: contentBox.innerHTML,
+    // Lưu kèm mốc thời gian phụ để F5 không mất cấu trúc giờ
+    hours: currentHours,
+    minutes: currentMinutes,
+    seconds: currentSeconds
   };
   localStorage.setItem('md_studio_data', JSON.stringify(data));
 }
@@ -440,14 +464,17 @@ function loadFromStorage() {
     document.getElementById('image').value = data.image || '';
     document.getElementById('tags').value = data.tags || '';
     contentBox.innerHTML = data.content || '';
+    if (data.hours) {
+      currentHours = data.hours;
+      currentMinutes = data.minutes;
+      currentSeconds = data.seconds;
+    }
   } else {
-    // Nếu không có data nháp cũ, tự động nạp ngày mặc định là hôm nay
     document.getElementById('date').value = formattedToday;
   }
   generatePreview();
 }
 
-// Chạy khởi tạo đọc bộ nhớ cục bộ
 loadFromStorage();
 </script>
 </body>
