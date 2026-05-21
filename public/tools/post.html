@@ -63,7 +63,7 @@
     }
     .config-box { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-bottom: 18px; }
     .upload-group { display: flex; gap: 8px; margin-top: 6px; }
-    .upload-status { font-size: 13px; color: #4b5563; font-weight: 500; margin-top: 4px; display: block; }
+    .upload-status { font-size: 13px; color: #10b981; font-weight: 600; margin-top: 4px; display: block; }
   </style>
 </head>
 <body>
@@ -79,7 +79,6 @@
       <div>
         <label>GitHub Personal Access Token (Lưu cục bộ tại trình duyệt của bạn)</label>
         <input type="password" id="ghToken" placeholder="github_pat_..." oninput="saveConfig()" />
-        <input type="hidden" id="fiApiKey" value="6d207e02198a847aa98d0a2a901485a5" />
       </div>
     </div>
   </div>
@@ -104,10 +103,10 @@
     <div class="field">
       <label>Thumbnail image</label>
       <div class="upload-group">
-        <input type="text" id="image" oninput="saveToStorage()" placeholder="Link ảnh thumbnail..." />
+        <input type="text" id="image" oninput="saveToStorage()" placeholder="Link hoặc mã Base64 ảnh thumbnail..." />
         <label class="btn-upload-label">
           📤 Tải ảnh lên
-          <input type="file" accept="image/*" onchange="triggerIframeUpload(this, 'image')" />
+          <input type="file" accept="image/*" style="display:none;" onchange="processLocalFile(this.files[0], 'image')" />
         </label>
       </div>
       <span id="status-thumb" class="upload-status"></span>
@@ -129,13 +128,13 @@
         <button onclick="clearAllHyperlinks()" class="btn-danger">🧹 Xóa sạch Link ẩn</button>
         
         <label class="btn-upload-label" style="background:#3b82f6;">
-          🖼️ Tải ảnh lên bài
-          <input type="file" accept="image/*" onchange="triggerIframeUpload(this, 'editor')" />
+          🖼️ Tải ảnh vào bài
+          <input type="file" accept="image/*" style="display:none;" onchange="processLocalFile(this.files[0], 'editor')" />
         </label>
         
         <button onclick="insertYoutube()">YouTube</button>
       </div>
-      <div id="status-editor" style="font-size:13px; color:#3b82f6; font-weight:600; margin-bottom:8px;"></div>
+      <div id="status-editor" style="font-size:13px; color:#10b981; font-weight:600; margin-bottom:8px;"></div>
       <div id="content" class="editor" contenteditable="true" oninput="saveToStorage()"></div>
     </div>
 
@@ -147,16 +146,6 @@
 
     <div class="preview" id="preview"></div>
   </div>
-</div>
-
-<div style="display: none;">
-  <form id="hidden-upload-form" action="https://freeimage.host/api/1/upload" method="POST" enctype="multipart/form-data" target="upload-iframe">
-    <input type="text" name="key" value="6d207e02198a847aa98d0a2a901485a5" />
-    <input type="text" name="action" value="upload" />
-    <input type="text" name="format" value="json" />
-    <input type="file" name="source" id="hidden-file-input" />
-  </form>
-  <iframe name="upload-iframe" id="hidden-upload-iframe"></iframe>
 </div>
 
 <script>
@@ -171,7 +160,6 @@ let currentMinutes = String(today.getMinutes()).padStart(2, '0');
 let currentSeconds = String(today.getSeconds()).padStart(2, '0');
 
 const contentBox = document.getElementById('content');
-let uploadTargetMode = 'editor'; // Biến kiểm soát ảnh đẩy vào đâu
 
 function execCmd(command) {
   document.execCommand(command, false, null);
@@ -215,80 +203,45 @@ function clearAllHyperlinks() {
   contentBox.focus();
 }
 
-// BẮT SỰ KIỆN PASTE ẢNH TỪ CLIPBOARD (BẤM COPY IMAGE Ở BÁO KHÁC RỒI PASTE)
+// BẮT SỰ KIỆN PASTE FILE ẢNH THÔ TỪ CLIPBOARD (BẤM COPY IMAGE Ở TRANG KHÁC RỒI PASTE)
 contentBox.addEventListener('paste', (e) => {
   const items = (e.clipboardData || e.originalEvent.clipboardData).items;
   for (let item of items) {
     if (item.type.indexOf("image") === 0) {
       e.preventDefault();
       const file = item.getAsFile();
-      
-      // Chuyển file từ Clipboard vào Form ngầm để tiến hành upload bằng Iframe ẩn
-      uploadTargetMode = 'editor';
-      executeFormUpload(file);
+      processLocalFile(file, 'editor');
     }
   }
 });
 
-// ĐIỀU HƯỚNG KHI CHỌN FILE TỪ THUMBNAIL HOẶC NÚT BẤM TOOLBAR
-function triggerIframeUpload(inputEl, target) {
-  if (!inputEl.files || inputEl.files.length === 0) return;
-  uploadTargetMode = target;
-  executeFormUpload(inputEl.files[0]);
-  inputEl.value = ""; // Reset trạng thái chọn để lần sau chọn tiếp ảnh trùng tên vẫn nhận
-}
-
-// LỆNH THỰC THI CHÈN FILE VÀO FORM VÀ SUBMIT QUA IFRAME CON
-function executeFormUpload(file) {
-  const statusEl = uploadTargetMode === 'image' ? document.getElementById('status-thumb') : document.getElementById('status-editor');
-  statusEl.textContent = "⏳ Đang đồng bộ và tải ảnh lên tài khoản FreeImage qua Iframe tunnel...";
-
-  // Sao chép File sang Form ẩn
-  const dataTransfer = new DataTransfer();
-  dataTransfer.items.add(file);
-  document.getElementById('hidden-file-input').files = dataTransfer.files;
-
-  // Submit form ngầm
-  document.getElementById('hidden-upload-form').submit();
-}
-
-// LẮNG NGHE KHI IFRAME NHẬN ĐƯỢC PHẢN HỒI JSON TỪ SERVER FREEIMAGE
-document.getElementById('hidden-upload-iframe').addEventListener('load', function() {
-  const statusEl = uploadTargetMode === 'image' ? document.getElementById('status-thumb') : document.getElementById('status-editor');
+// CƠ CHẾ CHUYỂN ĐỔI ẢNH CỤC BỘ SANG BASE64 ĐỂ NÉ TOÀN BỘ LỖI CORS VÀ X-FRAME
+function processLocalFile(file, target) {
+  if (!file) return;
   
-  try {
-    // Vì chặn CORS của fetch, nhưng nếu Iframe load dữ liệu dạng văn bản, ta có thể thử bóc nội dung thô
-    const iframeBody = this.contentWindow.document.body || this.contentDocument.body;
-    const rawText = iframeBody.textContent || iframeBody.innerText;
+  const statusEl = target === 'image' ? document.getElementById('status-thumb') : document.getElementById('status-editor');
+  statusEl.textContent = "⚡ Đang mã hóa và chèn ảnh cục bộ...";
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const base64Url = e.target.result;
     
-    if (!rawText || rawText.trim() === "") return; // Tránh chạy khi khởi tạo iframe trống ban đầu
-
-    const result = JSON.parse(rawText.trim());
-
-    if (result && result.status_code === 200) {
-      const newUrl = result.image?.url || result.image?.display_url;
-      
-      if (uploadTargetMode === 'image') {
-        document.getElementById('image').value = newUrl;
-        statusEl.textContent = "✅ Tải ảnh thumbnail thành công!";
-      } else {
-        const imgHtml = `<img src="${newUrl}" alt="Image" title="Image" />`;
-        contentBox.focus();
-        document.execCommand('insertHTML', false, imgHtml);
-        statusEl.textContent = "✅ Đã xử lý và chèn ảnh thành công!";
-        setTimeout(() => statusEl.textContent = "", 3000);
-      }
-      saveToStorage();
-      generatePreview();
+    if (target === 'image') {
+      document.getElementById('image').value = base64Url;
+      statusEl.textContent = "✅ Đã nạp ảnh Thumbnail!";
     } else {
-      statusEl.textContent = "❌ Lỗi: Server từ chối xử lý tệp tin.";
+      contentBox.focus();
+      const imgHtml = `<img src="${base64Url}" alt="Embedded Image" title="Embedded Image" />`;
+      document.execCommand('insertHTML', false, imgHtml);
+      statusEl.textContent = "✅ Đã chèn ảnh vào bài viết!";
+      setTimeout(() => statusEl.textContent = "", 3000);
     }
-  } catch (err) {
-    // Trường hợp xấu nhất trình duyệt chặn đọc text của Iframe do chính sách bảo mật miền chéo, 
-    // chúng ta báo cho người dùng biết để họ nhập tay hoặc dùng giải pháp Base64 dự phòng gián tiếp.
-    statusEl.textContent = "⚠️ Upload thành công hoặc gặp rào cản Iframe. Hãy kiểm tra hoặc dán link.";
-  }
-});
+    
+    saveToStorage();
+    generatePreview();
+  };
+  reader.readAsDataURL(file);
+}
 
 function insertYoutube() {
   const url = prompt('Dán link YouTube:');
