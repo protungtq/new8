@@ -10,7 +10,7 @@ tags:
 
 Trong thời đại mà mạng xã hội dường như bị bão hòa bởi những hình ảnh khoe thân nóng bỏng, những cô gái diện bikini gợi cảm thu hút hàng triệu lượt like và follow, thì sự xuất hiện của Hà Phi Yến như một luồng gió mới, trong lành và dịu mát. Cô gái này đã chứng minh sự quyến rũ thực sự không chỉ đến từ những bộ trang phục kiệm vải, mà nó có thể toát ra từ chính thần thái, sự tự tin và đặc biệt là một nụ cười rạng rỡ.
 
-Hà Phi Yến, chỉ với nụ cười "tỏa nắng" của mình, đủ sức "gây bão" mạng xã hội, chứng minh "chỉ cần cười là đủ khiến anh em đứng hình"
+Hà Phi Yến, chỉ với nụ cười "tỏa nắng" của mình, đủ sức "gây bão" mạng xã hội, chứng minh "chỉ cần cười là đủ khiến anh em đứng hình".
 
 Nụ cười của Hà Phi Yến là một nguồn năng lượng tích cực dồi dào. Nó không phải là nụ cười gượng gạo, tạo dáng trước ống kính, mà là một nụ cười tự nhiên, sảng khoái, đôi khi hơi tinh nghịch nhưng luôn tràn đầy sức sống.
 
