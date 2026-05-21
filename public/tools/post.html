@@ -21,11 +21,6 @@
     .header h1 { margin: 0; font-size: 28px; font-weight: 800; color: #111827; tracking: -0.05em; }
     .header p { margin-top: 4px; color: #6b7280; font-size: 14px; }
     
-    .grid-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
-    @min-width: 1024px {
-      .grid-layout { grid-template-columns: 320px 1fr; items: start; }
-    }
-    
     .card {
       background: white; border-radius: 16px; padding: 24px;
       box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); 
@@ -45,7 +40,16 @@
     }
     #description { min-height: 80px; resize: vertical; font-size: 13.5px; line-height: 1.5; }
     
-    .editor { min-height: 500px; overflow-y: auto; line-height: 1.8; white-space: pre-wrap; font-size: 15px; background: #fafafa; }
+    /* FIX LỖI KÉO DÀI: Khóa chiều cao cố định và bật thanh cuộn nội bộ tự động */
+    .editor { 
+      height: 550px; 
+      max-height: 550px; 
+      overflow-y: auto; 
+      line-height: 1.8; 
+      white-space: pre-wrap; 
+      font-size: 15px; 
+      background: #fafafa; 
+    }
     .editor img { max-width: 100%; height: auto; display: block; margin: 12px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .editor img.uploading { opacity: 0.3; filter: blur(2px); border: 2px dashed #dc2626; animation: pulse 1.5s infinite; }
     .editor iframe { max-width: 100%; margin: 12px 0; border-radius: 8px; }
@@ -64,7 +68,11 @@
     .toolbar button.btn-blue { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
     .toolbar button.btn-blue:hover { background: #bfdbfe; }
     
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; border-top: 1px solid #e5e7eb; pt: 20px; }
+    /* Nút căn lề */
+    .toolbar button.btn-align { background: #f8fafc; color: #475569; }
+    .toolbar button.btn-align:hover { background: #e2e8f0; }
+    
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 20px; }
     .actions button { border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 700; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
     
     .preview-btn { background: #4b5563; color: white; }
@@ -146,6 +154,11 @@
         <button onclick="execCmd('italic')"><i>I</i> Nghiêng</button>
         <button onclick="execFormat('h2')">Thẻ H2</button>
         <button onclick="execFormat('h3')">Thẻ H3</button>
+        
+        <button onclick="execCmd('justifyLeft')" class="btn-align">⬅ Căn Trái</button>
+        <button onclick="execCmd('justifyCenter')" class="btn-align">🔲 Căn Giữa</button>
+        <button onclick="execCmd('justifyRight')" class="btn-align">➡ Căn Phải</button>
+        
         <button onclick="handleHyperlink()" class="btn-success">🔗 Thêm/Sửa Link</button>
         <button onclick="clearAllHyperlinks()" class="btn-danger">🧹 Xóa sạch Link ẩn</button>
         
@@ -172,7 +185,6 @@
 </div>
 
 <script>
-// Giữ nguyên 100% logic script xử lý dữ liệu gốc của bạn bên dưới để tránh xung đột hệ thống
 const today = new Date();
 const yyyy = today.getFullYear();
 const mm = String(today.getMonth() + 1).padStart(2, '0');
