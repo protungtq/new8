@@ -97,7 +97,6 @@
       resize: vertical;
     }
 
-    /* Định dạng ô soạn thảo kiểu Blogger */
     .editor {
       min-height: 420px;
       overflow-y: auto;
@@ -293,7 +292,6 @@
 <script>
 const contentBox = document.getElementById('content');
 
-// Các hàm định dạng trực quan kiểu Word/Blogger
 function execCmd(command) {
   document.execCommand(command, false, null);
   contentBox.focus();
@@ -333,7 +331,7 @@ function insertYoutube() {
   document.execCommand('insertHTML', false, iframeHtml);
 }
 
-// Bộ chuyển đổi cấu trúc HTML trong ô soạn thảo thành cú pháp Markdown chuẩn
+// BỘ CHUYỂN ĐỔI HTML -> MARKDOWN NÂNG CẤP (XỬ LÝ LỖI KHỬ THẺ LINK BỌC ẢNH)
 function htmlToMarkdown(html) {
   let div = document.createElement('div');
   div.innerHTML = html;
@@ -341,18 +339,37 @@ function htmlToMarkdown(html) {
   let md = [];
 
   function convert(node) {
-    if (node.nodeType === 3) { // Text node
+    if (node.nodeType === 3) {
       return node.nodeValue;
     }
     
-    if (node.nodeType !== 1) return ''; // Không phải element
+    if (node.nodeType !== 1) return '';
+
+    const tag = node.tagName.toLowerCase();
+
+    // CHỦ ĐỘNG XỬ LÝ THẺ BỌC LINK <a> (ví dụ ảnh copy từ báo thường nằm trong thẻ <a>)
+    if (tag === 'a') {
+      // Nếu bên trong thẻ link có chứa thẻ ảnh img, bóc tách lấy nguyên ảnh, bỏ qua link text trùng lặp
+      if (node.querySelector('img')) {
+        let internalImgMarkdown = '';
+        node.childNodes.forEach(child => {
+          if (child.tagName && child.tagName.toLowerCase() === 'img') {
+            internalImgMarkdown += convert(child);
+          }
+        });
+        return internalImgMarkdown;
+      }
+      // Nếu là thẻ link text bình thường thì đưa về cấu trúc link markdown [Text](URL)
+      const href = node.getAttribute('href') || '';
+      let linkText = '';
+      node.childNodes.forEach(child => { linkText += convert(child); });
+      return linkText.trim() ? `[${linkText}](${href})` : '';
+    }
 
     let childText = '';
     node.childNodes.forEach(child => {
       childText += convert(child);
     });
-
-    const tag = node.tagName.toLowerCase();
 
     switch (tag) {
       case 'h2': return `\n\n## ${childText.trim()}\n\n`;
@@ -367,11 +384,13 @@ function htmlToMarkdown(html) {
       case 'br': return '\n';
       case 'img':
         const src = node.getAttribute('src') || '';
-        const alt = node.getAttribute('alt') || 'Image';
-        const title = node.getAttribute('title') || alt;
+        let alt = node.getAttribute('alt') || 'Image';
+        // Chuẩn hóa xóa bỏ các ký tự dấu ngoặc vuông vuông bị lỗi nếu có trong alt bài cũ
+        alt = alt.replace(/[\[\]]/g, '');
+        let title = node.getAttribute('title') || alt;
+        title = title.replace(/"/g, '\\"'); // Tránh lỗi nháy kép trong thuộc tính title ảnh
         return `\n\n![${alt}](${src} "${title}")\n\n`;
       case 'iframe':
-        // Giữ nguyên thẻ iframe cho video Youtube trong file markdown
         return `\n\n${node.outerHTML}\n\n`;
       default:
         return childText;
@@ -382,20 +401,21 @@ function htmlToMarkdown(html) {
     md.push(convert(node));
   });
 
-  // Dọn dẹp các khoảng trắng và dòng trống dư thừa
   return md.join('')
     .replace(/\n{3,}/g, '\n\n')
+    .replace(/\!\[(.*?)\]\((.*?)\)\s*\"(.*?)\"/g, '![$1]($2 "$3")') // Dọn dẹp khoảng cách thừa cú pháp ảnh
     .trim();
 }
 
 function generateMarkdown() {
-  const title = document.getElementById('title').value.trim();
-  const description = document.getElementById('description').value.trim();
+  const rawTitle = document.getElementById('title').value.trim();
+  const title = rawTitle.replace(/"/g, '\\"');
+  const description = document.getElementById('description').value.trim().replace(/"/g, '\\"');
+  
   const date = document.getElementById('date').value;
   const image = document.getElementById('image').value.trim();
   const tagsInput = document.getElementById('tags').value.trim();
   
-  // Lấy toàn bộ HTML của ô nhập nội dung và chuyển sang Markdown
   const contentHtml = contentBox.innerHTML;
   const contentMarkdown = htmlToMarkdown(contentHtml);
 
@@ -435,8 +455,8 @@ function slugify(text) {
 
 function exportMarkdown() {
   const markdown = generateMarkdown();
-  const title = document.getElementById('title').value.trim();
-  const filename = slugify(title) || 'article';
+  const rawTitle = document.getElementById('title').value.trim();
+  const filename = slugify(rawTitle) || 'article';
 
   const blob = new Blob([markdown], { type: 'text/markdown' });
   const link = document.createElement('a');
@@ -449,17 +469,20 @@ function exportMarkdown() {
   document.body.removeChild(link);
 }
 
-/* SAMPLE DATA */
-document.getElementById('title').value = 'Fortnite chính thức quay trở lại App Store toàn cầu';
-document.getElementById('description').value = 'Epic Games xác nhận Fortnite đã quay trở lại App Store trên iPhone và iPad sau nhiều năm vắng bóng.';
-document.getElementById('date').value = '2026-05-20';
-document.getElementById('image').value = 'https://game8.vn/media/202307/images/2007-Fortnite-1.jpg';
-document.getElementById('tags').value = 'Fortnite, Epic Games, Apple, iOS';
+const today = new Date();
+const yyyy = today.getFullYear();
+const mm = String(today.getMonth() + 1).padStart(2, '0');
+const dd = String(today.getDate()).padStart(2, '0');
+const formattedToday = `${yyyy}-${mm}-${dd}`;
 
-// Thêm nội dung mẫu trực quan
-contentBox.innerHTML = '<div>Epic Games xác nhận trò chơi sinh tồn nổi tiếng <strong>Fortnite</strong> đã chính thức quay trở lại nền tảng iOS thông qua cửa hàng ứng dụng bên thứ ba tại khu vực Châu Âu và các giải pháp đám mây trên toàn cầu.</div>' +
-  '<img src="https://game8.vn/media/202307/images/2007-Fortnite-1.jpg" alt="Fortnite Quay Trở Lại" title="Fortnite iOS" />' +
-  '<div>Đây là bước ngoặt lớn sau cuộc chiến pháp lý kéo dài nhiều năm giữa Epic và Apple.</div>';
+/* SAMPLE DATA */
+document.getElementById('title').value = 'Hà Phi Yến chẳng cần bikini, một nụ cười đủ "gây bão" mạng.';
+document.getElementById('description').value = 'Khoảnh khắc rạng rỡ của cô nàng đang nhận được "bão like" từ cộng đồng mạng.';
+document.getElementById('date').value = formattedToday;
+document.getElementById('image').value = 'https://gamek.mediacdn.vn/133514250583805952/2026/5/19/img8121-131017-1779176195578-1779176208135180404093.jpeg';
+document.getElementById('tags').value = 'Hà Phi Yến, Hot Girl, Đời sống';
+
+contentBox.innerHTML = '<div>Cộng đồng mạng mới đây lại một lần nữa đổ rầm rầm trước loạt ảnh mới nhất của cô nàng. Không cần trang phục quá cầu kỳ, chỉ một nụ cười tỏa nắng là đủ chiếm trọn mọi ánh nhìn.</div>';
 
 generatePreview();
 </script>
