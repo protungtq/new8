@@ -4,21 +4,30 @@ import ArticleItem from "../../components/ArticleItem.astro";
 
 const POSTS_PER_PAGE = 10;
 
+// Bộ lọc dùng chung cho phần lấy dữ liệu trang hiện tại
+const now = new Date();
+
 const rawPosts = Object.entries(
   import.meta.glob('../../content/posts/*.md', { eager: true })
 );
 
-const posts = rawPosts.map(([path, post]) => {
-  const slug = path
-    .split('/')
-    .pop()
-    .replace('.md', '');
+const posts = rawPosts
+  .map(([path, post]) => {
+    const slug = path
+      .split('/')
+      .pop()
+      .replace('.md', '');
 
-  return {
-    slug,
-    frontmatter: post.frontmatter
-  };
-});
+    return {
+      slug,
+      frontmatter: post.frontmatter
+    };
+  })
+  // BỘ LỌC HẸN GIỜ: Loại bỏ bài viết tương lai
+  .filter((post) => {
+    if (!post.frontmatter?.date) return false;
+    return new Date(post.frontmatter.date) <= now;
+  });
 
 posts.sort(
   (a, b) => new Date(b.frontmatter.date) - new Date(a.frontmatter.date)
@@ -26,11 +35,19 @@ posts.sort(
 
 const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
 
+// ĐỊNH TUYẾN TRANG TĨNH (Phải đồng bộ lọc để tính chuẩn số lượng trang)
 export async function getStaticPaths() {
+  const now = new Date();
   const rawPosts = Object.entries(
     import.meta.glob('../../content/posts/*.md', { eager: true })
   );
-  const totalPages = Math.ceil(rawPosts.length / 10);
+
+  const activePosts = rawPosts.filter(([_, post]) => {
+    if (!post?.frontmatter?.date) return false;
+    return new Date(post.frontmatter.date) <= now;
+  });
+
+  const totalPages = Math.ceil(activePosts.length / 10);
 
   return Array.from(
     { length: totalPages },
@@ -46,98 +63,72 @@ const currentPage = Number(Astro.params.page);
 const start = (currentPage - 1) * POSTS_PER_PAGE;
 const end = start + POSTS_PER_PAGE;
 const visiblePosts = posts.slice(start, end);
-
-const popularPosts = posts.slice(0, 5);
-
-const formatShortDate = (dateString) => {
-  if (!dateString) return "";
-  try {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
-    });
-  } catch (e) {
-    return dateString;
-  }
-};
 ---
 
-<BaseLayout title={`Trang ${currentPage} - Game News`}>
-  <main class="max-w-[1180px] mx-auto bg-white min-h-screen px-4 md:px-6 py-6 shadow-sm rounded-b-xl">
+<BaseLayout title={`Tin tức - Trang ${currentPage}`}>
+
+  <main class=\"max-w-[1180px] mx-auto bg-white min-h-screen px-3 md:px-5 py-5 grid lg:grid-cols-12 gap-8\">
     
-    <div class="grid grid-cols-1 md:grid-cols-12 md:gap-8 items-start">
-      
-      <section class="md:col-span-8">
-        <div class="border-b-2 border-gray-900 pb-2 mb-4">
-          <h2 class="font-bold text-[18px] uppercase tracking-wider text-gray-900">Trang {currentPage}</h2>
-        </div>
+    <section class=\"lg:col-span-8 space-y-4\">
+      {
+        visiblePosts.map((post) => (
+          <ArticleItem post={post} />
+        ))
+      }
 
-        <div class="divide-y divide-gray-100">
-          {visiblePosts.map((post) => (
-            <ArticleItem post={post} />
-          ))}
-        </div>
-
-        <div class="mt-8 flex justify-center gap-4">
-          {currentPage > 1 && (
+      <div class=\"mt-6 flex justify-between\">
+        {
+          currentPage > 1 && (
             <a
               href={currentPage === 2 ? "/" : `/page/${currentPage - 1}`}
-              class="bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-900 hover:text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm"
+              class=\"bg-[#e5e5e5] px-6 py-3\"
             >
-              &larr; Trang trước
+              Trang trước
             </a>
-          )}
+          )
+        }
 
-          {currentPage < totalPages && (
+        {
+          currentPage < totalPages && (
             <a
               href={`/page/${currentPage + 1}`}
-              class="bg-gray-50 border border-gray-200 text-gray-700 hover:bg-red-600 hover:text-white hover:border-red-600 px-8 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-sm"
+              class=\"bg-[#e5e5e5] px-6 py-3\"
             >
-              Xem thêm &rarr;
+              Xem thêm
             </a>
-          )}
-        </div>
-      </section>
+          )
+        }
+      </div>
+    </section>
 
-      <aside class="hidden lg:block lg:col-span-4 sticky top-6 mt-8 lg:mt-0">
-        <div class="border-l-4 border-red-600 pl-3 mb-5">
-          <h2 class="font-extrabold text-[22px] tracking-tight text-gray-900">
-            Đọc nhiều
-          </h2>
-        </div>
+    <aside class=\"lg:col-span-4 mt-8 lg:mt-0\">
+      <div class=\"border-l-4 border-red-600 pl-3 mb-5\">
+        <h2 class=\"font-bold text-[22px] md:text-[28px] leading-none\">
+          Đọc nhiều
+        </h2>
+      </div>
 
-        <div class="space-y-4">
-          {popularPosts.map((post, index) => (
+      <div class=\"space-y-4\">
+        {
+          posts.slice(0, 5).map((post, index) => (
             <a
               href={`/posts/${post.slug}`}
-              class="group flex gap-3 items-center border-b border-gray-50 pb-3 last:border-0"
+              class=\"flex gap-3 border-b pb-3\"
             >
-              <div class={`flex-shrink-0 w-7 h-7 flex items-center justify-center font-bold text-sm rounded-md transition-colors ${
-                index < 3 ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-500'
-              }`}>
+              <div class=\"text-red-600 font-bold text-2xl w-6\">
                 {index + 1}
               </div>
-
-              <div class="w-14 h-14 flex-shrink-0 overflow-hidden rounded-md bg-gray-50 border border-gray-100">
-                <img 
-                  src={post.frontmatter.image} 
-                  alt={post.frontmatter.title} 
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-
-              <div class="min-w-0">
-                <h3 class="font-bold text-[14px] leading-snug text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
+              <div>
+                <h3 class=\"font-bold leading-6 text-[17px]\">
                   {post.frontmatter.title}
                 </h3>
-                <p class="text-[11px] text-gray-400 mt-1">{formatShortDate(post.frontmatter.date)}</p>
               </div>
             </a>
-          ))}
-        </div>
-      </aside>
+          ))
+        }
+      </div>
+    </aside>
 
-    </div>
   </main>
+
 </BaseLayout>
