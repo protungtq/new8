@@ -89,27 +89,27 @@
     <div class="grid">
       <div class="field">
         <label>Title</label>
-        <input type="text" id="title" />
+        <input type="text" id="title" oninput="saveToStorage()" />
       </div>
       <div class="field">
         <label>Date</label>
-        <input type="date" id="date" />
+        <input type="date" id="date" oninput="saveToStorage()" />
       </div>
     </div>
 
     <div class="field">
       <label>Description</label>
-      <textarea id="description"></textarea>
+      <textarea id="description" oninput="saveToStorage()"></textarea>
     </div>
 
     <div class="field">
       <label>Thumbnail image</label>
-      <input type="text" id="image" />
+      <input type="text" id="image" oninput="saveToStorage()" />
     </div>
 
     <div class="field">
       <label>Tags</label>
-      <input type="text" id="tags" placeholder="Fortnite, Epic Games, Apple" />
+      <input type="text" id="tags" placeholder="Fortnite, Epic Games, Apple" oninput="saveToStorage()" />
     </div>
 
     <div class="field">
@@ -122,7 +122,7 @@
         <button onclick="insertImage()">Chèn ảnh</button>
         <button onclick="insertYoutube()">YouTube</button>
       </div>
-      <div id="content" class="editor" contenteditable="true"></div>
+      <div id="content" class="editor" contenteditable="true" oninput="saveToStorage()"></div>
     </div>
 
     <div class="actions">
@@ -136,6 +136,13 @@
 </div>
 
 <script>
+// 1. KHỞI TẠO NGÀY HỆ THỐNG TRÊN ĐẦU FILE ĐỂ ĐỒNG BỘ TRƯỚC
+const today = new Date();
+const yyyy = today.getFullYear();
+const mm = String(today.getMonth() + 1).padStart(2, '0');
+const dd = String(today.getDate()).padStart(2, '0');
+const formattedToday = `${yyyy}-${mm}-${dd}`;
+
 const contentBox = document.getElementById('content');
 
 function execCmd(command) {
@@ -176,9 +183,10 @@ function insertYoutube() {
   saveToStorage();
 }
 
-// BẮT SỰ KIỆN PASTE ĐỂ LỌC VÀ REHOST ẢNH
+// THEO DÕI SỰ KIỆN PASTE
 contentBox.addEventListener('paste', () => {
   setTimeout(() => {
+    saveToStorage();
     rehostAllImagesInEditor();
   }, 100);
 });
@@ -192,7 +200,6 @@ async function rehostAllImagesInEditor() {
   for (let img of images) {
     const originalSrc = img.getAttribute('src');
     
-    // Bỏ qua ảnh trống, ảnh base64 hoặc ảnh đã thuộc freeimage
     if (!originalSrc || originalSrc.startsWith('data:') || originalSrc.includes('freeimage.host')) {
       img.classList.add('uploaded');
       continue;
@@ -201,23 +208,37 @@ async function rehostAllImagesInEditor() {
     img.classList.add('uploading');
 
     try {
-      // BƯỚC 1: Sử dụng CORS Proxy trung chuyển để bóc tách file thô từ trình duyệt
-      const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(originalSrc);
-      const imgRes = await fetch(proxyUrl);
-      if (!imgRes.ok) throw new Error("Proxy không phản hồi file ảnh");
-      const imgBlob = await imgRes.blob();
+      let imgBlob = null;
+      
+      // HỆ THỐNG PROXY CORS DỰ PHÒNG 2 LỚP ĐỂ KHÔNG BỊ CHẶN HOTLINK
+      const proxies = [
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(originalSrc)}`,
+        `https://corsproxy.io/?${encodeURIComponent(originalSrc)}`
+      ];
+
+      for (let proxy of proxies) {
+        try {
+          const imgRes = await fetch(proxy);
+          if (imgRes.ok) {
+            imgBlob = await imgRes.blob();
+            break; 
+          }
+        } catch (e) {
+          console.warn("Proxy thất bại, đang chuyển hướng sang lớp dự phòng...");
+        }
+      }
+
+      if (!imgBlob) throw new Error("Tất cả hệ thống proxy đều bị server ảnh chặn tải");
 
       let mimeType = imgBlob.type || "image/jpeg";
       let extension = mimeType.split("/")[1] || "jpg";
 
-      // BƯỚC 2: Đóng gói dạng File nhị phân gửi đi, triệt tiêu lỗi server chặn hotlink
       const form = new FormData();
       form.append("key", apiKey);
       form.append("action", "upload");
       form.append("format", "json");
       form.append("source", new File([imgBlob], `image.${extension}`, { type: mimeType }));
 
-      // BƯỚC 3: Thực hiện POST thẳng lên FreeImage
       const res = await fetch("https://freeimage.host/api/1/upload", {
         method: "POST",
         body: form
@@ -230,11 +251,13 @@ async function rehostAllImagesInEditor() {
         img.setAttribute('src', newUrl);
         img.classList.remove('uploading');
         img.classList.add('uploaded');
+        
+        // ĐỒNG BỘ LƯU TRỮ VÀ RENDER NGAY LẬP TỨC
         saveToStorage();
         generatePreview();
       } else {
         img.classList.remove('uploading');
-        console.error("API FreeImage báo lỗi:", result?.status_txt);
+        console.error("API FreeImage lỗi:", result?.status_txt);
       }
     } catch (err) {
       img.classList.remove('uploading');
@@ -417,23 +440,15 @@ function loadFromStorage() {
     document.getElementById('image').value = data.image || '';
     document.getElementById('tags').value = data.tags || '';
     contentBox.innerHTML = data.content || '';
+  } else {
+    // Nếu không có data nháp cũ, tự động nạp ngày mặc định là hôm nay
+    document.getElementById('date').value = formattedToday;
   }
   generatePreview();
 }
 
-const today = new Date();
-const yyyy = today.getFullYear();
-const mm = String(today.getMonth() + 1).padStart(2, '0');
-const dd = String(today.getDate()).padStart(2, '0');
-const formattedToday = `${yyyy}-${mm}-${dd}`;
-
+// Chạy khởi tạo đọc bộ nhớ cục bộ
 loadFromStorage();
-contentBox.addEventListener('input', saveToStorage);
-document.getElementById('title').addEventListener('input', saveToStorage);
-document.getElementById('date').addEventListener('input', saveToStorage);
-document.getElementById('description').addEventListener('input', saveToStorage);
-document.getElementById('image').addEventListener('input', saveToStorage);
-document.getElementById('tags').addEventListener('input', saveToStorage);
 </script>
 </body>
 </html>
