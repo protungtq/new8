@@ -1,6 +1,6 @@
 ---
 title: "Hà Phi Yến chẳng cần bikini, một nụ cười đủ "gây bão" mạng"
-description: "Cô gái chứng minh "chỉ cần cười là đủ khiến anh em đứng hình"."
+description: "Cô gái chứng minh chỉ cần cười là đủ khiến anh em đứng hình"."
 date: "2026-05-20"
 image: "https://iili.io/C9Eb9EB.webp"
 tags:
