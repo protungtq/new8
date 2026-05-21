@@ -9,7 +9,7 @@ tags:
   - Đời sống
 ---
 
-Trong thời đại mà mạng xã hội dường như bị bão hòa bởi những hình ảnh khoe thân nóng bỏng, những cô gái diện bikini gợi cảm thu hút hàng triệu lượt like và [follow](https://gamek.vn/nong-bong-mat-voi-bo-anh-giua-sa-mac-cua-nu-tiktoker-t13-trieu-follow-178260507173240239.chn), thì sự xuất hiện của Hà Phi Yến như một luồng gió mới, trong lành và dịu mát. Cô gái này đã chứng minh sự quyến rũ thực sự không chỉ đến từ những bộ trang phục kiệm vải, mà nó có thể toát ra từ chính thần thái, sự tự tin và đặc biệt là một nụ cười rạng rỡ.
+Trong thời đại mà mạng xã hội dường như bị bão hòa bởi những hình ảnh khoe thân nóng bỏng, những cô gái diện bikini gợi cảm thu hút hàng triệu lượt like và [follow](https://gamek.vn/nong-bong-mat-voi-bo-anh-giua-sa-mac-cua-nu-tiktoker-t13-trieu-follow-178260507173240239.chn), thì sự xuất hiện của Hà Phi Yến như một luồng gió mới, trong lành và dịu mát. Cô gái này đã chứng minh sự quyến rũ thực sự không chỉ đến từ những bộ trang phục kiệm vải, mà nó có thể toát ra từ chính thần thái, sự tự tin và đặc biệt là một nụ cười rạng rỡ..
 
 Hà Phi Yến, chỉ với nụ cười "tỏa nắng" của mình, đủ sức "gây bão" mạng xã hội, chứng minh "chỉ cần cười là đủ khiến anh em đứng hình".
 
