@@ -48,6 +48,10 @@
       border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.2s ease; font-size: 14px;
     }
     .toolbar button:hover { transform: translateY(-1px); opacity: 0.95; }
+    /* Nút xóa link nhanh cho màu đặc biệt */
+    .toolbar button.btn-danger { background: #ef4444; }
+    .toolbar button.btn-success { background: #10b981; }
+    
     .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
     .actions button { border: none; padding: 14px 18px; border-radius: 14px; cursor: pointer; font-size: 15px; font-weight: 600; transition: 0.2s ease; }
     .preview-btn { background: #111827; color: white; }
@@ -119,6 +123,8 @@
         <button onclick="execCmd('italic')">Italic</button>
         <button onclick="execFormat('h2')">H2</button>
         <button onclick="execFormat('h3')">H3</button>
+        <button onclick="handleHyperlink()" class="btn-success">🔗 Thêm/Sửa Link</button>
+        <button onclick="clearAllHyperlinks()" class="btn-danger">🧹 Xóa sạch Link ẩn</button>
         <button onclick="insertImage()">Chèn ảnh</button>
         <button onclick="insertYoutube()">YouTube</button>
       </div>
@@ -136,14 +142,12 @@
 </div>
 
 <script>
-// Khởi tạo ngày tháng hệ thống (chỉ lấy phần YYYY-MM-DD để đưa vào input date ban đầu)
 const today = new Date();
 const yyyy = today.getFullYear();
 const mm = String(today.getMonth() + 1).padStart(2, '0');
 const dd = String(today.getDate()).padStart(2, '0');
 const formattedToday = `${yyyy}-${mm}-${dd}`;
 
-// Lưu trữ biến kiểm soát giờ phút giây ban đầu của phiên làm việc (nếu cần đồng bộ)
 let currentHours = String(today.getHours()).padStart(2, '0');
 let currentMinutes = String(today.getMinutes()).padStart(2, '0');
 let currentSeconds = String(today.getSeconds()).padStart(2, '0');
@@ -159,6 +163,56 @@ function execCmd(command) {
 function execFormat(tag) {
   document.execCommand('formatBlock', false, `<${tag}>`);
   saveToStorage();
+  contentBox.focus();
+}
+
+// CHỨC NĂNG 1: THÊM HOẶC CẬP NHẬT HYPERLINK ĐANG CHỌN
+function handleHyperlink() {
+  const selection = window.getSelection();
+  let selectedNode = selection.anchorNode;
+  
+  if (!selectedNode) return;
+  if (selectedNode.nodeType === 3) {
+    selectedNode = selectedNode.parentNode;
+  }
+
+  // Kiểm tra xem đoạn chữ đang chọn có nằm trong một thẻ <a> cũ không
+  const existingLink = selectedNode.closest('a');
+  let defaultUrl = "";
+  if (existingLink) {
+    defaultUrl = existingLink.getAttribute('href');
+  }
+
+  const url = prompt("Nhập hoặc sửa liên kết URL:", defaultUrl || "https://");
+  if (url === null) return; // Nhấn Cancel
+
+  if (url.trim() === "") {
+    // Nếu xóa hết chữ trong prompt, gỡ bỏ link cũ luôn
+    if (existingLink) {
+      existingLink.outerHTML = existingLink.innerHTML;
+    }
+  } else {
+    // Thực hiện chèn hoặc ghi đè link mới
+    document.execCommand("createLink", false, url);
+  }
+  
+  saveToStorage();
+  generatePreview();
+  contentBox.focus();
+}
+
+// CHỨC NĂNG 2: XÓA SẠCH LINK ẨN CỦA BÀI BÁO GỐC KHI PASTE
+function clearAllHyperlinks() {
+  if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ liên kết (Hyperlink) ẩn trong bài viết không? (Chữ vẫn được giữ nguyên)")) return;
+  
+  const links = contentBox.querySelectorAll('a');
+  links.forEach(link => {
+    // Thay thế thẻ <a> bằng nội dung chữ thuần bên trong của chính nó
+    link.outerHTML = link.innerHTML;
+  });
+  
+  saveToStorage();
+  generatePreview();
   contentBox.focus();
 }
 
@@ -226,11 +280,11 @@ async function rehostAllImagesInEditor() {
             break; 
           }
         } catch (e) {
-          console.warn("Proxy lỗi, chuyển sang proxy dự phòng...");
+          console.warn("Proxy lỗi, chuyển đổi dự phòng...");
         }
       }
 
-      if (!imgBlob) throw new Error("Không thể tải file ảnh");
+      if (!imgBlob) throw new Error("Lỗi fetch proxy");
 
       let mimeType = imgBlob.type || "image/jpeg";
       let extension = mimeType.split("/")[1] || "jpg";
@@ -329,10 +383,8 @@ function generateMarkdown() {
   const image = document.getElementById('image').value.trim();
   const tagsInput = document.getElementById('tags').value.trim();
   
-  // TÍNH TOÁN GIỜ PHÚT GIÂY ĐỂ ĐƯA VÀO FRONTMATTER ISO 8601
   let finalDateTime = dateInput;
   if (dateInput) {
-    // Nếu ngày chọn trùng ngày hôm nay, lấy giờ hiện hành thực tế. Nếu chọn ngày khác, dùng giờ được lưu hoặc mặc định 12:00:00
     const now = new Date();
     const inputDateObj = new Date(dateInput);
     
@@ -341,7 +393,6 @@ function generateMarkdown() {
       h = String(now.getHours()).padStart(2, '0');
       m = String(now.getMinutes()).padStart(2, '0');
       s = String(now.getSeconds()).padStart(2, '0');
-      // Cập nhật lại biến phiên để đồng bộ tạm thời
       currentHours = h; currentMinutes = m; currentSeconds = s;
     }
     finalDateTime = `${dateInput}T${h}:${m}:${s}+07:00`;
@@ -418,8 +469,8 @@ async function pushToGitHub() {
 
     if (pushRes.status === 201 || pushRes.status === 200) {
       alert(`🚀 Đăng thành công lên GitHub!`);
-      clearStorage();
-      location.reload();
+      saveToStorage(); 
+      generatePreview();
     } else {
       const errData = await pushRes.json();
       alert(`Lỗi: ${errData.message}`);
@@ -441,7 +492,6 @@ function saveToStorage() {
     image: document.getElementById('image').value,
     tags: document.getElementById('tags').value,
     content: contentBox.innerHTML,
-    // Lưu kèm mốc thời gian phụ để F5 không mất cấu trúc giờ
     hours: currentHours,
     minutes: currentMinutes,
     seconds: currentSeconds
