@@ -61,7 +61,7 @@
       padding: 22px; overflow-x: auto; white-space: pre-wrap; line-height: 1.8;
       font-family: Consolas, monospace; font-size: 14px;
     }
-    .config-box { background: #f1f5f9; border: 1px solid #e2e2e0; border-radius: 16px; padding: 16px; margin-bottom: 18px; }
+    .config-box { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-bottom: 18px; }
     .upload-group { display: flex; gap: 8px; margin-top: 6px; }
     .upload-status { font-size: 13px; color: #4b5563; font-weight: 500; margin-top: 4px; display: block; }
   </style>
@@ -79,7 +79,9 @@
       <div>
         <label>GitHub Personal Access Token (Lưu cục bộ tại trình duyệt của bạn)</label>
         <input type="password" id="ghToken" placeholder="github_pat_..." oninput="saveConfig()" />
-        <input type="hidden" id="uploadServerUrl" value="https://tq-upload-proxy.mobitungtq.workers.dev" />
+        <input type="hidden" id="fiApiKey" value="6d207e02198a847aa98d0a2a901485a5" />
+        
+        <input type="text" id="workerProxyUrl" oninput="saveConfig()" placeholder="https://my-freeimage-proxy.xxxx.workers.dev" style="margin-top: 10px;" />
       </div>
     </div>
   </div>
@@ -104,10 +106,10 @@
     <div class="field">
       <label>Thumbnail image</label>
       <div class="upload-group">
-        <input type="text" id="image" oninput="saveToStorage()" placeholder="Link ảnh từ hệ thống upanh..." />
+        <input type="text" id="image" oninput="saveToStorage()" placeholder="Link ảnh từ hệ thống..." />
         <label class="btn-upload-label">
           📤 Tải ảnh lên
-          <input type="file" accept="image/*" style="display:none;" onchange="uploadToBackend(this.files[0], 'image')" />
+          <input type="file" accept="image/*" style="display:none;" onchange="uploadViaWorker(this.files[0], 'image')" />
         </label>
       </div>
       <span id="status-thumb" class="upload-status"></span>
@@ -130,7 +132,7 @@
         
         <label class="btn-upload-label" style="background:#3b82f6;">
           🖼️ Tải ảnh vào bài
-          <input type="file" accept="image/*" style="display:none;" onchange="uploadToBackend(this.files[0], 'editor')" />
+          <input type="file" accept="image/*" style="display:none;" onchange="uploadViaWorker(this.files[0], 'editor')" />
         </label>
         
         <button onclick="insertYoutube()">YouTube</button>
@@ -204,60 +206,66 @@ function clearAllHyperlinks() {
   contentBox.focus();
 }
 
-// BẮT SỰ KIỆN PASTE FILE ẢNH TỪ CLIPBOARD (PASTE ẢNH THÔ)
+// BẮT SỰ KIỆN PASTE FILE ẢNH
 contentBox.addEventListener('paste', async (e) => {
   const items = (e.clipboardData || e.originalEvent.clipboardData).items;
   for (let item of items) {
     if (item.type.indexOf("image") === 0) {
       e.preventDefault();
       const file = item.getAsFile();
-      await uploadToBackend(file, 'editor');
+      await uploadViaWorker(file, 'editor');
     }
   }
 });
 
-// HÀM ĐẨY ẢNH QUA SERVER BACKEND TRUNG CHUYỂN HOÀN TOÀN KHÔNG LỖI CORS
-async function uploadToBackend(file, target) {
+// LUỒNG TẢI ẢNH QUA PROXY CLOUDFLARE WORKER ĐỘC LẬP
+async function uploadViaWorker(file, target) {
   if (!file) return;
-  const serverUrl = document.getElementById('uploadServerUrl').value;
+  const proxyUrl = document.getElementById('workerProxyUrl').value.trim();
+  const apiKey = document.getElementById('fiApiKey').value.trim();
   const statusEl = target === 'image' ? document.getElementById('status-thumb') : document.getElementById('status-editor');
   
-  statusEl.textContent = "⏳ Đang chuyển tiếp ảnh lên cổng lưu trữ tuoitreit...";
+  if (!proxyUrl) {
+    alert("Vui lòng cấu hình đường dẫn Cloudflare Worker Proxy ở phía trên!");
+    return;
+  }
+
+  statusEl.textContent = "⏳ Đang tải ảnh lên FreeImage qua Cloudflare Worker Tunnel...";
 
   try {
     const form = new FormData();
-    // Đóng gói theo chuẩn cấu trúc tham số mà file upload.php yêu cầu
-    form.append("type", "upload");
-    form.append("fileupload[]", file); // Tên trường nhận file mảng của jQuery FileUpload
+    form.append("key", apiKey);
+    form.append("action", "upload");
+    form.append("format", "json");
+    form.append("source", file);
 
-    const res = await fetch(serverUrl, {
+    const res = await fetch(proxyUrl, {
       method: "POST",
       body: form
     });
     
     const result = await res.json();
 
-    // Hệ thống tuoitreit trả về mảng kết quả hoặc object chứa url trực tiếp
-    if (result && (result.url || (result.files && result.files[0]?.url))) {
-      const directUrl = result.url || result.files[0].url;
+    if (result && result.status_code === 200) {
+      const newUrl = result.image?.url || result.image?.display_url;
       
       if (target === 'image') {
-        document.getElementById('image').value = directUrl;
+        document.getElementById('image').value = newUrl;
         statusEl.textContent = "✅ Nạp ảnh đại diện bài viết thành công!";
       } else {
-        const imgHtml = `<img src="${directUrl}" alt="Image" title="Image" />`;
+        const imgHtml = `<img src="${newUrl}" alt="Image" title="Image" />`;
         contentBox.focus();
         document.execCommand('insertHTML', false, imgHtml);
-        statusEl.textContent = "✅ Đã Rehost ảnh thành công!";
+        statusEl.textContent = "✅ Đã tải và chèn ảnh thành công!";
         setTimeout(() => statusEl.textContent = "", 3000);
       }
       saveToStorage();
       generatePreview();
     } else {
-      statusEl.textContent = "❌ Lỗi cấu hình tham số truyền tải từ Server.";
+      statusEl.textContent = "❌ Lỗi: " + (result?.error || "Server từ chối xử lý");
     }
   } catch (err) {
-    statusEl.textContent = "❌ Lỗi: Server tuoitreit chưa bật cấu hình CORS mở rộng cho tên miền này.";
+    statusEl.textContent = "❌ Lỗi kết nối đến Cloudflare Worker. Hãy kiểm tra lại link proxy.";
     console.error(err);
   }
 }
@@ -437,6 +445,7 @@ async function pushToGitHub() {
 
 function saveConfig() {
   localStorage.setItem('gh_studio_token', document.getElementById('ghToken').value);
+  localStorage.setItem('cf_worker_proxy_url', document.getElementById('workerProxyUrl').value);
 }
 
 function saveToStorage() {
@@ -459,6 +468,9 @@ function clearStorage() { localStorage.removeItem('md_studio_data'); }
 function loadFromStorage() {
   const savedToken = localStorage.getItem('gh_studio_token');
   if (savedToken) document.getElementById('ghToken').value = savedToken;
+
+  const savedWorker = localStorage.getItem('cf_worker_proxy_url');
+  if (savedWorker) document.getElementById('workerProxyUrl').value = savedWorker;
 
   const savedData = localStorage.getItem('md_studio_data');
   if (savedData) {
