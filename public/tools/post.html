@@ -40,7 +40,7 @@
     #description { min-height: 90px; resize: vertical; }
     .editor { min-height: 420px; overflow-y: auto; line-height: 1.7; }
     .editor img { max-width: 100%; height: auto; display: block; margin: 10px 0; border-radius: 8px; }
-    .editor img.uploading { opacity: 0.4; filter: blur(2px); border: 2px solid #6366f1; }
+    .editor img.uploading { opacity: 0.4; filter: blur(3px); border: 2px dashed #6366f1; animation: pulse 1.5s infinite; }
     .editor iframe { max-width: 100%; margin: 10px 0; }
     .toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
     .toolbar button {
@@ -59,6 +59,12 @@
       font-family: Consolas, monospace; font-size: 14px;
     }
     .config-box { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; margin-bottom: 18px; }
+    
+    @keyframes pulse {
+      0% { opacity: 0.4; }
+      50% { opacity: 0.7; }
+      100% { opacity: 0.4; }
+    }
   </style>
 </head>
 <body>
@@ -170,6 +176,7 @@ function insertYoutube() {
   saveToStorage();
 }
 
+// BẮT SỰ KIỆN PASTE ĐỂ LỌC VÀ REHOST ẢNH
 contentBox.addEventListener('paste', () => {
   setTimeout(() => {
     rehostAllImagesInEditor();
@@ -185,6 +192,7 @@ async function rehostAllImagesInEditor() {
   for (let img of images) {
     const originalSrc = img.getAttribute('src');
     
+    // Bỏ qua ảnh trống, ảnh base64 hoặc ảnh đã thuộc freeimage
     if (!originalSrc || originalSrc.startsWith('data:') || originalSrc.includes('freeimage.host')) {
       img.classList.add('uploaded');
       continue;
@@ -193,12 +201,23 @@ async function rehostAllImagesInEditor() {
     img.classList.add('uploading');
 
     try {
+      // BƯỚC 1: Sử dụng CORS Proxy trung chuyển để bóc tách file thô từ trình duyệt
+      const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(originalSrc);
+      const imgRes = await fetch(proxyUrl);
+      if (!imgRes.ok) throw new Error("Proxy không phản hồi file ảnh");
+      const imgBlob = await imgRes.blob();
+
+      let mimeType = imgBlob.type || "image/jpeg";
+      let extension = mimeType.split("/")[1] || "jpg";
+
+      // BƯỚC 2: Đóng gói dạng File nhị phân gửi đi, triệt tiêu lỗi server chặn hotlink
       const form = new FormData();
       form.append("key", apiKey);
       form.append("action", "upload");
       form.append("format", "json");
-      form.append("source", originalSrc); 
+      form.append("source", new File([imgBlob], `image.${extension}`, { type: mimeType }));
 
+      // BƯỚC 3: Thực hiện POST thẳng lên FreeImage
       const res = await fetch("https://freeimage.host/api/1/upload", {
         method: "POST",
         body: form
@@ -219,7 +238,7 @@ async function rehostAllImagesInEditor() {
       }
     } catch (err) {
       img.classList.remove('uploading');
-      console.error("Lỗi kết nối API:", err);
+      console.error("Lỗi luồng xử lý Rehost:", err);
     }
   }
 }
