@@ -3,8 +3,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import ArticleItem from "../../components/ArticleItem.astro";
 
 const POSTS_PER_PAGE = 10;
-
-// Bộ lọc dùng chung cho phần lấy dữ liệu trang hiện tại
 const now = new Date();
 
 const rawPosts = Object.entries(
@@ -23,7 +21,6 @@ const posts = rawPosts
       frontmatter: post.frontmatter
     };
   })
-  // BỘ LỌC HẸN GIỜ: Loại bỏ bài viết tương lai
   .filter((post) => {
     if (!post.frontmatter?.date) return false;
     return new Date(post.frontmatter.date) <= now;
@@ -35,7 +32,6 @@ posts.sort(
 
 const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE);
 
-// ĐỊNH TUYẾN TRANG TĨNH (Phải đồng bộ lọc để tính chuẩn số lượng trang)
 export async function getStaticPaths() {
   const now = new Date();
   const rawPosts = Object.entries(
@@ -63,25 +59,40 @@ const currentPage = Number(Astro.params.page);
 const start = (currentPage - 1) * POSTS_PER_PAGE;
 const end = start + POSTS_PER_PAGE;
 const visiblePosts = posts.slice(start, end);
+
+// ĐỒNG BỘ SIDEBAR: Lấy ngẫu nhiên bài viết trong 7 ngày qua
+const SEVEN_DAYS_AGO = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+const randomPosts = posts
+  .filter((post) => {
+    if (!post.frontmatter.date) return false;
+    const postDate = new Date(post.frontmatter.date);
+    return postDate >= SEVEN_DAYS_AGO && postDate <= now;
+  })
+  .sort(() => 0.5 - Math.random())
+  .slice(0, 5);
 ---
 
 <BaseLayout title={`Tin tức - Trang ${currentPage}`}>
 
-  <main class=\"max-w-[1180px] mx-auto bg-white min-h-screen px-3 md:px-5 py-5 grid lg:grid-cols-12 gap-8\">
+  <main class="max-w-[1180px] mx-auto bg-white min-h-screen px-3 md:px-5 py-5 grid lg:grid-cols-12 gap-8 items-start">
     
-    <section class=\"lg:col-span-8 space-y-4\">
+    <section class="lg:col-span-8 space-y-4">
+      <div class="border-b-2 border-gray-900 pb-2 mb-4">
+        <h2 class="font-bold text-[18px] uppercase tracking-wider text-gray-900">Trang {currentPage}</h2>
+      </div>
+
       {
         visiblePosts.map((post) => (
           <ArticleItem post={post} />
         ))
       }
 
-      <div class=\"mt-6 flex justify-between\">
+      <div class="mt-6 flex justify-between">
         {
           currentPage > 1 && (
             <a
               href={currentPage === 2 ? "/" : `/page/${currentPage - 1}`}
-              class=\"bg-[#e5e5e5] px-6 py-3\"
+              class="bg-[#e5e5e5] px-6 py-3 font-semibold"
             >
               Trang trước
             </a>
@@ -92,7 +103,7 @@ const visiblePosts = posts.slice(start, end);
           currentPage < totalPages && (
             <a
               href={`/page/${currentPage + 1}`}
-              class=\"bg-[#e5e5e5] px-6 py-3\"
+              class="bg-[#e5e5e5] px-6 py-3 font-semibold"
             >
               Xem thêm
             </a>
@@ -101,30 +112,36 @@ const visiblePosts = posts.slice(start, end);
       </div>
     </section>
 
-    <aside class=\"lg:col-span-4 mt-8 lg:mt-0\">
-      <div class=\"border-l-4 border-red-600 pl-3 mb-5\">
-        <h2 class=\"font-bold text-[22px] md:text-[28px] leading-none\">
-          Đọc nhiều
+    <aside class="hidden lg:block lg:col-span-4 sticky top-6 bg-gray-50/60 p-4 rounded-xl border border-gray-100">
+      <div class="border-l-4 border-red-600 pl-3 mb-5">
+        <h2 class="font-bold text-[20px] text-gray-900 tracking-tight">
+          Khám phá trong tuần
         </h2>
       </div>
 
-      <div class=\"space-y-4\">
+      <div class="space-y-4">
         {
-          posts.slice(0, 5).map((post, index) => (
+          randomPosts.map((post, index) => (
             <a
               href={`/posts/${post.slug}`}
-              class=\"flex gap-3 border-b pb-3\"
+              class="group flex gap-3 items-center border-b border-gray-200/60 pb-3 last:border-0 last:pb-0"
             >
-              <div class=\"text-red-600 font-bold text-2xl w-6\">
+              <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center font-bold text-xs bg-gray-200/80 text-gray-600 rounded-md group-hover:bg-red-600 group-hover:text-white transition-colors">
                 {index + 1}
               </div>
-              <div>
-                <h3 class=\"font-bold leading-6 text-[17px]\">
+              <div class="min-w-0">
+                <h3 class="font-bold leading-snug text-[14px] text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
                   {post.frontmatter.title}
                 </h3>
               </div>
             </a>
           ))
+        }
+        
+        {
+          randomPosts.length === 0 && (
+            <p class="text-xs text-gray-400 italic py-2">Chưa có bài viết mới nào trong 7 ngày qua.</p>
+          )
         }
       </div>
     </aside>
