@@ -5,24 +5,30 @@ on:
     branches:
       - main
   schedule:
-    # Tự động chạy build 30 phút một lần
+    # Tự động chạy build định kỳ 30 phút một lần để quét bài viết hẹn giờ
     - cron: '*/30 * * * *'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    # Thiết lập biến môi trường ép chạy Javascript Action trên nền Node mới theo khuyến nghị của GitHub
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
-        # SỬA LỖI TẠI ĐÂY: Thay đổi actions/node-env thành actions/setup-node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          # NÂNG CẤP LÊN NODE 22: Thỏa mãn hoàn toàn điều kiện ">=22.12.0" của Astro
+          node-version: 22
+          cache: 'npm' # Tự động cache node_modules để các lượt build sau nhanh hơn nữa
 
       - name: Install Dependencies
-        run: npm install
+        run: npm ci # Sử dụng npm ci thay cho npm install để cài đặt chính xác theo package-lock.json, tránh lỗi vặt
 
       - name: Build Project
         run: npm run build
