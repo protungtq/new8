@@ -11,6 +11,7 @@ const rawPosts = Object.entries(
 
 const now = new Date();
 
+// 1. Lọc và chuẩn hóa danh sách bài viết đã xuất bản
 const posts = rawPosts
   .map(([path, post]) => {
     if (!post || !post.frontmatter) {
@@ -27,13 +28,13 @@ const posts = rawPosts
     };
   })
   .filter(Boolean)
-  // BỘ LỌC HẸN GIỜ
+  // BỘ LỌC HẸN GIỜ: Loại bỏ bài viết tương lai
   .filter((post) => {
     if (!post.frontmatter?.date) return false;
     return new Date(post.frontmatter.date) <= now;
   });
 
-// Tạo danh sách trang tag tĩnh dựa trên các bài viết đã công khai
+// 2. Tạo danh sách trang tag tĩnh dựa trên các bài viết đã công khai
 export async function getStaticPaths() {
   const now = new Date();
   const rawPosts = Object.entries(
@@ -46,8 +47,7 @@ export async function getStaticPaths() {
 
   rawPosts.forEach(([_, post]) => {
     if (!post?.frontmatter?.date) return;
-    // Chỉ tạo tag cho các bài viết đã đến giờ phát sóng
-    if (new Date(post.frontmatter.date) > now) return;
+    if (new Date(post.frontmatter.date) > now) return; // Bỏ qua bài viết hẹn giờ
 
     const tags = post.frontmatter.tags || [];
     tags.forEach(tag => {
@@ -64,15 +64,19 @@ export async function getStaticPaths() {
 
 const currentTag = Astro.params.tag;
 
-const originalTag = posts
-  .flatMap(post => post.frontmatter.tags || [])
-  .find(tag => slugify(tag) === currentTag);
+// Tìm tên tag gốc nguyên bản
+const originalTag =
+  posts
+    .flatMap(post => post.frontmatter.tags || [])
+    .find(tag => slugify(tag) === currentTag);
 
+// Lọc bài viết thuộc tag này
 const filteredPosts = posts.filter(post => {
   const tags = post.frontmatter.tags || [];
   return tags.some(tag => slugify(tag) === currentTag);
 });
 
+// Sắp xếp bài viết mới nhất lên đầu
 filteredPosts.sort((a, b) => {
   const dateA = a.frontmatter?.date || "2000-01-01";
   const dateB = b.frontmatter?.date || "2000-01-01";
@@ -80,25 +84,41 @@ filteredPosts.sort((a, b) => {
 });
 ---
 
-<BaseLayout title={`Thẻ: ${originalTag || 'Phân loại'}`}>
-  <main class=\"max-w-[1180px] mx-auto bg-white min-h-screen px-3 md:px-5 py-5\">
-    <div class=\"border-l-4 border-red-600 pl-3 mb-6\">
-      <h1 class=\"font-bold text-[24px] md:text-[32px]\">
-        Chủ đề: {originalTag}
-      </h1>
-    </div>
+{/* ĐỒNG BỘ: Tiêu đề sạch sẽ hoàn toàn, không chứa từ khóa "tin" */}
+<BaseLayout title={`Chủ đề: ${originalTag || 'Phân loại'}`}>
 
-    <section class=\"space-y-4\">
-      {
-        filteredPosts.map(post => (
-          <ArticleItem post={post} />
-        ))
-      }
-      {
-        filteredPosts.length === 0 && (
-          <p class=\"text-gray-500 py-10 text-center\">Chưa có bài viết nào thuộc chủ đề này.</p>
-        )
-      }
-    </section>
-  </main>
+  {/* BỌC NỀN XÁM: Tạo không gian đệm và màu sắc đồng nhất với trang đọc bài */}
+  <div class="w-full bg-[#efefef] min-h-screen py-6 px-3 md:px-5">
+    
+    {/* SỬA LỖI VỠ KHUNG: Ép chặt chiều rộng max-w-[1180px], căn giữa mx-auto và đóng khối trắng bo góc */}
+    <main class="max-w-[1180px] mx-auto bg-white p-4 md:p-6 shadow-sm rounded-lg">
+
+      <div class="mb-6 border-l-4 border-red-600 pl-4 py-1">
+        <h1 class="text-[24px] md:text-[32px] font-bold text-gray-900 tracking-tight leading-none">
+          #{originalTag}
+        </h1>
+        <p class="text-gray-400 text-xs mt-1.5 font-medium">
+          Tổng số: {filteredPosts.length} bài viết
+        </p>
+      </div>
+
+      {/* Danh sách các bài viết hiển thị thẳng thớm, ngay ngắn */}
+      <section class="divide-y divide-gray-100">
+        {
+          filteredPosts.map((post) => (
+            <ArticleItem post={post} />
+          ))
+        }
+        
+        {
+          filteredPosts.length === 0 && (
+            <p class="text-sm text-gray-400 italic py-12 text-center">Chưa có nội dung nào thuộc chủ đề này.</p>
+          )
+        }
+      </section>
+
+    </main>
+    
+  </div>
+
 </BaseLayout>
