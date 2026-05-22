@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ArticleItem from "../../components/ArticleItem.astro";
-import SidebarAd from "../../components/SidebarAd.astro"; // Import component quảng cáo dùng chung
+import SidebarAd from "../../components/SidebarAd.astro";
 import { slugify } from "../../utils/slugify";
 
 const rawPosts = Object.entries(
@@ -29,7 +29,6 @@ const posts = rawPosts
     };
   })
   .filter(Boolean)
-  // BỘ LỌC HẸN GIỜ: Loại bỏ bài viết tương lai
   .filter((post) => {
     if (!post.frontmatter?.date) return false;
     return new Date(post.frontmatter.date) <= now;
@@ -84,7 +83,7 @@ filteredPosts.sort((a, b) => {
   return new Date(dateB) - new Date(dateA);
 });
 
-// Lấy danh sách các tag khác để làm danh mục khám phá ở Sidebar (loại trừ tag hiện tại)
+// Lấy danh sách các tag khác để làm danh mục khám phá ở Sidebar
 const allTags = Array.from(
   new Set(posts.flatMap(post => post.frontmatter.tags || []))
 ).filter(tag => slugify(tag) !== currentTag).slice(0, 8);
@@ -105,10 +104,10 @@ const allTags = Array.from(
         </p>
       </div>
 
-      {/* CHUYỂN ĐỔI BỐ CỤC: Chia grid thành 12 cột tương tự trang chủ */}
+      {/* BỐ CỤC GRID CHUẨN: Đảm bảo thẻ cha trực tiếp quản lý độ cao song song của cả 2 cột */}
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* CỘT TRÁI (8 Cột): Danh sách bài viết thuộc Tag */}
+        {/* CỘT TRÁI (8 Cột): Danh sách bài viết */}
         <section class="lg:col-span-8 divide-y divide-gray-100">
           {
             filteredPosts.map((post) => (
@@ -123,10 +122,10 @@ const allTags = Array.from(
           }
         </section>
 
-        {/* CỘT PHẢI (4 Cột): Sidebar danh mục chủ đề khác & Khối Quảng cáo */}
-        <aside class="hidden lg:block lg:col-span-4 sticky top-6">
+        {/* CỘT PHẢI (4 Cột): ĐÃ SỬA class "sticky top-6 w-full" hoạt động hoàn hảo */}
+        <aside class="hidden lg:block lg:col-span-4 sticky top-6 w-full space-y-6">
           
-          {/* Khối danh mục khám phá nhanh nhằm tăng tương tác chuyển trang */}
+          {/* Khối danh mục khám phá nhanh */}
           <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
             <div class="border-l-4 border-red-600 pl-3 mb-4">
               <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
@@ -148,7 +147,7 @@ const allTags = Array.from(
             </div>
           </div>
 
-          {/* CHÈN QUẢNG CÁO: Xuất hiện đồng bộ ngay phía dưới khối chủ đề nổi bật */}
+          {/* Khối Quảng cáo tự động chạy dính liền mạch bên dưới */}
           <SidebarAd />
 
         </aside>
