@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ArticleItem from "../../components/ArticleItem.astro";
+import SidebarAd from "../../components/SidebarAd.astro"; // Import component quảng cáo dùng chung
 import { slugify } from "../../utils/slugify";
 
 const rawPosts = Object.entries(
@@ -47,7 +48,7 @@ export async function getStaticPaths() {
 
   rawPosts.forEach(([_, post]) => {
     if (!post?.frontmatter?.date) return;
-    if (new Date(post.frontmatter.date) > now) return; // Bỏ qua bài viết hẹn giờ
+    if (new Date(post.frontmatter.date) > now) return;
 
     const tags = post.frontmatter.tags || [];
     tags.forEach(tag => {
@@ -82,15 +83,17 @@ filteredPosts.sort((a, b) => {
   const dateB = b.frontmatter?.date || "2000-01-01";
   return new Date(dateB) - new Date(dateA);
 });
+
+// Lấy danh sách các tag khác để làm danh mục khám phá ở Sidebar (loại trừ tag hiện tại)
+const allTags = Array.from(
+  new Set(posts.flatMap(post => post.frontmatter.tags || []))
+).filter(tag => slugify(tag) !== currentTag).slice(0, 8);
 ---
 
-{/* ĐỒNG BỘ: Tiêu đề sạch sẽ hoàn toàn, không chứa từ khóa "tin" */}
 <BaseLayout title={`Chủ đề: ${originalTag || 'Phân loại'}`}>
 
-  {/* BỌC NỀN XÁM: Tạo không gian đệm và màu sắc đồng nhất với trang đọc bài */}
   <div class="w-full bg-[#efefef] min-h-screen py-6 px-3 md:px-5">
     
-    {/* SỬA LỖI VỠ KHUNG: Ép chặt chiều rộng max-w-[1180px], căn giữa mx-auto và đóng khối trắng bo góc */}
     <main class="max-w-[1180px] mx-auto bg-white p-4 md:p-6 shadow-sm rounded-lg">
 
       <div class="mb-6 border-l-4 border-red-600 pl-4 py-1">
@@ -102,20 +105,55 @@ filteredPosts.sort((a, b) => {
         </p>
       </div>
 
-      {/* Danh sách các bài viết hiển thị thẳng thớm, ngay ngắn */}
-      <section class="divide-y divide-gray-100">
-        {
-          filteredPosts.map((post) => (
-            <ArticleItem post={post} />
-          ))
-        }
+      {/* CHUYỂN ĐỔI BỐ CỤC: Chia grid thành 12 cột tương tự trang chủ */}
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {
-          filteredPosts.length === 0 && (
-            <p class="text-sm text-gray-400 italic py-12 text-center">Chưa có nội dung nào thuộc chủ đề này.</p>
-          )
-        }
-      </section>
+        {/* CỘT TRÁI (8 Cột): Danh sách bài viết thuộc Tag */}
+        <section class="lg:col-span-8 divide-y divide-gray-100">
+          {
+            filteredPosts.map((post) => (
+              <ArticleItem post={post} />
+            ))
+          }
+          
+          {
+            filteredPosts.length === 0 && (
+              <p class="text-sm text-gray-400 italic py-12 text-center">Chưa có nội dung nào thuộc chủ đề này.</p>
+            )
+          }
+        </section>
+
+        {/* CỘT PHẢI (4 Cột): Sidebar danh mục chủ đề khác & Khối Quảng cáo */}
+        <aside class="hidden lg:block lg:col-span-4 sticky top-6">
+          
+          {/* Khối danh mục khám phá nhanh nhằm tăng tương tác chuyển trang */}
+          <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
+            <div class="border-l-4 border-red-600 pl-3 mb-4">
+              <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
+                Chủ đề nổi bật
+              </h2>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {allTags.map((tag) => (
+                <a
+                  href={`/tags/${slugify(tag)}`}
+                  class="bg-white hover:bg-red-50 text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200/60 transition-all shadow-sm"
+                >
+                  #{tag}
+                </a>
+              ))}
+              {allTags.length === 0 && (
+                <p class="text-xs text-gray-400 italic">Không có chủ đề nào khác.</p>
+              )}
+            </div>
+          </div>
+
+          {/* CHÈN QUẢNG CÁO: Xuất hiện đồng bộ ngay phía dưới khối chủ đề nổi bật */}
+          <SidebarAd />
+
+        </aside>
+
+      </div>
 
     </main>
     

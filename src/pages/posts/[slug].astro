@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { slugify } from "../../utils/slugify";
+import SidebarAd from "../../components/SidebarAd.astro";
 
 const postModules = import.meta.glob(
   '../../content/posts/*.md',
@@ -161,6 +162,7 @@ const formatShortDate = (dateString) => {
                 <p class="text-xs text-gray-400 italic py-2">Không có bài viết liên quan nào khác.</p>
               )}
             </div>
+            <SidebarAd />
           </aside>
 
         </div>

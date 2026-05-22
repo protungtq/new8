@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro"; // [cite: 46]
 import ArticleItem from "../components/ArticleItem.astro"; // [cite: 46]
-
+import SidebarAd from "../components/SidebarAd.astro"; //
 const POSTS_PER_PAGE = 10; // [cite: 46]
 
 const rawPosts = Object.entries(
@@ -149,6 +149,7 @@ const formatShortDate = (dateString) => {
             <p class="text-xs text-gray-400 italic py-2">Chưa có nội dung nào trong 7 ngày qua.</p>
           )}
         </div>
+        <SidebarAd />
       </aside>
 
     </div>
