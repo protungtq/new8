@@ -1,7 +1,6 @@
 ---
-const { post } = Astro.props;
+const { post } = Astro.props; // [cite: 76]
 
-// Hàm định dạng ngày tháng hiển thị sang kiểu Việt Nam (DD/MM/YYYY)
 const formatDate = (dateString) => {
   if (!dateString) return "";
   try {
@@ -20,14 +19,14 @@ const displayDate = formatDate(post.frontmatter.date);
 ---
 
 <a
-  href={`/posts/${post.slug}`}
+  href={`/posts/${post.slug}`} // [cite: 76]
   class="group flex gap-4 py-5 border-b border-gray-100 last:border-0 transition-all duration-300"
 >
   <div class="w-[120px] h-[72px] md:w-[220px] md:h-[124px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 border border-gray-100">
     <img
-      src={post.frontmatter.image}
-      alt={post.frontmatter.title}
-      loading="lazy"
+      src={post.frontmatter.image} // [cite: 76]
+      alt={post.frontmatter.title} // [cite: 76]
+      loading="lazy" // [cite: 76]
       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
     />
   </div>
@@ -47,11 +46,10 @@ const displayDate = formatDate(post.frontmatter.date);
         line-clamp-2
       "
     >
-      {post.frontmatter.title}
+      {post.frontmatter.title} {/* [cite: 76] */}
     </h2>
 
-    <p class="text-[12px] text-gray-400 mt-1.5 flex items-center gap-1.5">
-      <span class="inline-block w-1.5 h-1.5 rounded-full bg-gray-200 group-hover:bg-red-400 transition-colors"></span>
+    <p class="text-[12px] text-gray-400 mt-1.5">
       {displayDate}
     </p>
 
@@ -66,7 +64,7 @@ const displayDate = formatDate(post.frontmatter.date);
         line-clamp-2
       "
     >
-      {post.frontmatter.description}
+      {post.frontmatter.description} {/* [cite: 78] */}
     </p>
   </div>
 </a>

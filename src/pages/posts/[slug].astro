@@ -1,64 +1,60 @@
 ---
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import { slugify } from "../../utils/slugify";
+import BaseLayout from "../../layouts/BaseLayout.astro"; // [cite: 12]
+import { slugify } from "../../utils/slugify"; // [cite: 12]
 
 const postModules = import.meta.glob(
-  '../../content/posts/*.md',
-  { eager: true }
+  '../../content/posts/*.md', // [cite: 13]
+  { eager: true } // [cite: 13]
 );
 
 export async function getStaticPaths() {
   const posts = Object.entries(
-    import.meta.glob(
-      '../../content/posts/*.md',
-      { eager: true }
+    import.meta.glob( // [cite: 14]
+      '../../content/posts/*.md', // [cite: 14]
+      { eager: true } // [cite: 14]
     )
   );
 
-  return posts.map(([path, post]) => {
-    const slug = path
+  return posts.map(([path, post]) => { // [cite: 15]
+    const slug = path // [cite: 15]
       .split('/')
       .pop()
-      .replace('.md', '');
+      .replace('.md', ''); // [cite: 15]
 
-    return {
-      params: { slug },
-      props: { post }
-    };
-  });
+    return { // [cite: 15]
+      params: { slug }, // [cite: 15]
+      props: { post } // [cite: 15]
+    }; // [cite: 15]
+  }); // [cite: 15]
 }
 
-const { post } = Astro.props;
-const { Content, frontmatter } = post;
+const { post } = Astro.props; // [cite: 16]
+const { Content, frontmatter } = post; // [cite: 16]
 
-// Bộ lọc bảo mật bài viết tương lai
 const now = new Date();
 const isFuturePost = frontmatter?.date ? new Date(frontmatter.date) > now : false;
 
-// Đọc tất cả bài viết để làm tài nguyên lọc bài liên quan (Chỉ lấy bài đã xuất bản)
-const allPosts = Object.entries(postModules)
-  .map(([path, item]) => {
-    if (!item || !item.frontmatter) return null;
-    const slug = path.split('/').pop().replace('.md', '');
-    return { slug, frontmatter: item.frontmatter };
+const allPosts = Object.entries(postModules) // [cite: 17]
+  .map(([path, item]) => { // [cite: 17]
+    if (!item || !item.frontmatter) return null; // [cite: 17]
+    const slug = path.split('/').pop().replace('.md', ''); // [cite: 17]
+    return { slug, frontmatter: item.frontmatter }; // [cite: 17]
   })
-  .filter(Boolean)
+  .filter(Boolean) // [cite: 17]
   .filter((item) => new Date(item.frontmatter.date) <= now);
 
-const currentTags = frontmatter?.tags || [];
+const currentTags = frontmatter?.tags || []; // [cite: 18]
 
-// Lọc ra tối đa 5 bài viết có cùng từ khóa (loại trừ bài hiện tại)
-const relatedPosts = allPosts
+const relatedPosts = allPosts // [cite: 18]
   .filter((item) => {
-    if (item.slug === Astro.params.slug) return false;
-    const tags = item.frontmatter?.tags || [];
-    return tags.some(tag =>
-      currentTags.map(t => t.toLowerCase()).includes(tag.toLowerCase())
+    if (item.slug === Astro.params.slug) return false; // [cite: 18]
+    const tags = item.frontmatter?.tags || []; // [cite: 18]
+    return tags.some(tag => // [cite: 18]
+      currentTags.map(t => t.toLowerCase()).includes(tag.toLowerCase()) // [cite: 18]
     );
   })
-  .slice(0, 5);
+  .slice(0, 5); // [cite: 18]
 
-// Hàm định dạng ngày hiển thị
 const formatShortDate = (dateString) => {
   if (!dateString) return "";
   try {
@@ -75,8 +71,8 @@ const formatShortDate = (dateString) => {
 
 <BaseLayout
   title={isFuturePost ? "Nội dung chưa công khai" : frontmatter.title}
-  description={frontmatter.description}
-  image={frontmatter.image}
+  description={frontmatter.description} // [cite: 19]
+  image={frontmatter.image} // [cite: 19]
 >
   <div class="w-full bg-[#efefef] min-h-screen py-6 px-3 md:px-5">
     <main class="max-w-[1180px] mx-auto bg-white p-4 md:p-6 shadow-sm rounded-lg">
@@ -84,29 +80,27 @@ const formatShortDate = (dateString) => {
       {isFuturePost ? (
         <div class="text-center py-20">
           <h1 class="text-2xl font-bold text-red-600">Nội dung chưa công khai</h1>
-          <p class="text-gray-500 mt-2">Bài viết này đã được lên lịch và sẽ tự động mở khi đến thời gian quy định.</p>
+          <p class="text-gray-500 mt-2">Bài viết này đã được lên lịch và sẽ tự động hiển thị khi đến thời gian quy định.</p>
           <a href="/" class="inline-block mt-6 bg-red-600 text-white px-6 py-2 rounded font-semibold">Quay lại trang chủ</a>
         </div>
       ) : (
-        /* CHIA LƯỚI CỐ ĐỊNH: Nội dung chiếm 8 cột, Sidebar chiếm 4 cột */
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           <article class="lg:col-span-8 w-full min-w-0 overflow-hidden">
-            
             <h1 class="text-[24px] md:text-[32px] font-bold text-gray-900 leading-tight tracking-tight">
-              {frontmatter.title}
+              {frontmatter.title} {/* [cite: 19] */}
             </h1>
 
             <div class="text-xs text-gray-400 mt-3 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <span class="font-bold text-red-600 uppercase">Tin tức</span>
+              <span class="font-bold text-gray-700 uppercase">Nội dung chuyên sâu</span>
               <span>•</span>
-              <span>{formatShortDate(frontmatter.date)}</span>
+              <span>{formatShortDate(frontmatter.date)}</span> {/* [cite: 19] */}
             </div>
 
             <div class="mt-5 w-full overflow-hidden rounded-lg bg-gray-100 aspect-[16/9]">
               <img
-                src={frontmatter.image}
-                alt={frontmatter.title}
+                src={frontmatter.image} // [cite: 20]
+                alt={frontmatter.title} // [cite: 20]
                 class="w-full h-full object-cover block"
               />
             </div>
@@ -115,52 +109,52 @@ const formatShortDate = (dateString) => {
               <Content />
             </div>
 
-            {currentTags.length > 0 && (
-              <div class="mt-8 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
-                {currentTags.map((tag) => (
+            {currentTags.length > 0 && ( // [cite: 21]
+              <div class="mt-8 pt-4 border-t border-gray-100 flex flex-wrap gap-2"> {/* [cite: 21] */}
+                {currentTags.map((tag) => ( // [cite: 21]
                   <a
-                    href={`/tags/${slugify(tag)}`}
+                    href={`/tags/${slugify(tag)}`} // [cite: 21]
                     class="bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 px-2.5 py-1 rounded text-xs font-medium border border-gray-200 transition-all"
                   >
-                    #{tag}
+                    #{tag} {/* [cite: 23] */}
                   </a>
                 ))}
               </div>
             )}
           </article>
 
-          <aside class="hidden lg:block lg:col-span-4 sticky top-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+          <aside class="hidden lg:block lg:col-span-4 sticky top-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100"> {/* [cite: 24] */}
             <div class="border-l-4 border-red-600 pl-3 mb-4">
-              <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
-                Tin cùng từ khóa
+              <h2 class="font-bold text-[18px] text-gray-900 tracking-tight"> {/* [cite: 24] */}
+                Bài viết liên quan
               </h2>
             </div>
 
             <div class="space-y-4">
-              {relatedPosts.map((item) => (
+              {relatedPosts.map((item) => ( // [cite: 25]
                 <a
-                  href={`/posts/${item.slug}`}
+                  href={`/posts/${item.slug}`} // [cite: 25]
                   class="group flex gap-3 items-start border-b border-gray-200/50 pb-3 last:border-0 last:pb-0"
                 >
                   <div class="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-200 aspect-[4/3]">
                     <img
-                      src={item.frontmatter.image}
-                      alt={item.frontmatter.title}
+                      src={item.frontmatter.image} // [cite: 27]
+                      alt={item.frontmatter.title} // [cite: 27]
                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
 
                   <div class="min-w-0">
-                    <h3 class="font-bold text-[13px] leading-snug text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
-                      {item.frontmatter.title}
+                    <h3 class="font-bold text-[13px] leading-snug text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2"> {/* [cite: 30] */}
+                      {item.frontmatter.title} {/* [cite: 30] */}
                     </h3>
-                    <p class="text-[10px] text-gray-400 mt-1">{formatShortDate(item.frontmatter.date)}</p>
+                    <p class="text-[10px] text-gray-400 mt-1">{formatShortDate(item.frontmatter.date)}</p> {/* [cite: 33] */}
                   </div>
                 </a>
               ))}
 
               {relatedPosts.length === 0 && (
-                <p class="text-xs text-gray-400 italic py-2">Không có bài viết nào khác có cùng từ khóa này.</p>
+                <p class="text-xs text-gray-400 italic py-2">Không có nội dung liên quan nào khác.</p>
               )}
             </div>
           </aside>
@@ -191,7 +185,6 @@ const formatShortDate = (dateString) => {
     margin-bottom: 0.5rem;
     color: #222;
   }
-  /* Ép toàn bộ ảnh chèn bên trong nội dung Markdown cũng phải khít khổ chữ */
   .custom-markdown-content img {
     max-width: 100%;
     height: auto;
