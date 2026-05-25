@@ -124,7 +124,9 @@ const formatShortDate = (dateString) => {
             )}
           </article>
 
-          <aside class="lg:col-span-4 w-full">
+          {/* KHỐI SIDEBAR: Thêm h-full để cố định trục dọc trên PC */}
+          <aside class="lg:col-span-4 w-full h-full">
+            {/* Lớp bọc con xử lý dính cứng khi cuộn màn hình máy tính */}
             <div class="lg:sticky lg:top-6 space-y-6">
               
               <div class="bg-gray-50/50 p-4 rounded-xl border border-gray-100">

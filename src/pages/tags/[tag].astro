@@ -119,11 +119,11 @@ const allTags = Array.from(
         </section>
 
         {/* CỘT PHẢI: BỎ hoàn toàn class hidden ban đầu */}
-        <aside class="lg:col-span-4 w-full">
-          {/* Lớp bọc con xử lý lg:sticky chạy dọc theo màn hình lớn */}
+        {/* CỘT PHẢI: Thêm h-full để kích hoạt lại không gian trượt dính */}
+        <aside class="lg:col-span-4 w-full h-full">
+          {/* Lớp bọc con xử lý bám dính dọc màn hình lớn */}
           <div class="lg:sticky lg:top-6 space-y-6">
             
-            {/* Khối danh mục khám phá nhanh */}
             <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
               <div class="border-l-4 border-red-600 pl-3 mb-4">
                 <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
