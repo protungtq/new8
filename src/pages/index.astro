@@ -1,42 +1,44 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro"; // [cite: 46]
-import ArticleItem from "../components/ArticleItem.astro"; // [cite: 46]
-import SidebarAd from "../components/SidebarAd.astro"; //
-const POSTS_PER_PAGE = 10; // [cite: 46]
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ArticleItem from "../components/ArticleItem.astro";
+import SidebarAd from "../components/SidebarAd.astro";
+
+const POSTS_PER_PAGE = 10;
 
 const rawPosts = Object.entries(
-  import.meta.glob('../content/posts/*.md', { // [cite: 47]
+  import.meta.glob('../content/posts/*.md', {
     eager: true
   })
 );
 
 const now = new Date();
 
+// 1. Lọc và chuẩn hóa danh sách bài viết đã xuất bản
 const posts = rawPosts
-  .map(([path, post]) => { // [cite: 48]
-    if (!post || !post.frontmatter) { // [cite: 48]
+  .map(([path, post]) => {
+    if (!post || !post.frontmatter) {
       return null;
     }
-    const slug = path // [cite: 48]
+    const slug = path
       .split('/')
       .pop()
       .replace('.md', '');
 
-    return { // [cite: 48]
+    return {
       slug,
       frontmatter: post.frontmatter
     };
   })
-  .filter(Boolean) // [cite: 48]
+  .filter(Boolean)
   .filter((post) => {
     if (!post.frontmatter.date) return false;
     return new Date(post.frontmatter.date) <= now;
   });
 
-posts.sort((a, b) => { // [cite: 49]
-  const dateA = a.frontmatter?.date || "2000-01-01"; // [cite: 49]
-  const dateB = b.frontmatter?.date || "2000-01-01"; // [cite: 49]
-  return new Date(dateB) - new Date(dateA); // [cite: 49]
+posts.sort((a, b) => {
+  const dateA = a.frontmatter?.date || "2000-01-01";
+  const dateB = b.frontmatter?.date || "2000-01-01";
+  return new Date(dateB) - new Date(dateA);
 });
 
 const featuredPost = posts[0];
@@ -67,7 +69,7 @@ const formatShortDate = (dateString) => {
 };
 ---
 
-<BaseLayout title="Game News"> {/* [cite: 50] */}
+<BaseLayout title="Game News">
   <main class="max-w-[1180px] mx-auto bg-white min-h-screen px-4 md:px-6 py-6 shadow-sm rounded-b-xl">
     
     {featuredPost && (
@@ -96,9 +98,11 @@ const formatShortDate = (dateString) => {
       </section>
     )}
 
-    <div class="grid grid-cols-1 md:grid-cols-12 md:gap-8 items-start">
+    {/* SỬA LỖI MOBILE: Thay gap-8 thành gap-x-8 gap-y-12 */}
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-12 items-start">
       
-      <section class="md:col-span-8">
+      {/* Luồng danh sách tin mới cập nhật bên trái */}
+      <section class="lg:col-span-8">
         <div class="border-b-2 border-gray-900 pb-2 mb-4">
           <h2 class="font-bold text-[18px] uppercase tracking-wider text-gray-900">Cập nhật mới nhất</h2>
         </div>
@@ -109,10 +113,10 @@ const formatShortDate = (dateString) => {
           ))}
         </div>
 
-        {posts.length > POSTS_PER_PAGE && ( // [cite: 51]
+        {posts.length > POSTS_PER_PAGE && (
           <div class="mt-8 flex justify-center">
             <a
-              href="/page/2" // [cite: 51]
+              href="/page/2"
               class="bg-gray-50 border border-gray-200 text-gray-700 hover:bg-red-600 hover:text-white hover:border-red-600 px-12 py-3 rounded-lg font-semibold transition-all duration-200 shadow-sm"
             >
               Xem thêm bài viết
@@ -121,35 +125,45 @@ const formatShortDate = (dateString) => {
         )}
       </section>
 
-      <aside class="hidden lg:block lg:col-span-4 sticky top-6 bg-gray-50/60 p-4 rounded-xl border border-gray-100"> {/* [cite: 53] */}
-        <div class="border-l-4 border-red-600 pl-3 mb-5">
-          <h2 class="font-bold text-[20px] text-gray-900 tracking-tight"> {/* [cite: 53] */}
-            Khám phá ngẫu nhiên
-          </h2>
-        </div>
-
-        <div class="space-y-4">
-          {randomPosts.map((post, index) => (
-            <a
-              href={`/posts/${post.slug}`} // [cite: 53]
-              class="group flex gap-3 items-center border-b border-gray-200/60 pb-3 last:border-0 last:pb-0"
-            >
-              <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center font-bold text-xs bg-gray-200/80 text-gray-600 rounded-md group-hover:bg-red-600 group-hover:text-white transition-colors">
-                {index + 1}
-              </div>
-              <div class="min-w-0">
-                <h3 class="font-bold leading-snug text-[14px] text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2"> {/* [cite: 55] */}
-                  {post.frontmatter.title} {/* [cite: 55] */}
-                </h3>
-              </div>
-            </a>
-          ))}
+      {/* SỬA LỖI MOBILE: Bỏ hidden, cho hiển thị tự nhiên tụt xuống đáy */}
+      <aside class="lg:col-span-4 w-full">
+        {/* Lớp con kích hoạt lg:sticky top-6 từ màn hình máy tính */}
+        <div class="lg:sticky lg:top-6 space-y-6">
           
-          {randomPosts.length === 0 && (
-            <p class="text-xs text-gray-400 italic py-2">Chưa có nội dung nào trong 7 ngày qua.</p>
-          )}
+          <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
+            <div class="border-l-4 border-red-600 pl-3 mb-5">
+              <h2 class="font-bold text-[20px] text-gray-900 tracking-tight">
+                Khám phá ngẫu nhiên
+              </h2>
+            </div>
+
+            <div class="space-y-4">
+              {randomPosts.map((post, index) => (
+                <a
+                  href={`/posts/${post.slug}`}
+                  class="group flex gap-3 items-center border-b border-gray-200/60 pb-3 last:border-0 last:pb-0"
+                >
+                  <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center font-bold text-xs bg-gray-200/80 text-gray-600 rounded-md group-hover:bg-red-600 group-hover:text-white transition-colors">
+                    {index + 1}
+                  </div>
+                  <div class="min-w-0">
+                    <h3 class="font-bold leading-snug text-[14px] text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
+                      {post.frontmatter.title}
+                    </h3>
+                  </div>
+                </a>
+              ))}
+              
+              {randomPosts.length === 0 && (
+                <p class="text-xs text-gray-400 italic py-2">Chưa có nội dung nào trong 7 ngày qua.</p>
+              )}
+            </div>
+          </div>
+
+          {/* Khối quảng cáo dùng chung xuất hiện dưới bài ngẫu nhiên */}
+          <SidebarAd />
+
         </div>
-        <SidebarAd />
       </aside>
 
     </div>

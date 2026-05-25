@@ -32,11 +32,9 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content, frontmatter } = post;
 
-// Bộ lọc bảo mật bài viết tương lai (Hẹn giờ đăng bài)
 const now = new Date();
 const isFuturePost = frontmatter?.date ? new Date(frontmatter.date) > now : false;
 
-// Đọc tất cả bài viết để làm tài nguyên lọc bài liên quan (Chỉ lấy bài đã xuất bản)
 const allPosts = Object.entries(postModules)
   .map(([path, item]) => {
     if (!item || !item.frontmatter) return null;
@@ -48,7 +46,6 @@ const allPosts = Object.entries(postModules)
 
 const currentTags = frontmatter?.tags || [];
 
-// Lọc ra tối đa 5 bài viết có cùng từ khóa (loại trừ bài hiện tại)
 const relatedPosts = allPosts
   .filter((item) => {
     if (item.slug === Astro.params.slug) return false;
@@ -59,7 +56,6 @@ const relatedPosts = allPosts
   })
   .slice(0, 5);
 
-// Hàm định dạng ngày hiển thị
 const formatShortDate = (dateString) => {
   if (!dateString) return "";
   try {
@@ -89,7 +85,8 @@ const formatShortDate = (dateString) => {
           <a href="/" class="inline-block mt-6 bg-red-600 text-white px-6 py-2 rounded font-semibold">Quay lại trang chủ</a>
         </div>
       ) : (
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* SỬA LỖI MOBILE: Thay gap-8 thành gap-x-8 gap-y-12 */}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-12 items-start">
           
           <article class="lg:col-span-8 w-full min-w-0 overflow-hidden">
             <h1 class="text-[24px] md:text-[32px] font-bold text-gray-900 leading-tight tracking-tight">
@@ -102,6 +99,7 @@ const formatShortDate = (dateString) => {
               <span>{formatShortDate(frontmatter.date)}</span>
             </div>
 
+            {/* FIX ẢNH THUMBNAIL: Tự co giãn tự nhiên rộng bằng chữ, cao theo tỉ lệ gốc */}
             <div class="mt-5 w-full overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
               <img
                 src={frontmatter.image}
@@ -128,48 +126,51 @@ const formatShortDate = (dateString) => {
             )}
           </article>
 
-          <aside class="hidden lg:block lg:col-span-4 sticky top-6 w-full space-y-6">
-            
-            {/* Khối bài viết liên quan */}
-            <div class="bg-gray-50/50 p-4 rounded-xl border border-gray-100">
-              <div class="border-l-4 border-red-600 pl-3 mb-4">
-                <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
-                  Bài viết liên quan
-                </h2>
+          <aside class="lg:col-span-4 w-full">
+            {/* Lớp bọc con xử lý lg:sticky từ màn hình máy tính trở lên */}
+            <div class="lg:sticky lg:top-6 space-y-6">
+              
+              {/* Khối bài viết liên quan */}
+              <div class="bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+                <div class="border-l-4 border-red-600 pl-3 mb-4">
+                  <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
+                    Bài viết liên quan
+                  </h2>
+                </div>
+
+                <div class="space-y-4">
+                  {relatedPosts.map((item) => (
+                    <a
+                      href={`/posts/${item.slug}`}
+                      class="group flex gap-3 items-start border-b border-gray-200/50 pb-3 last:border-0 last:pb-0"
+                    >
+                      <div class="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-200 aspect-[4/3]">
+                        <img
+                          src={item.frontmatter.image}
+                          alt={item.frontmatter.title}
+                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+
+                      <div class="min-w-0">
+                        <h3 class="font-bold text-[13px] leading-snug text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
+                          {item.frontmatter.title}
+                        </h3>
+                        <p class="text-[10px] text-gray-400 mt-1">{formatShortDate(item.frontmatter.date)}</p>
+                      </div>
+                    </a>
+                  ))}
+
+                  {relatedPosts.length === 0 && (
+                    <p class="text-xs text-gray-400 italic py-2">Không có bài viết liên quan nào khác.</p>
+                  )}
+                </div>
               </div>
 
-              <div class="space-y-4">
-                {relatedPosts.map((item) => (
-                  <a
-                    href={`/posts/${item.slug}`}
-                    class="group flex gap-3 items-start border-b border-gray-200/50 pb-3 last:border-0 last:pb-0"
-                  >
-                    <div class="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-200 aspect-[4/3]">
-                      <img
-                        src={item.frontmatter.image}
-                        alt={item.frontmatter.title}
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    </div>
+              {/* Khối Quảng cáo */}
+              <SidebarAd />
 
-                    <div class="min-w-0">
-                      <h3 class="font-bold text-[13px] leading-snug text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
-                        {item.frontmatter.title}
-                      </h3>
-                      <p class="text-[10px] text-gray-400 mt-1">{formatShortDate(item.frontmatter.date)}</p>
-                    </div>
-                  </a>
-                ))}
-
-                {relatedPosts.length === 0 && (
-                  <p class="text-xs text-gray-400 italic py-2">Không có bài viết liên quan nào khác.</p>
-                )}
-              </div>
             </div>
-
-            {/* Khối Quảng cáo tự động chạy dính liền mạch bên dưới khối liên quan */}
-            <SidebarAd />
-
           </aside>
 
         </div>
@@ -199,7 +200,7 @@ const formatShortDate = (dateString) => {
     color: #222;
   }
   
-  /* FIX ẢNH TRONG BÀI VIẾT: Ép chiều rộng khít 100% khổ chữ, chiều cao tự nhảy tự nhiên */
+  /* FIX ẢNH TRONG BÀI VIẾT: Rộng khít 100% khổ chữ, cao tự co giãn tự nhiên theo tỉ lệ gốc */
   .custom-markdown-content img {
     width: 100% !important;
     max-width: 100% !important;
