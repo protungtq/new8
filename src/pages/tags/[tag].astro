@@ -104,11 +104,12 @@ const allTags = Array.from(
         </p>
       </div>
 
-     {/* BỐ CỤC GRID CHUẨN: Ép items-start ở đây để cố định điểm đầu */}
+      {/* ĐỒNG BỘ: Sử dụng cấu trúc Grid y hệt trang bài viết với items-start */}
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* CỘT TRÁI (8 Cột): Danh sách bài viết */}
-        <section class="lg:col-span-8 divide-y divide-gray-100">
+        {/* CỘT TRÁI (8 Cột): Danh sách bài viết. 
+            Thêm min-h-[700px] để tạo không gian trượt cho những tag ít bài viết như #Com2us */}
+        <section class="lg:col-span-8 divide-y divide-gray-100 min-h-[700px]">
           {
             filteredPosts.map((post) => (
               <ArticleItem post={post} />
@@ -122,39 +123,31 @@ const allTags = Array.from(
           }
         </section>
 
-        {/* CỘT PHẢI (4 Cột): ĐÃ FIX TÁCH LỚP STICKY RA KHỐI CON BÊN TRONG */}
-        <aside class="hidden lg:block lg:col-span-4 h-full">
+        {/* CỘT PHẢI (4 Cột): Ẩn hoàn toàn trên mobile, chỉ hiện trên PC và trượt dính sticky mượt mà */}
+        <aside class="hidden lg:block lg:col-span-4 sticky top-6 w-full space-y-6">
           
-          {/* Lớp bọc con này sẽ chịu trách nhiệm bám dính dính cứng khi cuộn chuột */}
-          <div class="sticky top-6 space-y-6">
-            
-            {/* Khối danh mục khám phá nhanh */}
-            <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
-              <div class="border-l-4 border-red-600 pl-3 mb-4">
-                <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
-                  Chủ đề nổi bật
-                </h2>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                {allTags.map((tag) => (
-                  <a
-                    href={`/tags/${slugify(tag)}`}
-                    class="bg-white hover:bg-red-50 text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200/60 transition-all shadow-sm"
-                  >
-                    #{tag}
-                  </a>
-                ))}
-                {allTags.length === 0 && (
-                  <p class="text-xs text-gray-400 italic">Không có chủ đề nào khác.</p>
-                )}
-              </div>
+          {/* Khối danh mục khám phá nhanh */}
+          <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
+            <div class="border-l-4 border-red-600 pl-3 mb-4">
+              <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
+                Chủ đề nổi bật
+              </h2>
             </div>
-
-            {/* Khối Quảng cáo tự động chạy dính liền mạch */}
-            <SidebarAd />
-
+            <div class="flex flex-wrap gap-2">
+              {allTags.map((tag) => (
+                <a
+                  href={`/tags/${slugify(tag)}`}
+                  class="bg-white hover:bg-red-50 text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200/60 transition-all shadow-sm"
+                >
+                  #{tag}
+                </a>
+              ))}
+            </div>
           </div>
-          
+
+          {/* Khối Quảng cáo tự động chạy dính liền mạch bên dưới */}
+          <SidebarAd />
+
         </aside>
 
       </div>
