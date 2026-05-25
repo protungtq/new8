@@ -1,214 +1,161 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { slugify } from "../../utils/slugify";
+import ArticleItem from "../../components/ArticleItem.astro";
 import SidebarAd from "../../components/SidebarAd.astro";
+import { slugify } from "../../utils/slugify";
 
-const postModules = import.meta.glob(
-  '../../content/posts/*.md',
-  { eager: true }
+const rawPosts = Object.entries(
+  import.meta.glob('../../content/posts/*.md', {
+    eager: true
+  })
 );
 
-export async function getStaticPaths() {
-  const posts = Object.entries(
-    import.meta.glob(
-      '../../content/posts/*.md',
-      { eager: true }
-    )
-  );
+const now = new Date();
 
-  return posts.map(([path, post]) => {
+// 1. Lọc và chuẩn hóa danh sách bài viết đã xuất bản
+const posts = rawPosts
+  .map(([path, post]) => {
+    if (!post || !post.frontmatter) {
+      return null;
+    }
     const slug = path
       .split('/')
       .pop()
       .replace('.md', '');
 
     return {
-      params: { slug },
-      props: { post }
+      slug,
+      frontmatter: post.frontmatter
     };
-  });
-}
-
-const { post } = Astro.props;
-const { Content, frontmatter } = post;
-
-// Bộ lọc bảo mật bài viết tương lai
-const now = new Date();
-const isFuturePost = frontmatter?.date ? new Date(frontmatter.date) > now : false;
-
-// Đọc tất cả bài viết để làm tài nguyên lọc bài liên quan (Chỉ lấy bài đã xuất bản)
-const allPosts = Object.entries(postModules)
-  .map(([path, item]) => {
-    if (!item || !item.frontmatter) return null;
-    const slug = path.split('/').pop().replace('.md', '');
-    return { slug, frontmatter: item.frontmatter };
   })
   .filter(Boolean)
-  .filter((item) => new Date(item.frontmatter.date) <= now);
+  .filter((post) => {
+    if (!post.frontmatter?.date) return false;
+    return new Date(post.frontmatter.date) <= now;
+  });
 
-const currentTags = frontmatter?.tags || [];
+// 2. Tạo danh sách trang tag tĩnh dựa trên các bài viết đã công khai
+export async function getStaticPaths() {
+  const now = new Date();
+  const rawPosts = Object.entries(
+    import.meta.glob('../../content/posts/*.md', {
+      eager: true
+    })
+  );
 
-// Lọc ra tối đa 5 bài viết có cùng từ khóa (loại trừ bài hiện tại)
-const relatedPosts = allPosts
-  .filter((item) => {
-    if (item.slug === Astro.params.slug) return false;
-    const tags = item.frontmatter?.tags || [];
-    return tags.some(tag =>
-      currentTags.map(t => t.toLowerCase()).includes(tag.toLowerCase())
-    );
-  })
-  .slice(0, 5);
+  const tagSet = new Set();
 
-// Hàm định dạng ngày hiển thị
-const formatShortDate = (dateString) => {
-  if (!dateString) return "";
-  try {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
+  rawPosts.forEach(([_, post]) => {
+    if (!post?.frontmatter?.date) return;
+    if (new Date(post.frontmatter.date) > now) return;
+
+    const tags = post.frontmatter.tags || [];
+    tags.forEach(tag => {
+      tagSet.add(tag);
     });
-  } catch (e) {
-    return dateString;
-  }
-};
+  });
+
+  return Array.from(tagSet).map(tag => ({
+    params: {
+      tag: slugify(tag)
+    }
+  }));
+}
+
+const currentTag = Astro.params.tag;
+
+// Tìm tên tag gốc nguyên bản
+const originalTag =
+  posts
+    .flatMap(post => post.frontmatter.tags || [])
+    .find(tag => slugify(tag) === currentTag);
+
+// Lọc bài viết thuộc tag này
+const filteredPosts = posts.filter(post => {
+  const tags = post.frontmatter.tags || [];
+  return tags.some(tag => slugify(tag) === currentTag);
+});
+
+// Sắp xếp bài viết mới nhất lên đầu
+filteredPosts.sort((a, b) => {
+  const dateA = a.frontmatter?.date || "2000-01-01";
+  const dateB = b.frontmatter?.date || "2000-01-01";
+  return new Date(dateB) - new Date(dateA);
+});
+
+// Lấy danh sách các tag khác để làm danh mục khám phá ở Sidebar
+const allTags = Array.from(
+  new Set(posts.flatMap(post => post.frontmatter.tags || []))
+).filter(tag => slugify(tag) !== currentTag).slice(0, 8);
 ---
 
-<BaseLayout
-  title={isFuturePost ? "Nội dung chưa công khai" : frontmatter.title}
-  description={frontmatter.description}
-  image={frontmatter.image}
->
+<BaseLayout title={`Chủ đề: ${originalTag || 'Phân loại'}`}>
+
   <div class="w-full bg-[#efefef] min-h-screen py-6 px-3 md:px-5">
+    
     <main class="max-w-[1180px] mx-auto bg-white p-4 md:p-6 shadow-sm rounded-lg">
-      
-      {isFuturePost ? (
-        <div class="text-center py-20">
-          <h1 class="text-2xl font-bold text-red-600">Nội dung chưa công khai</h1>
-          <p class="text-gray-500 mt-2">Bài viết này đã được lên lịch và sẽ tự động hiển thị khi đến thời gian quy định.</p>
-          <a href="/" class="inline-block mt-6 bg-red-600 text-white px-6 py-2 rounded font-semibold">Quay lại trang chủ</a>
-        </div>
-      ) : (
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+      <div class="mb-6 border-l-4 border-red-600 pl-4 py-1">
+        <h1 class="text-[24px] md:text-[32px] font-bold text-gray-900 tracking-tight leading-none">
+          #{originalTag}
+        </h1>
+        <p class="text-gray-400 text-xs mt-1.5 font-medium">
+          Tổng số: {filteredPosts.length} bài viết
+        </p>
+      </div>
+
+      {/* BỐ CỤC GRID CHUẨN: Đảm bảo thẻ cha trực tiếp quản lý độ cao song song của cả 2 cột */}
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        {/* CỘT TRÁI (8 Cột): Danh sách bài viết */}
+        <section class="lg:col-span-8 divide-y divide-gray-100">
+          {
+            filteredPosts.map((post) => (
+              <ArticleItem post={post} />
+            ))
+          }
           
-          <article class="lg:col-span-8 w-full min-w-0 overflow-hidden">
-            <h1 class="text-[24px] md:text-[32px] font-bold text-gray-900 leading-tight tracking-tight">
-              {frontmatter.title}
-            </h1>
+          {
+            filteredPosts.length === 0 && (
+              <p class="text-sm text-gray-400 italic py-12 text-center">Chưa có nội dung nào thuộc chủ đề này.</p>
+            )
+          }
+        </section>
 
-            <div class="text-xs text-gray-400 mt-3 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <span class="font-bold text-gray-700 uppercase">Nội dung chuyên sâu</span>
-              <span>•</span>
-              <span>{formatShortDate(frontmatter.date)}</span>
-            </div>
-
-            <div class="mt-5 w-full overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
-              <img
-                src={frontmatter.image}
-                alt={frontmatter.title}
-                class="w-full h-auto block"
-              />
-            </div>
-
-            <div class="custom-markdown-content mt-6 text-[#222] text-[16px] md:text-[17px] leading-relaxed space-y-4">
-              <Content />
-            </div>
-
-            {currentTags.length > 0 && (
-              <div class="mt-8 pt-4 border-t border-gray-100 flex flex-wrap gap-2">
-                {currentTags.map((tag) => (
-                  <a
-                    href={`/tags/${slugify(tag)}`}
-                    class="bg-gray-100 hover:bg-red-50 text-gray-600 hover:text-red-600 px-2.5 py-1 rounded text-xs font-medium border border-gray-200 transition-all"
-                  >
-                    #{tag}
-                  </a>
-                ))}
-              </div>
-            )}
-          </article>
-
-          <aside class="hidden lg:block lg:col-span-4 sticky top-6 bg-gray-50/50 p-4 rounded-xl border border-gray-100">
+        {/* CỘT PHẢI (4 Cột): ĐÃ SỬA class "sticky top-6 w-full" hoạt động hoàn hảo */}
+        <aside class="hidden lg:block lg:col-span-4 sticky top-6 w-full space-y-6">
+          
+          {/* Khối danh mục khám phá nhanh */}
+          <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
             <div class="border-l-4 border-red-600 pl-3 mb-4">
               <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
-                Bài viết liên quan
+                Chủ đề nổi bật
               </h2>
             </div>
-
-            <div class="space-y-4">
-              {relatedPosts.map((item) => (
+            <div class="flex flex-wrap gap-2">
+              {allTags.map((tag) => (
                 <a
-                  href={`/posts/${item.slug}`}
-                  class="group flex gap-3 items-start border-b border-gray-200/50 pb-3 last:border-0 last:pb-0"
+                  href={`/tags/${slugify(tag)}`}
+                  class="bg-white hover:bg-red-50 text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200/60 transition-all shadow-sm"
                 >
-                  <div class="w-20 h-14 flex-shrink-0 overflow-hidden rounded bg-gray-200 aspect-[4/3]">
-                    <img
-                      src={item.frontmatter.image}
-                      alt={item.frontmatter.title}
-                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-
-                  <div class="min-w-0">
-                    <h3 class="font-bold text-[13px] leading-snug text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
-                      {item.frontmatter.title}
-                    </h3>
-                    <p class="text-[10px] text-gray-400 mt-1">{formatShortDate(item.frontmatter.date)}</p>
-                  </div>
+                  #{tag}
                 </a>
               ))}
-
-              {relatedPosts.length === 0 && (
-                <p class="text-xs text-gray-400 italic py-2">Không có bài viết liên quan nào khác.</p>
+              {allTags.length === 0 && (
+                <p class="text-xs text-gray-400 italic">Không có chủ đề nào khác.</p>
               )}
             </div>
-            <SidebarAd />
-          </aside>
+          </div>
 
-        </div>
-      )}
+          {/* Khối Quảng cáo tự động chạy dính liền mạch bên dưới */}
+          <SidebarAd />
+
+        </aside>
+
+      </div>
+
     </main>
+    
   </div>
-</BaseLayout>
 
-<style is:global>
-  .custom-markdown-content p {
-    margin-bottom: 1.25rem;
-    color: #2b2b2b;
-    text-align: justify;
-  }
-  .custom-markdown-content h2 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-top: 1.75rem;
-    margin-bottom: 0.75rem;
-    color: #111;
-  }
-  .custom-markdown-content h3 {
-    font-size: 18px;
-    font-weight: 700;
-    margin-top: 1.5rem;
-    margin-bottom: 0.5rem;
-    color: #222;
-  }
-  
-  /* FIX ẢNH TRONG BÀI VIẾT: Ép chiều rộng khít 100% khổ chữ, chiều cao tự nhảy tự nhiên */
-  .custom-markdown-content img {
-    width: 100% !important;
-    max-width: 100% !important;
-    height: auto !important;
-    object-fit: contain !important;
-    border-radius: 12px;
-    margin: 1.5rem auto;
-    display: block;
-  }
-  
-  .custom-markdown-content ul, .custom-markdown-content ol {
-    margin-left: 1.5rem;
-    margin-bottom: 1.25rem;
-    list-style-type: disc;
-  }
-  .custom-markdown-content li {
-    margin-bottom: 0.25rem;
-  }
-</style>
+</BaseLayout>
