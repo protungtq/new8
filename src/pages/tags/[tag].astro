@@ -29,6 +29,7 @@ const posts = rawPosts
     };
   })
   .filter(Boolean)
+  // BỘ LỌC HẸN GIỜ: Loại bỏ bài viết tương lai
   .filter((post) => {
     if (!post.frontmatter?.date) return false;
     return new Date(post.frontmatter.date) <= now;
@@ -104,11 +105,10 @@ const allTags = Array.from(
         </p>
       </div>
 
-      {/* ĐỒNG BỘ: Sử dụng cấu trúc Grid y hệt trang bài viết với items-start */}
+      {/* ĐỒNG BỘ GRID: Ép items-start để cố định phạm vi hoạt động của cột phải */}
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
-        {/* CỘT TRÁI (8 Cột): Danh sách bài viết. 
-            Thêm min-h-[700px] để tạo không gian trượt cho những tag ít bài viết như #Com2us */}
+        {/* CỘT TRÁI (8 Cột): Danh sách bài viết */}
         <section class="lg:col-span-8 divide-y divide-gray-100 min-h-[700px]">
           {
             filteredPosts.map((post) => (
@@ -123,31 +123,36 @@ const allTags = Array.from(
           }
         </section>
 
-        {/* CỘT PHẢI (4 Cột): Ẩn hoàn toàn trên mobile, chỉ hiện trên PC và trượt dính sticky mượt mà */}
-        <aside class="hidden lg:block lg:col-span-4 sticky top-6 w-full space-y-6">
+        {/* CỘT PHẢI (4 Cột): Giữ cột cố định trên layout */}
+        <aside class="hidden lg:block lg:col-span-4">
           
-          {/* Khối danh mục khám phá nhanh */}
-          <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
-            <div class="border-l-4 border-red-600 pl-3 mb-4">
-              <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
-                Chủ đề nổi bật
-              </h2>
+          {/* LỚP BỌC CON: Nơi xử lý bám dính khi cuộn trang chuột dọc theo màn hình */}
+          <div class="sticky top-6 space-y-6">
+            
+            {/* Khối danh mục khám phá nhanh */}
+            <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
+              <div class="border-l-4 border-red-600 pl-3 mb-4">
+                <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
+                  Chủ đề nổi bật
+                </h2>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {allTags.map((tag) => (
+                  <a
+                    href={`/tags/${slugify(tag)}`}
+                    class="bg-white hover:bg-red-50 text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200/60 transition-all shadow-sm"
+                  >
+                    #{tag}
+                  </a>
+                ))}
+              </div>
             </div>
-            <div class="flex flex-wrap gap-2">
-              {allTags.map((tag) => (
-                <a
-                  href={`/tags/${slugify(tag)}`}
-                  class="bg-white hover:bg-red-50 text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200/60 transition-all shadow-sm"
-                >
-                  #{tag}
-                </a>
-              ))}
-            </div>
+
+            {/* Khối Quảng cáo tự động dính liền bên dưới */}
+            <SidebarAd />
+
           </div>
-
-          {/* Khối Quảng cáo tự động chạy dính liền mạch bên dưới */}
-          <SidebarAd />
-
+          
         </aside>
 
       </div>
