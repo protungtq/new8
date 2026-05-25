@@ -85,7 +85,6 @@ const formatShortDate = (dateString) => {
           <a href="/" class="inline-block mt-6 bg-red-600 text-white px-6 py-2 rounded font-semibold">Quay lại trang chủ</a>
         </div>
       ) : (
-        {/* SỬA LỖI MOBILE: Thay gap-8 thành gap-x-8 gap-y-12 */}
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-12 items-start">
           
           <article class="lg:col-span-8 w-full min-w-0 overflow-hidden">
@@ -99,7 +98,6 @@ const formatShortDate = (dateString) => {
               <span>{formatShortDate(frontmatter.date)}</span>
             </div>
 
-            {/* FIX ẢNH THUMBNAIL: Tự co giãn tự nhiên rộng bằng chữ, cao theo tỉ lệ gốc */}
             <div class="mt-5 w-full overflow-hidden rounded-xl border border-gray-100 bg-gray-50">
               <img
                 src={frontmatter.image}
@@ -127,10 +125,8 @@ const formatShortDate = (dateString) => {
           </article>
 
           <aside class="lg:col-span-4 w-full">
-            {/* Lớp bọc con xử lý lg:sticky từ màn hình máy tính trở lên */}
             <div class="lg:sticky lg:top-6 space-y-6">
               
-              {/* Khối bài viết liên quan */}
               <div class="bg-gray-50/50 p-4 rounded-xl border border-gray-100">
                 <div class="border-l-4 border-red-600 pl-3 mb-4">
                   <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
@@ -167,7 +163,6 @@ const formatShortDate = (dateString) => {
                 </div>
               </div>
 
-              {/* Khối Quảng cáo */}
               <SidebarAd />
 
             </div>
@@ -200,7 +195,7 @@ const formatShortDate = (dateString) => {
     color: #222;
   }
   
-  /* FIX ẢNH TRONG BÀI VIẾT: Rộng khít 100% khổ chữ, cao tự co giãn tự nhiên theo tỉ lệ gốc */
+  /* Cấu hình ép ảnh nội dung rộng 100% khổ chữ, cao tự nhiên */
   .custom-markdown-content img {
     width: 100% !important;
     max-width: 100% !important;
