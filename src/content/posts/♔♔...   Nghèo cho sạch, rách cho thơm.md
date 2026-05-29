@@ -1,0 +1,103 @@
+---
+title: "♔♔...   Nghèo cho sạch, rách cho thơm"
+description: "Không có công việc nào là cao quý,mà chỉ có những con người cao quý trong công việc. Hạn chế sử dụng chai nhựa và vứt rác bừa bãi,nếu không có môi trư..."
+date: "2019-08-14"
+image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiuYLCItGK6Dvc44KUgLj3jY2uxbQ-TppublGrGKAOTOULbYdvHdV7xhdOatbDWYA4psBJCC8fuxkU33PN3yMXGvHlwgywuisw29XZjvpUtU_t_UqrrTjPUeCX_qT2GpHV82_xDK7Jubeg/s1600/69077704_2937510032958024_7532514726056558592_o.jpg"
+tags:
+  - Bùi Thị Tú Uyên
+  - 1998
+  - sexy
+  - cô gái nhặt ve chai
+  - Nghèo cho sạch
+  - rách cho thơm
+---
+
+Không có công việc nào là cao quý,mà chỉ có những con người cao quý trong công việc. Hạn chế sử dụng chai nhựa và vứt rác bừa bãi,nếu không có môi trường sống lành mạnh thì đẹp cũng không có nghĩa lý gì. Cùng chung tay để cho môi trường sống của chúng ta ngày càng xanh và sạch. Photographer Bùi Mạnh Dũng ( Bụng Bự ) Được biết, chủ nhân của bộ ảnh gây tranh cãi là Bùi Thị Tú Uyên (sinh năm 1998) hiện đang sống tại TP. HCM. Cô cho biết, bộ ảnh nhặt rác được chụp cách đây 4 ngày. Trước phản ứng dữ dội từ dư luận, Tú Uyên cho hay: "Bộ ảnh nhận về nhiều phản hồi, tích cực có, chê có, chửi có, nhưng không sao vì trong quá trình làm mẫu của mình, mình đã có một abum ảnh để đời. Mình rất vui vì điều đó. Bộ ảnh chủ yếu chụp sexy, chỉ là lên ý tưởng độc đáo hơn những bộ ảnh sexy bình thường khác. Mình cũng muốn có một bộ ảnh ấn tượng nên đã đồng ý hợp tác với photo".
+
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiuYLCItGK6Dvc44KUgLj3jY2uxbQ-TppublGrGKAOTOULbYdvHdV7xhdOatbDWYA4psBJCC8fuxkU33PN3yMXGvHlwgywuisw29XZjvpUtU_t_UqrrTjPUeCX_qT2GpHV82_xDK7Jubeg/s1600/69077704_2937510032958024_7532514726056558592_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 1.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 2.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiKx-Fx0J-KfunY_DNU_0aesMtcdjx-G6_jNT0cs9zS01Qszxcq_pAiNSnfKKmCUnTTGYY-wx_A5Ny02bzjKi_s7GAJFXpX4fI0Q55c3vg_aMc2FWcv6VsezqKem8C4UsU3hh1ZNihRnsI/s1600/67801108_2937792852929742_3999505827009396736_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 2.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 3.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjWE3YYXCxyuXN4eA2kFD7MOKxDA-xhWcWaeQ8GFrrxI4DQ8l1F76M4cq2dDwCZ3WmkiDMlnoIfUwc0UiB86JBLQj8SdlU0rnpsECHHom-TWSuRjYNxcyR_ONn1ikm9smtvbHWA8bf0VcY/s1600/68893896_2937517152957312_652868521146974208_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 3.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 4.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgD9WBAdOK7h78zeOqbDfkAIFhyYyr6xUx4R1uiz_M_403PftlxDJpATtEIUB5sQwpnoWOp5JYUrr4x7sjcnuVtZok8FYg_y-SHF3NL6gYo8sAek0LWzNN9-ZYrwtSQ5k2Ju5X1HebUAz4/s1600/67716893_2937754669600227_5049500686635499520_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 4.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 5.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgRTxJpYqZjT1BtEE5mloV8DYIhktAgeQqf_qjzg_4hAcbxEfITfl6DTfZO2esMzvm7DHEfJ8J3hUWmXQSLyTSsSVUsg8on_FXCUv6-6FxWlojdTBeYQuun8MweEYGjfnT3G0WnCCiiSYQ/s1600/67790928_2937792832929744_8857327848415821824_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 5.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 6.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg6SPsPuih_Q0Ey8hoo2SD4LmhTMo_g2dsKU6vH_p21I4qRKvfmpHzuFKL19pe-PZ25AxqOLSqjr6akRFXrW6gmdsHnXIasF5gFtp5Gk0FWOp1w4sf0XxLu5T3TdUj7BREM4P9L5NYpfJw/s1600/67809145_2937773559598338_3020616234027712512_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 6.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 7.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEguWxiY9jOwHHPd914tQI8Yldipl33EoGfYj4pmjZBKB33gMrtgFKCKvdwpdsEEhsyDBpx97rSyxOpRBtB7UfS_b8LtJKQvIvjLqM6pavVWKopZWx36a3j6L4VrAQifL1CBKSUkR1kTXyg/s1600/67811788_2937493149626379_1079186055824932864_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 7.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 8.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEigJEpCQA8CJGRpK2BXgdjx-TbIksIgY3QAscCg9wxB47sjQOxmCIlbz9Y8XgsdV1BVFV0wKb4ad6KClp8fhyphenhyphensEF1n1rO6ZADxmfRZ_MtEqsMR_OHO4ZvZXSyGivbWgqhBQcgqBVKn3vXg/s1600/67824086_2937773549598339_768565972209500160_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 8.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 9.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgFwp5hEqOtdXNl7qIu3soJ1OWsshrTYqmfOBxU0j2jPi9EhyphenhyphenoMKJu11BZ6Zs7BYWilYaGJHg0AYTkbjly6Jj7Ws5AfZl3b6TxZUNA1vZBg3dBqkEKX9y9gxaf-v2Gx-ZunQApksrUNOcY/s1600/67849010_2937754546266906_4584912240276144128_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 9.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 10.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjkJ2sFJtuUq1nyYqXO-f1RpO-PD-rOtWIZZobYX62N98qDBIQFI2tZxR0EPavTqjvdBc-7iqeLiVnNLRPGIoT27PLVOl8Sz_XWL_O2jAYlaW-8UDszHLjhOVizwRA8UuLW8LLX8WMt2BY/s1600/67877079_2937808409594853_2290790136683692032_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 10.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 11.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjr1Cgb0HRfO32Xu-WuDyjN8yumkq4RgStSj-X8qyeWLA7VGnGYl5oxV_cFsiwlCfRWFFD1SHlVd2DWwMS9Mt6R_hD_Y7yLq6chlR6gw0a6wqZwuZVel-T3zuRKv2zreVMxCLXzMQB2iac/s1600/67887873_2937779112931116_2613027140467163136_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 11.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 12.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh2Jrt4-Rp1UYtvZ5ibMNhX0EYTnx07KeDELy6hm-CqOPpf3Cr28HZ7qSQKt89pI2oWWgoQbx-8zbNtHeEPsmxqpGBi2LTr-3gPw4Tn3yEddse7F9BzfjeAgHd2DpInBg3x_suq6MLBIHI/s1600/67911514_2937510042958023_7478999708426305536_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 12.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 13.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh6jYB4hZ242_IYU4P1VddY97e6QBt_cn3VhFgpeuww3tCV3CiuzJEC2zrpad3XX-i0WqaoBa3xNm_OXJ2hqgJc8EXKvks1rpz5j__-WBOqww_oN3nxRtfwhrJ0tjVyF8euS_zC97GrqfM/s1600/67926453_2937504012958626_2236427451422998528_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 13.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 14.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgNqYtP3V7xeXfTIz39XPJABpQQElkattJnQgAqHB1q_psKwCswtqjXv-cool6fYkN8JXweC9GmKYKIEu-pjEw2kMlfiv2Fr-rRB1RTEYM2-gVfXeN2F6zbhFDdAzA815-HW1NfZylJ_Nk/s1600/68259096_2937754662933561_2089151970576171008_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 14.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 15.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiMUAyKMqMf09cPhX90CzDLPqWNwQBLTbR6Xdwk7tY3zkQjD6pprAnzqY8J99XMfxZpUXrDDh4LdHe9suGxSXJO0jDhQzh1y63cR50XG4jbR5i_yXdce29X1rVQUZBIarSF68tPqXTHdwU/s1600/68264511_2937493949626299_6260619681002946560_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 15.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 16.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgIYRu1C3soXUmos8YaR3VZzFK1t5vciNfot3nxsYXEbwfwtMIT3TKJCScvXfmGlAqbnrBINsC9P0SzchdBkiQX1T3PS9hNOcy_NFLUWL0BHWtKQIGBkHPFvThHlCDjSPYX_RqfKZ8diyY/s1600/68280513_2937754499600244_3740800194216722432_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 16.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 17.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh9u_8kLJsKIcRuL5xt1ISXNScURIRIPeqlNGRwZ_qCkSjtI9LKGcrSkETnTWiIbP5VRqPMEZGCxxF6inshknzbmT90R5IPMk6RXI4okD6DeMlK6cydpf_4_h1Sr7XsiokPUah-3GNQiA8/s1600/68285852_2937754482933579_2269722072261328896_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 17.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 18.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEifYRoPGeGeGVYOWxWozDqvSSTxS4FzP__9VgsbTkM750W8zc_1OjE5LE_-5Z2zAYXaudL6PGpkM5uNd6oEk-MDPrFCtnDTS_mqLEHMkDw8VPGK4xgViQl9_0oxIQwKHywqeMBU-7xs9HE/s1600/68325188_2937516852957342_6416278109082877952_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 18.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 19.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj27xvnqKbVMgNv1YZ93LcfKYZ2UN3Etzf_wg7Ut94ITKrlwkqBL6jmG6MPsFPw7pBnoCaSjVam_qdB-F9XBNNe9OdABYEsZ5GyfrX7R0hBZw9D4e6BjTM82C3EFkqis7JGSZ5pSPobAOE/s1600/68341941_2937516462957381_4312067682519220224_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 19.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 20.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiBniVy21AeeY39z8xGigNeF70Z4l6_OUjBSUoRWqpPBcWLr3iuY17C5bNK1DBK8Jq1HwdNZaFdxaBDUXv1xCrBwmP4kISQKIV5Vb9t8XkiYgWQ8L96wK8lUoaL-1g9UEHuskGb-4cQdzM/s1600/68357884_2937503199625374_7030541205020606464_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 20.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 21.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhAjy6V6BdNN8FCuqsTpGcRf-GWajovWdvQFsdBmY4-_pzQhFlR15kWmxajoCOAiXswsAlhuu0FXA7tXhXqnAfscJ6R3moibkUi4sMKt1gYydGbKDSyTcNRiu8vksGuBCH3JoOx_gxFtgo/s1600/68381865_2937773699598324_1003925236522942464_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 21.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 22.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgWtn0ShP3MSpMg8U6U8_5ljwRGAGudZ8mMaUajrW-uPQrMje4xAJdww4YPjR-6k-75vAjlQ_VF57HekiStkmBQFeK-ztND86ll6fFGQbjrXxte0dlrNoVWt4MPtobrZYYh2JpJIUYRe3M/s1600/68420730_2937754489600245_638826799882567680_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 22.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 23.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi5H7zM4llrNFs6z6PHsSkHWrNtOQpHlvd7GcOjOAMYPKDovpISD8a8DDwtY98sFWrxd122b3IL9jcK1kLAgms3hLJK392p2sVQXpecsUuTsnMmk9MVfu9VrjpcAmG3RKaWwuCkbscHajQ/s1600/68423743_2937507802958247_6197192222450909184_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 23.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 24.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjQjRYAPwg52__lG5th3acRz4vOa7DflyQgxQKt6kFXdlJaMP8bXFQYOpkGYyanLb8lx1lHg_6rc3g6NwIf2S3iifSToYmuUso7MjV1zis9LZZ9jgwUpFIdTXjqfAcfz7OwZ60S4e9csAk/s1600/68452951_2937492676293093_5448727839647989760_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 24.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 25.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiXrGV_awrPwkX7xM4VONvo1xeSMp35eegi0b0OFX5lmFPMh4VJA92ywToFMFoStVK_wIIOQuiaYOta0L7nAwjS1Qd4rWnZpYMyBi650HiUAlWYyfL6Qh7I7M9SCJvzb_vhyphenhyphenh63SY4att0/s1600/68520686_2937773532931674_863981509663522816_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 25.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 26.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjqpHg2KdWRhgdRisnw_eycy7cPbh3v-RxWzT2VAIVP18oxIWMY-WUWcjN9zpDlEah3dTXOsdTuM8kKlu_xUaGVOF681qtQC4u6Mt_VWd6FD6Dma79YE5AqSx99OfyLTlClhpvYgxghtiI/s1600/68611370_2937792849596409_5363714017200177152_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 26.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 27.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjHA5uXdt3W_xSgCAsmSnfG6kT_hHQ1WnF40TK6VDanWde2iQLRxpkKFk-abQzqiwJ-1AyfDL0pjGHpoSMGhPPRHcaGqoyyyMlaU6DjdiT4eWfbMGiTXvKKWYJ9TUBsH1ZmUChyDzNxqp8/s1600/68686369_2937808479594846_9205524515004612608_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 27.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 28.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhdtYa1SqwjhIjRdATGu2svctooAzZfkIgBpq3dM1WW-olCTvBs5ifqL0QbHMrEGyT86b3GVi3LHg11Ad_Bp-qQGly85K_poe6bBgSXDTBLOS9spqEvDinzd47aiTzSfyLLXSnXKmimJgU/s1600/68697122_2937489082960119_6875655785154609152_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 28.")
+
+ 
+![♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 29.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgRaHZ-BTO8WApkRt8mrWS5ZAKHiSrF8dukO7yqiMhHixD6iJD6Ld13niNqatNxSQTqLKOiprdpvOe93SMiUv9JqnZKUKFvCax6uRlTxTBANb9pHnhU56KRuEAKduiAHfHr7u2nZNxkfOo/s1600/68723117_2937501232958904_1338816141673365504_o.jpg "♔♔...   Nghèo cho sạch, rách cho thơm - Ảnh 29.")
+
+ 
