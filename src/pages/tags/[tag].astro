@@ -34,7 +34,7 @@ const posts = rawPosts
     return new Date(post.frontmatter.date) <= now;
   });
 
-// 2. Tạo danh sách trang tag tĩnh dựa trên các bài viết đã công khai (Đã sửa lỗi Missing parameter)
+// 2. Tạo danh sách trang tag tĩnh - Đã ép kiểu dữ liệu chuỗi chống lỗi tag.trim()
 export async function getStaticPaths() {
   const now = new Date();
   const rawPosts = Object.entries(
@@ -50,17 +50,25 @@ export async function getStaticPaths() {
     if (new Date(post.frontmatter.date) > now) return;
 
     const tags = post.frontmatter.tags || [];
-    tags.forEach(tag => {
-      if (tag && tag.trim()) {
-        tagSet.add(tag.trim());
-      }
-    });
+    
+    // Đảm bảo tags là một mảng trước khi chạy vòng lặp
+    if (Array.isArray(tags)) {
+      tags.forEach(tag => {
+        if (tag !== null && tag !== undefined) {
+          // Ép chặt dữ liệu về dạng chuỗi String để luôn dùng được hàm .trim()
+          const cleanTag = String(tag).trim();
+          if (cleanTag) {
+            tagSet.add(cleanTag);
+          }
+        }
+      });
+    }
   });
 
   return Array.from(tagSet)
     .map(tag => {
+      // tag ở đây chắc chắn đã là chuỗi String hợp lệ
       const slugifiedTag = slugify(tag);
-      // Nếu tag sau khi ép slug bị rỗng (do chứa kí tự lạ từ Blogspot), loại bỏ ngay để tránh sập build
       if (!slugifiedTag || slugifiedTag.trim() === "") {
         return null;
       }
@@ -79,12 +87,12 @@ const currentTag = Astro.params.tag;
 const originalTag =
   posts
     .flatMap(post => post.frontmatter.tags || [])
-    .find(tag => slugify(tag) === currentTag);
+    .find(tag => slugify(String(tag)) === currentTag);
 
 // Lọc bài viết thuộc tag này
 const filteredPosts = posts.filter(post => {
   const tags = post.frontmatter.tags || [];
-  return tags.some(tag => slugify(tag) === currentTag);
+  return tags.some(tag => slugify(String(tag)) === currentTag);
 });
 
 // Sắp xếp bài viết mới nhất lên đầu
@@ -96,7 +104,7 @@ filteredPosts.sort((a, b) => {
 
 // Lấy danh sách các tag khác làm danh mục khám phá ở Sidebar
 const allTags = Array.from(
-  new Set(posts.flatMap(post => post.frontmatter.tags || []))
+  new Set(posts.flatMap(post => post.frontmatter.tags || []).map(t => String(t).trim()))
 ).filter(tag => slugify(tag) !== currentTag).slice(0, 8);
 ---
 
