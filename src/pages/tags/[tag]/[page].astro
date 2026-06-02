@@ -1,0 +1,177 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ArticleItem from "../../../components/ArticleItem.astro";
+import SidebarAd from "../../../components/SidebarAd.astro";
+import { slugify } from "../../../utils/slugify";
+
+// 1. Hàm getStaticPaths tích hợp phân trang tự động của Astro
+export async function getStaticPaths({ paginate }) {
+  const now = new Date();
+  const rawPosts = Object.entries(
+    import.meta.glob('../../../content/posts/*.md', {
+      eager: true
+    })
+  );
+
+  // Mảng chứa thông tin bài viết hợp lệ
+  const allPosts = rawPosts
+    .map(([path, post]) => {
+      if (!post || !post.frontmatter) return null;
+      const slug = path.split('/').pop().replace('.md', '');
+      return { slug, frontmatter: post.frontmatter };
+    })
+    .filter(Boolean)
+    .filter((post) => {
+      if (!post.frontmatter?.date) return false;
+      return new Date(post.frontmatter.date) <= now;
+    });
+
+  // Sắp xếp bài viết mới nhất lên đầu trước khi chia trang
+  allPosts.sort((a, b) => {
+    const dateA = a.frontmatter?.date || "2000-01-01";
+    const dateB = b.frontmatter?.date || "2000-01-01";
+    return new Date(dateB) - new Date(dateA);
+  });
+
+  // Gom nhóm bài viết theo từng tag độc nhất
+  const tagMap = new Map();
+  allPosts.forEach(post => {
+    const tags = post.frontmatter.tags || [];
+    if (Array.isArray(tags)) {
+      tags.forEach(tag => {
+        if (tag !== null && tag !== undefined) {
+          const originalTag = String(tag).trim();
+          const slugifiedTag = slugify(originalTag);
+          
+          if (slugifiedTag && slugifiedTag.trim() !== "") {
+            if (!tagMap.has(slugifiedTag)) {
+              tagMap.set(slugifiedTag, {
+                tagName: originalTag,
+                posts: []
+              });
+            }
+            tagMap.get(slugifiedTag).posts.push(post);
+          }
+        }
+      });
+    }
+  });
+
+  // Tiến hành trả về cấu trúc phân trang cho từng tag độc lập
+  return Array.from(tagMap.keys()).flatMap(slugifiedTag => {
+    const tagInfo = tagMap.get(slugifiedTag);
+    
+    // Sử dụng hàm paginate của Astro để chia nhỏ danh sách bài viết
+    return paginate(tagInfo.posts, {
+      params: { tag: slugifiedTag },
+      props: { originalTagName: tagInfo.tagName },
+      pageSize: 12 // SỐ BÀI VIẾT TRÊN MỖI TRANG (Bạn có thể sửa thành 10, 20 tùy ý)
+    });
+  });
+}
+
+// 2. Lấy dữ liệu phân trang từ Astro.page và Astro.props
+const { tag } = Astro.params;
+const { page, originalTagName } = Astro.props;
+
+// Lấy danh sách bài viết của trang hiện tại (chỉ chứa tối đa 12 bài thay vì 300 bài)
+const filteredPosts = page.data; 
+
+// 3. Khối xử lý Sidebar (Lấy danh sách tag nổi bật)
+const rawPostsForSidebar = Object.entries(
+  import.meta.glob('../../../content/posts/*.md', { eager: true })
+);
+const allTags = Array.from(
+  new Set(
+    rawPostsForSidebar
+      .flatMap(([_, post]) => post?.frontmatter?.tags || [])
+      .map(t => String(t).trim())
+  )
+).filter(t => slugify(t) !== tag).slice(0, 8);
+---
+
+<BaseLayout title={`Chủ đề: ${originalTagName || 'Phân loại'} - Trang ${page.currentPage}`}>
+
+  <div class="w-full bg-[#efefef] min-h-screen py-6 px-3 md:px-5">
+    
+    <main class="max-w-[1180px] mx-auto bg-white p-4 md:p-6 shadow-sm rounded-lg">
+
+      <div class="mb-6 border-l-4 border-red-600 pl-4 py-1">
+        <h1 class="text-[24px] md:text-[32px] font-bold text-gray-900 tracking-tight leading-none">
+          #{originalTagName || 'Danh mục'}
+        </h1>
+        <p class="text-gray-400 text-xs mt-1.5 font-medium">
+          Trang {page.currentPage} / {page.lastPage} (Tổng số: {page.total} bài viết)
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-12 items-start">
+        
+        {/* CỘT TRÁI (8 Cột): Danh sách bài viết rút gọn theo phân trang */}
+        <section class="lg:col-span-8 divide-y divide-gray-100 min-h-[500px]">
+          {
+            filteredPosts.map((post) => (
+              <ArticleItem post={post} />
+            ))
+          }
+          
+          {
+            filteredPosts.length === 0 && (
+              <p class="text-sm text-gray-400 italic py-12 text-center">Chưa có nội dung nào.</p>
+            )
+          }
+
+          {/* THANH PHÂN TRANG (PAGINATION UI) CHUẨN SEO */}
+          {page.lastPage > 1 && (
+            <nav class="flex items-center justify-center gap-2 pt-8 border-t border-gray-100 mt-6">
+              {page.url.prev ? (
+                <a href={page.url.prev} class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-red-600 hover:text-white transition-all">
+                  « Trang trước
+                </a>
+              ) : (
+                <span class="px-3 py-2 bg-gray-50 text-gray-300 rounded-lg text-sm cursor-not-allowed">« Trang trước</span>
+              )}
+
+              <span class="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-200 rounded-lg">
+                {page.currentPage} / {page.lastPage}
+              </span>
+
+              {page.url.next ? (
+                <a href={page.url.next} class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-red-600 hover:text-white transition-all">
+                  Trang sau »
+                </a>
+              ) : (
+                <span class="px-3 py-2 bg-gray-50 text-gray-300 rounded-lg text-sm cursor-not-allowed">Trang sau »</span>
+              )}
+            </nav>
+          )}
+        </section>
+
+        {/* CỘT PHẢI (4 Cột) */}
+        <aside class="lg:col-span-4 w-full h-full">
+          <div class="lg:sticky lg:top-6 space-y-6">
+            <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
+              <div class="border-l-4 border-red-600 pl-3 mb-4">
+                <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
+                  Chủ đề nổi bật
+                </h2>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {allTags.map((t) => (
+                  <a
+                    href={`/tags/${slugify(t)}/1`}
+                    class="bg-white hover:bg-red-50 text-gray-600 hover:text-red-600 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-200/60 transition-all shadow-sm"
+                  >
+                    #{t}
+                  </a>
+                ))}
+              </div>
+            </div>
+            <SidebarAd />
+          </div>
+        </aside>
+
+      </div>
+    </main>
+  </div>
+</BaseLayout>
