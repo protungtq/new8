@@ -4,20 +4,7 @@ description: "Vòng ba đầy đặn, săn chắc, khỏe khoắn đang là xu h
 date: "2015-09-08"
 image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi2f6hdR8oMLDlxbhJNIYKWP1Fykls-mTbshI_VZeV-W-KnSsObYXS9nQWcl6xj0xXGRCWq1PnRDkWI4tIGBucRYT7mhpBmwnXxqgg0Um6bKFMpQnh-K9SrV2Cgs52NEnMpAAYObOCJ16xG/s640/10-my-nhan-viet-dat-chuan-hong-qua-tao-1.jpg"
 tags:
-  - Vòng 1
-  - túi xách da
-  - sexy
-  - túi xách nữ
-  - Elly Trần
   - Mỹ Nhân
-  - Vòng 3
-  - Gợi cảm
-  - Váy ngắn
-  - Sao việt
-  - Váy áo
-  - Giày dép
-  - Angela Phương Trinh
-  - Vòng eo
 ---
 
 Vòng ba đầy đặn, săn chắc, khỏe khoắn đang là xu hướng rất được ưa chuộng tại châu Á thời gian gần đây. Thân hình mảnh khảnh, 'liễu yếu đào tơ', đã không còn là chuẩn mực cái đẹp tại châu Á. Phái đẹp tại nhiều nước khu vực này, đặc biệt là Hàn Quốc, đang 'mê mệt' thân hình gợi cảm với vòng ba nở nang, đầy đặn, được gọi bằng tên 'apple hips' (hông quả táo).  Họ tích cực tập luyện để có được body đạt 'chuẩn mới'. Các người mẫu với vòng ba bốc lửa được săn đón nhiều hơn những cô có vòng một 'khủng'.  Trong số các Hoa hậu Việt, Mai Phương Thúy được đánh giá là có hình thể chuẩn nhất. Người đẹp rất tích cực tập luyện để duy trì vóc dáng. Không ít lần cô khoe vòng ba sexy với nhiều kiểu trang phục khác nhau, khi thì là đồ tập đơn giản, khi thì lại trong những chiếc đầm cắt xẻ tinh tế.  Hồ Ngọc Hà tập yoga nhiều năm nay và đó chính là bí quyết giúp cô có được vòng ba nở nang, gợi cảm dù thân hình khá mảnh khảnh.  Người mẫu Hà Anh cũng thường xuyên khoe thân hình đạt chuẩn quốc tế trong những bộ váy cắt xẻ táo bạo.  'Viên ngọc đen' quyến rũ, Minh Triệu, có vòng ba đạt tiêu chuẩn 'apple hips'.  Thanh Hằng chuộng trang phục đơn giản, thoải mái nhưng vẫn khoe được những đường cong bắt mắt.  Angela Phương Trinh theo đuổi hình ảnh gợi cảm, quyến rũ với lợi thế thân hình chuẩn S-line.  Không chỉ có vòng một khủng, Elly Trần có có vòng ba nở nang, quyến rũ.  Tóc Tiên không bao giờ vắng mặt trong top những người đẹp có thân hình chuẩn nhất nhì showbiz Việt.  Chăm chỉ tập luyện giúp Vũ Ngọc Anh giữ được những đường cong đẹp mắt.  Trà Ngọc Hằng không ngại khoe thân hình gợi cảm trong các bộ hình thời trang.  Meu
