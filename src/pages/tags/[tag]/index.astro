@@ -1,0 +1,30 @@
+---
+// src/pages/tags/[tag]/index.astro
+import { slugify } from "../../../utils/slugify";
+
+export async function getStaticPaths() {
+  const now = new Date();
+  const rawPosts = Object.entries(
+    import.meta.glob('../../../content/posts/*.md', { eager: true })
+  );
+
+  const tagSet = new Set();
+  rawPosts.forEach(([_, post]) => {
+    if (!post?.frontmatter?.date || new Date(post.frontmatter.date) > now) return;
+    const tags = post.frontmatter.tags || [];
+    if (Array.isArray(tags)) {
+      tags.forEach(tag => {
+        const slugifiedTag = slugify(String(tag));
+        if (slugifiedTag) tagSet.add(slugifiedTag);
+      });
+    }
+  });
+
+  return Array.from(tagSet).map(slugifiedTag => ({
+    params: { tag: slugifiedTag }
+  }));
+}
+
+const { tag } = Astro.params;
+---
+<meta http-equiv="refresh" content={`0;url=/tags/${tag}/1`} />
