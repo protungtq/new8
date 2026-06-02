@@ -81,32 +81,123 @@ const {
   <body class="bg-[#efefef] text-[#222]">
 
     <!-- Header -->
-  <header class="bg-red-600 text-white shadow-md">
+ <header class="bg-red-600 text-white shadow-md relative z-50">
   <div class="max-w-[1180px] mx-auto px-3 md:px-5">
-    <div class="h-[72px] flex flex-col md:flex-row md:items-center md:justify-between py-2 md:py-0 gap-2 md:gap-0">
+    <div class="h-[72px] flex items-center justify-between relative">
       
-      <a href="/" class="text-[24px] md:text-[34px] font-bold tracking-tight leading-none">
-        DEMO NEWS
+      <a href="/" class="text-[26px] md:text-[34px] font-bold tracking-tight leading-none flex-shrink-0">
+        GAME NEWS
       </a>
 
-      <form action="/search" method="GET" class="relative w-full md:w-[320px]">
-        <input 
-          type="text" 
-          name="q" 
-          placeholder="Search..." 
-          required
-          class="w-full bg-white/10 hover:bg-white/15 focus:bg-white text-white focus:text-gray-900 placeholder-white/70 focus:placeholder-gray-400 pl-4 pr-10 py-2 rounded-lg border border-white/20 focus:border-white text-sm outline-none transition-all"
-        />
-        <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-white/70 hover:text-white focus:text-gray-950">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 currentColor" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div class="flex items-center justify-end flex-1 md:flex-initial">
+        
+        <form 
+          id="search-form"
+          action="/search" 
+          method="GET" 
+          class="
+            fixed left-0 top-[72px] w-full bg-red-700 p-3 border-t border-red-500/30 hidden opacity-0 translate-y-[-10px] transition-all duration-200
+            md:relative md:left-auto md:top-auto md:w-[320px] md:bg-transparent md:p-0 md:border-0 md:flex md:opacity-100 md:translate-y-0
+          "
+        >
+          <div class="relative w-full">
+            <input 
+              type="text" 
+              name="q" 
+              placeholder="Tìm kiếm bài viết..." 
+              required
+              class="w-full bg-white/15 md:bg-white/10 hover:bg-white/20 focus:bg-white text-white focus:text-gray-900 placeholder-white/70 focus:placeholder-gray-400 pl-4 pr-10 py-2.5 md:py-2 rounded-lg border border-white/20 focus:border-white text-sm outline-none transition-all"
+            />
+            
+            <button 
+              type="submit" 
+              aria-label="Bấm để tìm kiếm"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-white/70 hover:text-white focus:text-gray-950"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </div>
+        </form>
+
+        <button
+          id="search-toggle-btn"
+          aria-label="Mở thanh tìm kiếm"
+          aria-expanded="false"
+          class="block md:hidden p-2 ml-2 hover:bg-white/10 rounded-lg text-white transition-colors focus:outline-none"
+        >
+          <svg id="icon-open" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
+          <svg id="icon-close" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
-      </form>
+
+      </div>
 
     </div>
   </div>
 </header>
+
+{/* SCRIPT ĐIỀU KHIỂN ĐÓNG/MỞ KHUNG TÌM KIẾM ĐỘNG TRÊN MOBILE */}
+<script>
+  const toggleBtn = document.getElementById('search-toggle-btn');
+  const searchForm = document.getElementById('search-form');
+  const iconOpen = document.getElementById('icon-open');
+  const iconClose = document.getElementById('icon-close');
+
+  if (toggleBtn && searchForm && iconOpen && iconClose) {
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); // Ngăn sự kiện click lan ra ngoài làm đóng form lập tức
+      
+      const isHidden = searchForm.classList.contains('hidden');
+
+      if (isHidden) {
+        // Mở thanh tìm kiếm ra kèm hiệu ứng Fade-in mượt mà
+        searchForm.classList.remove('hidden');
+        setTimeout(() => {
+          searchForm.classList.remove('opacity-0', 'translate-y-[-10px]');
+          searchForm.classList.add('opacity-100', 'translate-y-0');
+        }, 10);
+        
+        // Đổi icon sang hình dấu X
+        iconOpen.classList.add('hidden');
+        iconClose.classList.remove('hidden');
+        toggleBtn.setAttribute('aria-expanded', 'true');
+
+        // Tự động focus con trỏ chuột vào ô nhập liệu ngay khi mở ra
+        const inputField = searchForm.querySelector('input[name="q"]') as HTMLInputElement;
+        if (inputField) inputField.focus();
+      } else {
+        closeSearch();
+      }
+    });
+
+    // Hàm đóng thanh tìm kiếm an toàn
+    const closeSearch = () => {
+      searchForm.classList.remove('opacity-100', 'translate-y-0');
+      searchForm.classList.add('opacity-0', 'translate-y-[-10px]');
+      
+      iconOpen.classList.remove('hidden');
+      iconClose.classList.add('hidden');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+
+      setTimeout(() => {
+        searchForm.classList.add('hidden');
+      }, 200); // Khớp thời gian với hiệu ứng duration-200 của CSS
+    };
+
+    // Tự động thu gọn thanh tìm kiếm nếu người dùng bấm chuột ra vùng ngoài Header
+    document.addEventListener('click', (e) => {
+      const target = e.target as Node;
+      if (!searchForm.classList.contains('hidden') && !searchForm.contains(target) && !toggleBtn.contains(target)) {
+        closeSearch();
+      }
+    });
+  }
+</script>
 
     <!-- Page Content -->
     <div>
