@@ -80,29 +80,32 @@ const {
   <body class="bg-[#efefef] text-[#222]">
 
     <!-- Header -->
-    <header class="bg-red-600 text-white">
+  <header class="bg-red-600 text-white shadow-md">
+  <div class="max-w-[1180px] mx-auto px-3 md:px-5">
+    <div class="h-[72px] flex flex-col md:flex-row md:items-center md:justify-between py-2 md:py-0 gap-2 md:gap-0">
+      
+      <a href="/" class="text-[24px] md:text-[34px] font-bold tracking-tight leading-none">
+        DEMO NEWS
+      </a>
 
-      <div class="max-w-[1180px] mx-auto px-3 md:px-5">
+      <form action="/search" method="GET" class="relative w-full md:w-[320px]">
+        <input 
+          type="text" 
+          name="q" 
+          placeholder="Search..." 
+          required
+          class="w-full bg-white/10 hover:bg-white/15 focus:bg-white text-white focus:text-gray-900 placeholder-white/70 focus:placeholder-gray-400 pl-4 pr-10 py-2 rounded-lg border border-white/20 focus:border-white text-sm outline-none transition-all"
+        />
+        <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 text-white/70 hover:text-white focus:text-gray-950">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 currentColor" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+      </form>
 
-        <div class="h-[72px] flex items-center">
-
-          <a
-            href="/"
-            class="
-              text-[28px]
-              md:text-[34px]
-              font-bold
-              tracking-tight
-            "
-          >
-            GAME NEWS
-          </a>
-
-        </div>
-
-      </div>
-
-    </header>
+    </div>
+  </div>
+</header>
 
     <!-- Page Content -->
     <div>
@@ -132,7 +135,7 @@ const {
 
         <p class="mt-3 leading-7 max-w-[700px]">
 
-          Trang tin tức game cập nhật nhanh
+          Blog game cập nhật nhanh
           các thông tin mới nhất về eSports,
           mobile, console, PC gaming và
           công nghệ giải trí.

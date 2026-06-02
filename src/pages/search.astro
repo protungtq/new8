@@ -1,0 +1,175 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SidebarAd from "../components/SidebarAd.astro";
+import { slugify } from "../utils/slugify";
+
+// 1. Lấy toàn bộ bài viết hợp lệ (Chỉ lấy các trường cần thiết phục vụ UI tìm kiếm để tránh nặng trang)
+const now = new Date();
+const rawPosts = Object.entries(
+  import.meta.glob('../content/posts/*.md', { eager: true })
+);
+
+const searchDatabase = rawPosts
+  .map(([path, post]) => {
+    if (!post || !post.frontmatter) return null;
+    const slug = path.split('/').pop().replace('.md', '');
+    return {
+      slug,
+      title: post.frontmatter.title,
+      date: post.frontmatter.date,
+      image: post.frontmatter.image,
+      description: post.frontmatter.description || ""
+    };
+  })
+  .filter(Boolean)
+  .filter((post) => post.date && new Date(post.date) <= now);
+
+// Sắp xếp bài viết mới nhất lên đầu
+searchDatabase.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+// Danh sách tag nổi bật cho Sidebar
+const allTags = Array.from(
+  new Set(searchDatabase.flatMap(post => post.title.split(' ').slice(0,1))) // Hoặc danh sách từ database gốc của bạn
+).slice(0, 8);
+---
+
+<BaseLayout title="Tìm kiếm bài viết">
+  <div class="w-full bg-[#efefef] min-h-screen py-6 px-3 md:px-5">
+    <main class="max-w-[1180px] mx-auto bg-white p-4 md:p-6 shadow-sm rounded-lg">
+      
+      <div class="mb-6 border-l-4 border-red-600 pl-4 py-1">
+        <h1 class="text-[24px] md:text-[32px] font-bold text-gray-900 tracking-tight leading-none">
+          Kết quả tìm kiếm
+        </h1>
+        <p id="search-status" class="text-gray-400 text-xs mt-1.5 font-medium">
+          Đang tìm kiếm dữ liệu...
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-12 items-start">
+        
+        {/* CỘT TRÁI: Hiển thị danh sách kết quả (Xử lý bằng JS) */}
+        <section class="lg:col-span-8 min-h-[500px]">
+          <div id="search-results" class="divide-y divide-gray-100">
+            </div>
+          
+          {/* THANH PHÂN TRANG ĐỘNG */}
+          <nav id="search-pagination" class="hidden flex items-center justify-center gap-2 pt-8 border-t border-gray-100 mt-6">
+            </nav>
+        </section>
+
+        {/* CỘT PHẢI: Sidebar */}
+        <aside class="lg:col-span-4 w-full h-full">
+          <div class="lg:sticky lg:top-6 space-y-6">
+            <SidebarAd />
+          </div>
+        </aside>
+
+      </div>
+    </main>
+  </div>
+</BaseLayout>
+
+{/* nhúng DỮ LIỆU BÀI VIẾT VÀO SCRIPT CLIENT ĐỂ XỬ LÝ TÌM KIẾM ĐỘNG */}
+<script define:vars={{ searchDatabase }}>
+  const POSTS_PER_PAGE = 10; // Cấu hình đồng bộ số lượng bài viết trên 1 trang kết quả
+  
+  // Hàm chuyển tiếng Việt có dấu sang không dấu để tìm kiếm chính xác
+  function cleanString(str) {
+    return str
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .trim();
+  }
+
+  // Lấy các tham số từ URL (?q=...&page=...)
+  const urlParams = new URLSearchParams(window.location.search);
+  const query = urlParams.get('q') || '';
+  let currentPage = parseInt(urlParams.get('page')) || 1;
+
+  if (query) {
+    // Điền lại từ khóa vào ô ô nhập liệu trên Header cho đồng bộ
+    const searchInput = document.querySelector('input[name="q"]');
+    if (searchInput) searchInput.value = query;
+
+    // Tiến hành lọc bài viết theo Title
+    const cleanedQuery = cleanString(query);
+    const filteredPosts = searchDatabase.filter(post => 
+      cleanString(post.title).includes(cleanedQuery)
+    );
+
+    const totalPosts = filteredPosts.length;
+    const totalPages = Math.ceil(totalPosts / POSTS_PER_PAGE);
+    
+    // Cập nhật trạng thái số lượng kết quả
+    const statusText = document.getElementById('search-status');
+    statusText.innerText = `Tìm thấy ${totalPosts} bài viết với từ khóa "${query}"`;
+
+    const resultsContainer = document.getElementById('search-results');
+    const paginationContainer = document.getElementById('search-pagination');
+
+    if (totalPosts > 0) {
+      // Xác định khoảng cắt dữ liệu phân trang
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+      
+      const startIndex = (currentPage - 1) * POSTS_PER_PAGE;
+      const endIndex = startIndex + POSTS_PER_PAGE;
+      const postsToDisplay = filteredPosts.slice(startIndex, endIndex);
+
+      // Render danh sách bài viết trùng khớp hoàn toàn với HTML của ArticleItem Component
+      resultsContainer.innerHTML = postsToDisplay.map(post => {
+        const displayDate = post.date ? new Date(post.date).toLocaleDateString("vi-VN", {day: "2-digit", month: "2-digit", year: "numeric"}) : "";
+        return `
+          <a href="/posts/${post.slug}" class="group flex gap-4 py-5 border-b border-gray-100 last:border-0 transition-all duration-300">
+            <div class="w-[120px] h-[72px] md:w-[220px] md:h-[124px] flex-shrink-0 overflow-hidden rounded-lg bg-gray-50 border border-gray-100">
+              <img src="${post.image}" alt="${post.title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            </div>
+            <div class="min-w-0 flex flex-col justify-center">
+              <h2 class="font-bold text-[16px] leading-snug md:text-[22px] md:leading-[30px] text-gray-900 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
+                ${post.title}
+              </h2>
+              <p class="text-[12px] text-gray-400 mt-1.5">${displayDate}</p>
+              <p class="hidden md:block text-[14px] leading-relaxed text-gray-500 mt-2 line-clamp-2">${post.description}</p>
+            </div>
+          </a>
+        `;
+      }).join('');
+
+      // Xử lý tạo nút bấm điều hướng phân trang UI
+      if (totalPages > 1) {
+        paginationContainer.classList.remove('hidden');
+        paginationContainer.classList.add('flex');
+        
+        let paginationHTML = '';
+        
+        // Nút trang trước
+        if (currentPage > 1) {
+          paginationHTML += `<a href="?q=${encodeURIComponent(query)}&page=${currentPage - 1}" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-red-600 hover:text-white transition-all">« Trang trước</a>`;
+        } else {
+          paginationHTML += `<span class="px-3 py-2 bg-gray-50 text-gray-300 rounded-lg text-sm cursor-not-allowed">« Trang trước</span>`;
+        }
+
+        // Số trang hiện tại
+        paginationHTML += `<span class="px-4 py-2 text-sm font-semibold text-gray-700 bg-gray-50 border border-gray-200 rounded-lg">${currentPage} / ${totalPages}</span>`;
+
+        // Nút trang sau
+        if (currentPage < totalPages) {
+          paginationHTML += `<a href="?q=${encodeURIComponent(query)}&page=${currentPage + 1}" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-red-600 hover:text-white transition-all">Trang sau »</a>`;
+        } else {
+          paginationHTML += `<span class="px-3 py-2 bg-gray-50 text-gray-300 rounded-lg text-sm cursor-not-allowed">Trang sau »</span>`;
+        }
+
+        paginationContainer.innerHTML = paginationHTML;
+      }
+    } else {
+      resultsContainer.innerHTML = `<p class="text-sm text-gray-400 italic py-12 text-center">Không tìm thấy bài viết nào phù hợp với từ khóa của bạn.</p>`;
+      paginationContainer.innerHTML = '';
+    }
+  } else {
+    document.getElementById('search-status').innerText = 'Vui lòng nhập từ khóa để tìm kiếm.';
+    document.getElementById('search-results').innerHTML = `<p class="text-sm text-gray-400 italic py-12 text-center">Ô tìm kiếm đang trống.</p>`;
+  }
+</script>
