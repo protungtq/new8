@@ -1,0 +1,37 @@
+---
+---
+<button
+  id="back-to-top"
+  aria-label="Cuộn lên đầu trang"
+  class="fixed bottom-6 right-6 z-50 bg-red-600 text-white p-3 rounded-full shadow-lg border border-red-500/20 translate-y-4 opacity-0 pointer-events-none transition-all duration-300 hover:bg-gray-900 hover:scale-110 focus:outline-none"
+>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+  </svg>
+</button>
+
+<script>
+  const backToTopBtn = document.getElementById('back-to-top');
+
+  if (backToTopBtn) {
+    // 1. Lắng nghe sự kiện cuộn trang của người dùng
+    window.addEventListener('scroll', () => {
+      // Nếu cuộn xuống quá 400px thì hiển thị nút, ngược lại thì ẩn đi
+      if (window.scrollY > 400) {
+        backToTopBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+        backToTopBtn.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+      } else {
+        backToTopBtn.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+        backToTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+      }
+    });
+
+    // 2. Xử lý sự kiện click để cuộn mượt (Smooth Scroll) lên đầu trang
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth' // Cuộn mượt mà thay vì giật lên ngay lập tức
+      });
+    });
+  }
+</script>
