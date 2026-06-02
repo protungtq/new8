@@ -65,7 +65,7 @@ export async function getStaticPaths({ paginate }) {
     return paginate(tagInfo.posts, {
       params: { tag: slugifiedTag },
       props: { originalTagName: tagInfo.tagName },
-      pageSize: 12 // SỐ BÀI VIẾT TRÊN MỖI TRANG (Bạn có thể sửa thành 10, 20 tùy ý)
+      pageSize: 10 // ĐỒNG BỘ HIỂN THỊ 10 BÀI/TRANG (Giống với cấu hình trang chủ chính của bạn)
     });
   });
 }
@@ -74,10 +74,10 @@ export async function getStaticPaths({ paginate }) {
 const { tag } = Astro.params;
 const { page, originalTagName } = Astro.props;
 
-// Lấy danh sách bài viết của trang hiện tại (chỉ chứa tối đa 12 bài thay vì 300 bài)
-const filteredPosts = page.data; 
+// Lấy danh sách bài viết của trang hiện tại
+const filteredPosts = page.data;
 
-// 3. Khối xử lý Sidebar (Lấy danh sách tag nổi bật)
+// 3. Khối xử lý Sidebar (Lấy danh sách tag nổi bật - Đã thêm bộ lọc phòng thủ tránh crash font)
 const rawPostsForSidebar = Object.entries(
   import.meta.glob('../../../content/posts/*.md', { eager: true })
 );
@@ -85,12 +85,20 @@ const allTags = Array.from(
   new Set(
     rawPostsForSidebar
       .flatMap(([_, post]) => post?.frontmatter?.tags || [])
+      .filter(Boolean) // Phòng thủ loại bỏ phần tử null/undefined trước khi ép kiểu
       .map(t => String(t).trim())
   )
 ).filter(t => slugify(t) !== tag).slice(0, 8);
+
+// Tạo đường dẫn canonical động phục vụ SEO cho từng trang
+const canonicalUrl = `https://yourdomain.com/tags/${tag}/${page.currentPage}`;
 ---
 
-<BaseLayout title={`Chủ đề: ${originalTagName || 'Phân loại'} - Trang ${page.currentPage}`}>
+<BaseLayout 
+  title={`Chủ đề: ${originalTagName || 'Phân loại'} - Trang ${page.currentPage}`}
+  description={`Danh sách bài viết thuộc chủ đề ${originalTagName || 'tin tức'} mới nhất - Trang ${page.currentPage}`}
+  canonical={canonicalUrl}
+>
 
   <div class="w-full bg-[#efefef] min-h-screen py-6 px-3 md:px-5">
     
@@ -107,7 +115,7 @@ const allTags = Array.from(
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-12 items-start">
         
-        {/* CỘT TRÁI (8 Cột): Danh sách bài viết rút gọn theo phân trang */}
+        {/* CỘT TRÁI (8 Cột): Danh sách bài viết */}
         <section class="lg:col-span-8 divide-y divide-gray-100 min-h-[500px]">
           {
             filteredPosts.map((post) => (
@@ -121,7 +129,7 @@ const allTags = Array.from(
             )
           }
 
-          {/* THANH PHÂN TRANG (PAGINATION UI) CHUẨN SEO */}
+          {/* THANH PHÂN TRANG (PAGINATION UI) */}
           {page.lastPage > 1 && (
             <nav class="flex items-center justify-center gap-2 pt-8 border-t border-gray-100 mt-6">
               {page.url.prev ? (
