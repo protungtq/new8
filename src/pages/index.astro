@@ -4,7 +4,6 @@ import ArticleItem from "../components/ArticleItem.astro";
 import SidebarAd from "../components/SidebarAd.astro";
 
 const POSTS_PER_PAGE = 10;
-
 const rawPosts = Object.entries(
   import.meta.glob('../content/posts/*.md', {
     eager: true
@@ -12,7 +11,6 @@ const rawPosts = Object.entries(
 );
 
 const now = new Date();
-
 // 1. Lọc và chuẩn hóa danh sách bài viết đã xuất bản
 const posts = rawPosts
   .map(([path, post]) => {
@@ -44,16 +42,18 @@ posts.sort((a, b) => {
 const featuredPost = posts[0];
 const remainingPosts = posts.slice(1, POSTS_PER_PAGE);
 
+// 2. Gói cơ sở dữ liệu bài viết siêu gọn nhẹ truyền xuống Client xử lý ngẫu nhiên
 const SEVEN_DAYS_AGO = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-const randomPosts = posts
+const rawRandomPostsData = posts
   .filter((post) => {
     if (!post.frontmatter.date) return false;
     const postDate = new Date(post.frontmatter.date);
     return postDate >= SEVEN_DAYS_AGO && postDate <= now;
   })
-  .sort(() => 0.5 - Math.random())
-  .slice(0, 5);
+  .map(post => ({
+    slug: post.slug,
+    title: post.frontmatter.title
+  }));
 
 const formatShortDate = (dateString) => {
   if (!dateString) return "";
@@ -98,7 +98,6 @@ const formatShortDate = (dateString) => {
       </section>
     )}
 
-    {/* SỬA LỖI MOBILE: Thay gap-8 thành gap-x-8 gap-y-12 */}
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-12 items-start">
       
       {/* Luồng danh sách tin mới cập nhật bên trái */}
@@ -125,9 +124,8 @@ const formatShortDate = (dateString) => {
         )}
       </section>
 
-      {/* SỬA LỖI MOBILE: Bỏ hidden, cho hiển thị tự nhiên tụt xuống đáy */}
-   <aside class="lg:col-span-4 w-full h-full">
-        {/* Lớp con kích hoạt dính chặt từ màn hình máy tính */}
+      {/* Cột phải Sidebar */}
+      <aside class="lg:col-span-4 w-full h-full">
         <div class="lg:sticky lg:top-6 space-y-6">
           
           <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
@@ -137,30 +135,12 @@ const formatShortDate = (dateString) => {
               </h2>
             </div>
 
-            <div class="space-y-4">
-              {randomPosts.map((post, index) => (
-                <a
-                  href={`/posts/${post.slug}`}
-                  class="group flex gap-3 items-center border-b border-gray-200/60 pb-3 last:border-0 last:pb-0"
-                >
-                  <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center font-bold text-xs bg-gray-200/80 text-gray-600 rounded-md group-hover:bg-red-600 group-hover:text-white transition-colors">
-                    {index + 1}
-                  </div>
-                  <div class="min-w-0">
-                    <h3 class="font-bold leading-snug text-[14px] text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
-                      {post.frontmatter.title}
-                    </h3>
-                  </div>
-                </a>
-              ))}
-              
-              {randomPosts.length === 0 && (
-                <p class="text-xs text-gray-400 italic py-2">Chưa có nội dung nào trong 7 ngày qua.</p>
-              )}
-            </div>
+            <div id="random-posts-wrapper" class="space-y-4">
+              </div>
+            
+            <p id="random-empty-msg" class="hidden text-xs text-gray-400 italic py-2">Chưa có nội dung nào trong 7 ngày qua.</p>
           </div>
 
-          {/* Khối quảng cáo dùng chung xuất hiện dưới bài ngẫu nhiên */}
           <SidebarAd />
 
         </div>
@@ -169,3 +149,38 @@ const formatShortDate = (dateString) => {
     </div>
   </main>
 </BaseLayout>
+
+{/* SCRIPT CLIENT XỬ LÝ LỌC BÀI VIẾT NGẪU NHIÊN KHI NGƯỜI DÙNG TRUY CẬP TRANG */}
+<script define:vars={{ rawRandomPostsData }}>
+  document.addEventListener('DOMContentLoaded', () => {
+    const wrapper = document.getElementById('random-posts-wrapper');
+    const emptyMsg = document.getElementById('random-empty-msg');
+    
+    if (!wrapper) return;
+
+    if (rawRandomPostsData && rawRandomPostsData.length > 0) {
+      // Thực hiện xáo trộn mảng dữ liệu ngẫu nhiên ngay tại trình duyệt của Client
+      const shuffled = [...rawRandomPostsData].sort(() => 0.5 - Math.random());
+      // Lấy tối đa 5 bài viết sau khi trộn
+      const selectedPosts = shuffled.slice(0, 5);
+
+      // Tiến hành kết xuất chuỗi HTML đồng bộ 100% cấu trúc giao diện cũ của bạn
+      wrapper.innerHTML = selectedPosts.map((post, index) => {
+        return `
+          <a href="/posts/${post.slug}" class="group flex gap-3 items-center border-b border-gray-200/60 pb-3 last:border-0 last:pb-0">
+            <div class="flex-shrink-0 w-6 h-6 flex items-center justify-center font-bold text-xs bg-gray-200/80 text-gray-600 rounded-md group-hover:bg-red-600 group-hover:text-white transition-colors">
+              ${index + 1}
+            </div>
+            <div class="min-w-0">
+              <h3 class="font-bold leading-snug text-[14px] text-gray-800 group-hover:text-red-600 transition-colors duration-200 line-clamp-2">
+                ${post.title}
+              </h3>
+            </div>
+          </a>
+        `;
+      }).join('');
+    } else {
+      if (emptyMsg) emptyMsg.classList.remove('hidden');
+    }
+  });
+</script>
