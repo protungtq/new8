@@ -4,37 +4,7 @@ import ArticleItem from "../../components/ArticleItem.astro";
 import SidebarAd from "../../components/SidebarAd.astro";
 import { slugify } from "../../utils/slugify";
 
-const rawPosts = Object.entries(
-  import.meta.glob('../../content/posts/*.md', {
-    eager: true
-  })
-);
-
-const now = new Date();
-
-// 1. Lọc và chuẩn hóa danh sách bài viết đã xuất bản
-const posts = rawPosts
-  .map(([path, post]) => {
-    if (!post || !post.frontmatter) {
-      return null;
-    }
-    const slug = path
-      .split('/')
-      .pop()
-      .replace('.md', '');
-
-    return {
-      slug,
-      frontmatter: post.frontmatter
-    };
-  })
-  .filter(Boolean)
-  .filter((post) => {
-    if (!post.frontmatter?.date) return false;
-    return new Date(post.frontmatter.date) <= now;
-  });
-
-// 2. Tạo danh sách trang tag tĩnh - Đã ép kiểu dữ liệu chuỗi chống lỗi tag.trim()
+// 1. Khai báo hàm getStaticPaths chuẩn SEO, không trùng lặp route
 export async function getStaticPaths() {
   const now = new Date();
   const rawPosts = Object.entries(
@@ -43,7 +13,8 @@ export async function getStaticPaths() {
     })
   );
 
-  const tagSet = new Set();
+  // Dùng Map thay vì Set để vừa lọc trùng Slug, vừa giữ lại Tên tag gốc đẹp nhất hiển thị lên UI
+  const tagMap = new Map();
 
   rawPosts.forEach(([_, post]) => {
     if (!post?.frontmatter?.date) return;
@@ -51,45 +22,63 @@ export async function getStaticPaths() {
 
     const tags = post.frontmatter.tags || [];
     
-    // Đảm bảo tags là một mảng trước khi chạy vòng lặp
     if (Array.isArray(tags)) {
       tags.forEach(tag => {
         if (tag !== null && tag !== undefined) {
-          // Ép chặt dữ liệu về dạng chuỗi String để luôn dùng được hàm .trim()
-          const cleanTag = String(tag).trim();
-          if (cleanTag) {
-            tagSet.add(cleanTag);
+          const originalTag = String(tag).trim();
+          const slugifiedTag = slugify(originalTag);
+          
+          // Nếu slug hợp lệ và chưa tồn tại trong Map thì mới thêm vào
+          if (slugifiedTag && slugifiedTag.trim() !== "") {
+            if (!tagMap.has(slugifiedTag)) {
+              tagMap.set(slugifiedTag, originalTag);
+            }
           }
         }
       });
     }
   });
 
-  return Array.from(tagSet)
-    .map(tag => {
-      // tag ở đây chắc chắn đã là chuỗi String hợp lệ
-      const slugifiedTag = slugify(tag);
-      if (!slugifiedTag || slugifiedTag.trim() === "") {
-        return null;
+  // Trả về danh sách route độc nhất 100%
+  return Array.from(tagMap.keys()).map(slugifiedTag => {
+    return {
+      params: {
+        tag: slugifiedTag
+      },
+      props: {
+        // Truyền luôn tên gốc qua props để trang dưới không phải tìm kiếm lại bằng vòng lặp
+        tagName: tagMap.get(slugifiedTag) 
       }
-      return {
-        params: {
-          tag: slugifiedTag
-        }
-      };
-    })
-    .filter(Boolean);
+    };
+  });
 }
 
+// 2. Lấy dữ liệu từ Astro.params và Astro.props
 const currentTag = Astro.params.tag;
+const { tagName: originalTag } = Astro.props;
 
-// Tìm tên tag gốc nguyên bản để hiển thị lên tiêu đề H1
-const originalTag =
-  posts
-    .flatMap(post => post.frontmatter.tags || [])
-    .find(tag => slugify(String(tag)) === currentTag);
+// 3. Lấy lại danh sách bài viết phục vụ cho việc hiển thị (chỉ chạy khi client truy cập route cụ thể)
+const rawPosts = Object.entries(
+  import.meta.glob('../../content/posts/*.md', {
+    eager: true
+  })
+);
 
-// Lọc bài viết thuộc tag này
+const now = new Date();
+
+const posts = rawPosts
+  .map(([path, post]) => {
+    if (!post || !post.frontmatter) return null;
+    const slug = path.split('/').pop().replace('.md', '');
+    return { slug, frontmatter: post.frontmatter };
+  })
+  .filter(Boolean)
+  .filter((post) => {
+    if (!post.frontmatter?.date) return false;
+    return new Date(post.frontmatter.date) <= now;
+  });
+
+// Lọc các bài viết thuộc tag hiện tại
 const filteredPosts = posts.filter(post => {
   const tags = post.frontmatter.tags || [];
   return tags.some(tag => slugify(String(tag)) === currentTag);
@@ -123,7 +112,6 @@ const allTags = Array.from(
         </p>
       </div>
 
-      {/* Cấu trúc Grid Responsive thông minh */}
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-x-8 gap-y-12 items-start">
         
         {/* CỘT TRÁI (8 Cột): Danh sách bài viết */}
@@ -141,13 +129,11 @@ const allTags = Array.from(
           }
         </section>
 
-        {/* CỘT PHẢI (4 Cột): Tự động dàn hàng dọc xuống dưới cùng trên Mobile và trượt dính trên PC */}
+        {/* CỘT PHẢI (4 Cột) */}
         <aside class="lg:col-span-4 w-full h-full">
           
-          {/* LỚP BỌC CON: Xử lý lg:sticky mượt mà trên máy tính */}
           <div class="lg:sticky lg:top-6 space-y-6">
             
-            {/* Khối danh mục khám phá nhanh */}
             <div class="bg-gray-50/60 p-4 rounded-xl border border-gray-100">
               <div class="border-l-4 border-red-600 pl-3 mb-4">
                 <h2 class="font-bold text-[18px] text-gray-900 tracking-tight">
@@ -166,7 +152,6 @@ const allTags = Array.from(
               </div>
             </div>
 
-            {/* Khối Quảng cáo */}
             <SidebarAd />
 
           </div>
