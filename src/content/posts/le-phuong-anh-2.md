@@ -9,5 +9,5 @@ tags:
   - "Girl Xinh"
 ---
 
-![Lê Phương Anh - Ảnh 1.](https://blogger.googleusercontent.com/img/a/AVvXsEisvoNx3hqwSwGOJNWWbTebe8Bh9MXmKPsyJi6iVcRC_RuMfygeXFJEiqxB2anXhwSR6GJCt8ts-n9BnEDL8NAykesjC2AenIiE0MKFbKD7ZyO0M9l0pXzyWgraB1e8tRf-WUknHNkIMgsFreQszWJChVyGiMGY2aqDuNlzqNe6mTwjiUqGHUnjJ_zRgQ=s320 "Lê Phương Anh - Ảnh 1.")
+![Lê Phương Anh - Ảnh 1.](https://blogger.googleusercontent.com/img/a/AVvXsEisvoNx3hqwSwGOJNWWbTebe8Bh9MXmKPsyJi6iVcRC_RuMfygeXFJEiqxB2anXhwSR6GJCt8ts-n9BnEDL8NAykesjC2AenIiE0MKFbKD7ZyO0M9l0pXzyWgraB1e8tRf-WUknHNkIMgsFreQszWJChVyGiMGY2aqDuNlzqNe6mTwjiUqGHUnjJ_zRgQ=s850 "Lê Phương Anh - Ảnh 1.")
 

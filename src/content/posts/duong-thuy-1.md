@@ -11,5 +11,5 @@ tags:
 
 Căng mọng https://www.facebook.com/conheosinhaha
 
-![Dương Thùy - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjW97OTZwdd5fj_7hYPov9F8KZwDxNVicyZNumkh9qyFGnymYNDTph2OzwcwjzkHFt-YYSn9zDN_Bid0KvKUdC101O8fZD0TXDoFvX7RD0QkUMsx4FSwGQPn0oPzgE3mp5Zo55YIXoF0SA4/s320/facebook_1626454324071_6821843877270167499-765033.jpg "Dương Thùy - Ảnh 1.")
+![Dương Thùy - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjW97OTZwdd5fj_7hYPov9F8KZwDxNVicyZNumkh9qyFGnymYNDTph2OzwcwjzkHFt-YYSn9zDN_Bid0KvKUdC101O8fZD0TXDoFvX7RD0QkUMsx4FSwGQPn0oPzgE3mp5Zo55YIXoF0SA4/s320/facebook_1626454324071_6821843877270167499-765033.jpg=s850 "Dương Thùy - Ảnh 1.")
 

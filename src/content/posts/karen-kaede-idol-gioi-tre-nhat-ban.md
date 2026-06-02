@@ -11,5 +11,5 @@ tags:
 
 Karen Kaede 🔥💗
 
-![Karen Kaede idol giới trẻ Nhật Bản - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgFrJquFY-cjjW0eWuBZbPsorqFkx9p7HX5-htwjdQouWZMEUGsRp9A6ii_rVpjeivQxctucZ8V5EkBoBhrTrD7bAMw-FtvJ20YviMFM3KhXSjJyc3hcqNGxwNpBJM5HWPk4ypQF1fwIIjt/s320/facebook_1625571530991_6818141174722877525-776206.jpg "Karen Kaede idol giới trẻ Nhật Bản - Ảnh 1.")
+![Karen Kaede idol giới trẻ Nhật Bản - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgFrJquFY-cjjW0eWuBZbPsorqFkx9p7HX5-htwjdQouWZMEUGsRp9A6ii_rVpjeivQxctucZ8V5EkBoBhrTrD7bAMw-FtvJ20YviMFM3KhXSjJyc3hcqNGxwNpBJM5HWPk4ypQF1fwIIjt/s320/facebook_1625571530991_6818141174722877525-776206.jpg=s850 "Karen Kaede idol giới trẻ Nhật Bản - Ảnh 1.")
 

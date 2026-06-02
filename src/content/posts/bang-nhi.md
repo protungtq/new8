@@ -11,5 +11,5 @@ tags:
 
 Happy birthday to me🎂 Ig: leetynie
 
-![Băng Nhi - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg61Q2UYW7pIvCQ1M58e_L5GnOeS0PpH07O9JgpP5z1ocB3aM68rmZvKe_qxgArJjD-KCyKkSgRmzX5ukd2xpTeYorZWof7sfifhJlpMOdmBuwNYCOU1esXlPbSXssahStKwTsBIluzw_Bn/s320/facebook_1625468996952_6817711115798194034-740938.jpg "Băng Nhi - Ảnh 1.")
+![Băng Nhi - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg61Q2UYW7pIvCQ1M58e_L5GnOeS0PpH07O9JgpP5z1ocB3aM68rmZvKe_qxgArJjD-KCyKkSgRmzX5ukd2xpTeYorZWof7sfifhJlpMOdmBuwNYCOU1esXlPbSXssahStKwTsBIluzw_Bn/s320/facebook_1625468996952_6817711115798194034-740938.jpg=s850 "Băng Nhi - Ảnh 1.")
 

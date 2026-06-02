@@ -9,5 +9,5 @@ tags:
   - "Girl Xinh"
 ---
 
-![Dương Thụy An - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiWMdWWy12k0Bk8RSfMXD8yzeczDhlv4zZbDdydVUFoC5kmdXvrr9oVhgngHIYNeKrokw5-7vz-ewduofhnMiINHbK6h9JA8eHkZ5RGSL-FNjVCXL8KVpqP5Ll6WnbOGZisgH-VcmPYzQjd/s320/facebook_1631795756790_6844247469889996554-786231.jpg "Dương Thụy An - Ảnh 1.")
+![Dương Thụy An - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiWMdWWy12k0Bk8RSfMXD8yzeczDhlv4zZbDdydVUFoC5kmdXvrr9oVhgngHIYNeKrokw5-7vz-ewduofhnMiINHbK6h9JA8eHkZ5RGSL-FNjVCXL8KVpqP5Ll6WnbOGZisgH-VcmPYzQjd/s320/facebook_1631795756790_6844247469889996554-786231.jpg=s850 "Dương Thụy An - Ảnh 1.")
 

@@ -9,5 +9,5 @@ tags:
   - "Girl Xinh"
 ---
 
-![Minh Nguyệt - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEicDutIlBqJYO_HOesccVdJPO6vwZa04YI0upWFDIxIINtBtEhcwqQmpOTnaJuRRB7HtIlIckmlTMZM1QIXABU0qtqodk3VOXi43P9-QEIPxiPQyvs_IcA_ueUbPAf9dLLrzsl8O-h5VT1a/s320/facebook_1631795717039_6844247303160197935-745332.jpg "Minh Nguyệt - Ảnh 1.")
+![Minh Nguyệt - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEicDutIlBqJYO_HOesccVdJPO6vwZa04YI0upWFDIxIINtBtEhcwqQmpOTnaJuRRB7HtIlIckmlTMZM1QIXABU0qtqodk3VOXi43P9-QEIPxiPQyvs_IcA_ueUbPAf9dLLrzsl8O-h5VT1a/s320/facebook_1631795717039_6844247303160197935-745332.jpg=s850 "Minh Nguyệt - Ảnh 1.")
 

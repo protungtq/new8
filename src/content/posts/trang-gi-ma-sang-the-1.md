@@ -12,5 +12,5 @@ tags:
 
 Đù trắng không vết muỗi đốt luôn 🤷 https://vm.tiktok.com/ZSe8E8tPw/
 
-![Trắng gì mà sáng thế 😳 - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiqbmHvEzako6FdMreU10BKtu5ygHD_XqBFDcUwX40nA_U80m_yVxswk8Gu0l23SxgrFMziGOC4_VRJtHanhxPKzJSttNQ674XR9PlQmLDxJDjbDHmFyvHjQ4HjuFMMSQT37JaD2qzFRxhY/s320/7010399061333298459-733948.gif "Trắng gì mà sáng thế 😳 - Ảnh 1.")
+![Trắng gì mà sáng thế 😳 - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiqbmHvEzako6FdMreU10BKtu5ygHD_XqBFDcUwX40nA_U80m_yVxswk8Gu0l23SxgrFMziGOC4_VRJtHanhxPKzJSttNQ674XR9PlQmLDxJDjbDHmFyvHjQ4HjuFMMSQT37JaD2qzFRxhY/s320/7010399061333298459-733948.gif=s850 "Trắng gì mà sáng thế 😳 - Ảnh 1.")
 

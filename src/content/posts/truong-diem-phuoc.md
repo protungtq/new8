@@ -11,5 +11,5 @@ tags:
 
 Gái Huế 2005 ạ 🥰 Ig: ziemphuoc
 
-![Trương Diễm Phước - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhIsZNDzbXw7IXxxr_NOXYdm2uly7v74fymgiMHxoAxXlOorV6gHyDg6K4UWxjm5hAdTmIoanlgHNNLIPx1A-F6maYmYlvxoXOoacIkoR17IS_3QWHQ5E1glccjUMvVlFYuzBRC4lpJjmMV/s320/facebook_1625582312884_6818186397259720921-741955.jpg "Trương Diễm Phước - Ảnh 1.")
+![Trương Diễm Phước - Ảnh 1.](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhIsZNDzbXw7IXxxr_NOXYdm2uly7v74fymgiMHxoAxXlOorV6gHyDg6K4UWxjm5hAdTmIoanlgHNNLIPx1A-F6maYmYlvxoXOoacIkoR17IS_3QWHQ5E1glccjUMvVlFYuzBRC4lpJjmMV/s320/facebook_1625582312884_6818186397259720921-741955.jpg=s850 "Trương Diễm Phước - Ảnh 1.")
 
