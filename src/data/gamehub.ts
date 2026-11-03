@@ -13,7 +13,7 @@ export const games: Game[] = [
     icon: "https://cdn.cloudflare.steamstatic.com/steam/apps/3513350/library_600x900.jpg",
     cover: "https://cdn.cloudflare.steamstatic.com/steam/apps/3513350/header.jpg",
     hero: "https://cdn.cloudflare.steamstatic.com/steam/apps/3513350/library_hero.jpg",
-    trailer: "https://www.youtube.com/embed/5r4d6k8x9qA", featured: true, hot: true, tags: ["Action", "Open World", "Anime"]
+    featured: true, hot: true, tags: ["Action", "Open World", "Anime"]
   },
   {
     slug: "genshin-impact", name: "Genshin Impact", platform: "Mobile", genre: "Open-world RPG",
@@ -49,7 +49,7 @@ export const games: Game[] = [
     icon: "https://cdn.cloudflare.steamstatic.com/steam/apps/2358720/library_600x900.jpg",
     cover: "https://cdn.cloudflare.steamstatic.com/steam/apps/2358720/header.jpg",
     hero: "https://cdn.cloudflare.steamstatic.com/steam/apps/2358720/library_hero.jpg",
-    trailer: "https://www.youtube.com/embed/Cr5rQ1NZ0Tw", featured: true, hot: true, tags: ["Action RPG", "Soulslike"]
+    featured: true, hot: true, tags: ["Action RPG", "Soulslike"]
   },
   {
     slug: "elden-ring", name: "Elden Ring", platform: "PC/Console", genre: "Action RPG",
