@@ -3,6 +3,7 @@ export type Game = {
   description: string; developer: string; publisher: string; status: string;
   icon: string; cover: string; hero: string; trailer?: string;
   featured?: boolean; hot?: boolean; updated?: string; tags: string[];
+  aliases?: string[]; website?: string;
 };
 
 export const games: Game[] = [
@@ -78,6 +79,63 @@ export const games: Game[] = [
     hero: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1800&q=90",
     hot: true, tags: ["FPS", "Competitive", "Shooter"]
   }
+  ,
+  {
+    slug: "free-fire", name: "Free Fire", platform: "Mobile", genre: "Battle Royale, Sinh tồn",
+    description: "Tựa game sinh tồn bắn súng battle royale trên di động do Garena phát hành.",
+    developer: "111dots Studio", publisher: "Garena", status: "Đang phát hành",
+    icon: "https://i.ibb.co/tT8tbz3j/logo-m-lq.webp",
+    cover: "https://i.ibb.co/fdV3H1SL/thumb-m-lq.webp",
+    hero: "https://i.ibb.co/fdV3H1SL/thumb-m-lq.webp",
+    website: "https://ff.garena.vn",
+    aliases: ["Garena Free Fire"],
+    tags: ["Battle Royale", "Sinh tồn", "Shooter"]
+  },
+  {
+    slug: "lien-quan-mobile", name: "Liên Quân Mobile", platform: "Mobile", genre: "MOBA",
+    description: "Game MOBA 5v5 trên di động của TiMi Studio Group, do Garena phát hành tại Việt Nam.",
+    developer: "TiMi Studio Group", publisher: "Garena", status: "Đang phát hành",
+    icon: "https://i.ibb.co/tT8tbz3j/logo-m-lq.webp",
+    cover: "https://i.ibb.co/fdV3H1SL/thumb-m-lq.webp",
+    hero: "https://i.ibb.co/fdV3H1SL/thumb-m-lq.webp",
+    website: "https://lienquan.garena.vn",
+    aliases: ["Liên Quân", "Arena of Valor", "AOV"],
+    tags: ["MOBA", "5v5", "Mobile"]
+  },
+  {
+    slug: "monster-hunter-wilds", name: "Monster Hunter Wilds", platform: "PC/Console", genre: "Hành động, Nhập vai, Săn quái vật",
+    description: "Tựa game săn quái vật của Capcom, người chơi vào vai Hunter khám phá vùng đất hoang dã và săn lùng những quái vật khổng lồ cùng đồng đội.",
+    developer: "Capcom", publisher: "Capcom", status: "Đang phát hành",
+    icon: "https://i.ibb.co/ch9VqpgY/mhw-icon-250.webp",
+    cover: "https://i.ibb.co/QvXTn9z7/mhw-thumb.webp",
+    hero: "https://i.ibb.co/QvXTn9z7/mhw-thumb.webp",
+    website: "https://www.monsterhunter.com/wilds/",
+    aliases: ["MHWilds", "MH Wilds"],
+    tags: ["Action", "RPG", "Co-op", "Monster Hunting"]
+  },
+  {
+    slug: "call-of-duty-modern-warfare-4", name: "Call of Duty: Modern Warfare 4", platform: "PC/Console", genre: "FPS, Bắn súng",
+    description: "Game bắn súng góc nhìn thứ nhất do Infinity Ward phát triển, Activision phát hành.",
+    developer: "Infinity Ward", publisher: "Activision", status: "Đã phát hành",
+    icon: "https://i.ibb.co/gb4CTBWd/gamehub2-call-of-duty-modern-warfare-4-icon.webp",
+    cover: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEimqM5ZfD6q33NmBooLN9OTvohAz3N_mdt5BnBbIiShdFXIlfbwX1SN54tnqBPbEl59Knt4Ta6BS_XBgFW6cdaYvBRtJwJvLNshs3bwsZk8Ly7V_CAkzSyKqNuMy0ebu7gjlowD2vWB3C89z-E4WLzwI1n_mp_FZXZxnWsvY1on4voN11awZ1v_fxc1cEk/s1600/mw4-cover.webp",
+    hero: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEimqM5ZfD6q33NmBooLN9OTvohAz3N_mdt5BnBbIiShdFXIlfbwX1SN54tnqBPbEl59Knt4Ta6BS_XBgFW6cdaYvBRtJwJvLNshs3bwsZk8Ly7V_CAkzSyKqNuMy0ebu7gjlowD2vWB3C89z-E4WLzwI1n_mp_FZXZxnWsvY1on4voN11awZ1v_fxc1cEk/s1600/mw4-cover.webp",
+    website: "https://www.callofduty.com/modern-warfare-4",
+    aliases: ["CoD MW4", "Modern Warfare 4"],
+    tags: ["FPS", "Shooter", "Action"]
+  },
+  {
+    slug: "attack-on-titan-3", name: "Attack on Titan 3", platform: "PC/Console", genre: "Hành động, Phiêu lưu",
+    description: "Phần tiếp theo của series game Attack on Titan từ Omega Force, lần đầu tiên kể trọn câu chuyện từ những ngày đầu của Trinh Sát Đoàn tới đoạn kết.",
+    developer: "Omega Force", publisher: "Koei Tecmo", status: "Sắp phát hành",
+    icon: "https://i.ibb.co/Zy8v3Nn/aot3-icon-250.webp",
+    cover: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEil3cdpmn7ldUUHAxKWkvg8J12Az_RhcHHhVYQPVie7p6-G_OqFCcRNDzav6NMdwk1Bf8q82gHBk6uQsnkxQQx7Ck9UVmtbLpebtDAp7EmrsApll4676nahjDD1RbSxn-vr38JlKcqYYuJvGSXEZ_sa5c6Hoz4L1dF5wLXDOrffGbgGhfczTUYY31wZNqo/s1600/aot3-thumb-750.webp",
+    hero: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEil3cdpmn7ldUUHAxKWkvg8J12Az_RhcHHhVYQPVie7p6-G_OqFCcRNDzav6NMdwk1Bf8q82gHBk6uQsnkxQQx7Ck9UVmtbLpebtDAp7EmrsApll4676nahjDD1RbSxn-vr38JlKcqYYuJvGSXEZ_sa5c6Hoz4L1dF5wLXDOrffGbgGhfczTUYY31wZNqo/s1600/aot3-thumb-750.webp",
+    website: "https://www.koeitecmoamerica.com/attackontitan3/us/",
+    aliases: ["A.O.T. 3", "AoT3"],
+    tags: ["Action", "Adventure", "Anime"]
+  }
+
 ];
 
 export const getGame = (slug: string) => games.find((game) => game.slug === slug);
