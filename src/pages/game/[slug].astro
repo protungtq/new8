@@ -60,6 +60,7 @@ const fmt = (date) => date ? new Date(date).toLocaleDateString("vi-VN") : "";
         {game.developer && <div class="gh-article"><div><div class="gh-game-meta">NHÀ PHÁT TRIỂN</div><strong>{game.developer}</strong></div></div>}
         {game.publisher && <div class="gh-article"><div><div class="gh-game-meta">NHÀ PHÁT HÀNH</div><strong>{game.publisher}</strong></div></div>}
         {game.status && <div class="gh-article"><div><div class="gh-game-meta">TRẠNG THÁI</div><strong>{game.status}</strong></div></div>}
+        {game.website && <div class="gh-article"><div><div class="gh-game-meta">WEBSITE</div><a href={game.website} target="_blank" rel="noopener noreferrer">{game.website}</a></div></div>}
         <div class="gh-category-tabs">{game.tags.map((tag) => <span class="gh-tab">{tag}</span>)}</div>
         <a class="gh-more" href={game.category === "mobile" ? "/game/mobile/" : "/game/pc-console/"}>← Xem thêm game cùng nền tảng</a>
       </aside>
