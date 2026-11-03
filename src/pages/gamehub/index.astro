@@ -1,0 +1,54 @@
+---
+import GameHubLayout from "../../layouts/GameHubLayout.astro";
+import { games } from "../../data/gamehub";
+
+const featured = games.filter((game) => game.featured);
+const hot = games.filter((game) => game.hot);
+const mobile = games.filter((game) => game.platform === "Mobile");
+const pc = games.filter((game) => game.platform === "PC/Console");
+const q = Astro.url.searchParams.get("q")?.trim().toLocaleLowerCase("vi") || "";
+const visibleGames = q ? games.filter((game) => game.name.toLocaleLowerCase("vi").includes(q) || game.tags.join(" ").toLocaleLowerCase("vi").includes(q)) : games;
+---
+<GameHubLayout title="Gamehub – Khám phá game Mobile, PC và Console" description="Khám phá game hot, game nổi bật, game mobile, PC và console. Xem thông tin, trailer và nội dung mới nhất tại Gamehub." active="discover">
+  <main class="gh-shell gh-main">
+    <section class="gh-hero">
+      <img class="gh-hero-image" src={featured[0]?.hero} alt="" />
+      <div class="gh-hero-content">
+        <span class="gh-eyebrow">Game nổi bật · Editor's choice</span>
+        <h1>{featured[0]?.name || "Khám phá thế giới game"}</h1>
+        <p>{featured[0]?.description}</p>
+        <a class="gh-cta" href={`/gamehub/${featured[0]?.slug}/`}>Khám phá game <span>→</span></a>
+      </div>
+    </section>
+
+    {q && <div class="gh-section"><p class="gh-subtitle">Kết quả tìm kiếm cho: <strong>{q}</strong></p></div>}
+
+    <section class="gh-section" id="hot">
+      <div class="gh-section-head"><div><h2 class="gh-section-title">🔥 Game hot</h2><p class="gh-section-note">Những tựa game đang được quan tâm</p></div><a class="gh-more" href="/gamehub/mobile/">Khám phá tất cả →</a></div>
+      <div class="gh-game-grid">
+        {hot.map((game) => <a class="gh-game-card" data-game-name={game.name} href={`/gamehub/${game.slug}/`}><div class="gh-game-art"><img src={game.cover} alt={game.name} loading="lazy" /><span class="gh-platform-pill">{game.platform}</span></div><div class="gh-game-info"><img class="gh-game-icon" src={game.icon} alt="" loading="lazy" /><div><h3 class="gh-game-name">{game.name}</h3><div class="gh-game-meta">{game.genre}</div></div></div></a>)}
+      </div>
+    </section>
+
+    <section class="gh-section">
+      <div class="gh-section-head"><div><h2 class="gh-section-title">✨ Game nổi bật</h2><p class="gh-section-note">Được đội ngũ Gamehub lựa chọn</p></div></div>
+      <div class="gh-feature-grid">
+        {featured.slice(0,3).map((game) => <a class="gh-feature" href={`/gamehub/${game.slug}/`}><img src={game.hero} alt="" loading="lazy" /><span class="gh-feature-label">{game.name}</span></a>)}
+      </div>
+    </section>
+
+    <section class="gh-section">
+      <div class="gh-section-head"><div><h2 class="gh-section-title">📱 Game mobile</h2><p class="gh-section-note">Khám phá game dành cho Android và iOS</p></div><a class="gh-more" href="/gamehub/mobile/">Xem tất cả →</a></div>
+      <div class="gh-game-grid">
+        {mobile.slice(0,4).map((game) => <a class="gh-game-card" data-game-name={game.name} href={`/gamehub/${game.slug}/`}><div class="gh-game-art"><img src={game.cover} alt={game.name} loading="lazy" /><span class="gh-platform-pill">Mobile</span></div><div class="gh-game-info"><img class="gh-game-icon" src={game.icon} alt="" loading="lazy" /><div><h3 class="gh-game-name">{game.name}</h3><div class="gh-game-meta">{game.genre}</div></div></div></a>)}
+      </div>
+    </section>
+
+    <section class="gh-section">
+      <div class="gh-section-head"><div><h2 class="gh-section-title">🖥️ Game PC / Console</h2><p class="gh-section-note">Những thế giới game trên PC và hệ máy console</p></div><a class="gh-more" href="/gamehub/pc-console/">Xem tất cả →</a></div>
+      <div class="gh-game-grid">
+        {pc.slice(0,4).map((game) => <a class="gh-game-card" data-game-name={game.name} href={`/gamehub/${game.slug}/`}><div class="gh-game-art"><img src={game.cover} alt={game.name} loading="lazy" /><span class="gh-platform-pill">PC / Console</span></div><div class="gh-game-info"><img class="gh-game-icon" src={game.icon} alt="" loading="lazy" /><div><h3 class="gh-game-name">{game.name}</h3><div class="gh-game-meta">{game.genre}</div></div></div></a>)}
+      </div>
+    </section>
+  </main>
+</GameHubLayout>

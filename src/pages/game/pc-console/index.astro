@@ -1,0 +1,12 @@
+---
+import GameHubLayout from "../../../layouts/GameHubLayout.astro";
+import { games } from "../../../data/gamehub";
+const items = games.filter((game) => game.platform === "PC/Console");
+---
+<GameHubLayout title="Game PC / Console – Gamehub" description="Danh sách game PC và console được giới thiệu trên Gamehub." active="pc">
+  <main class="gh-shell gh-main">
+    <span class="gh-eyebrow">Khám phá theo nền tảng</span><h1 class="gh-title">Game PC / Console</h1><p class="gh-subtitle">Khám phá game trên PC, PlayStation, Xbox và Nintendo Switch. Xem hồ sơ game, trailer và nội dung mới nhất.</p>
+    <div class="gh-category-tabs"><a class="gh-tab active" href="/game/pc-console/">Tất cả PC / Console</a><a class="gh-tab" href="/">Khám phá Gamehub</a></div>
+    <div class="gh-listing">{items.map((game) => <a class="gh-game-card" data-game-name={game.name} href={`/game/${game.slug}/`}><div class="gh-game-art"><img src={game.cover} alt={game.name} loading="lazy" /><span class="gh-platform-pill">PC / Console</span></div><div class="gh-game-info"><img class="gh-game-icon" src={game.icon} alt="" loading="lazy" /><div><h3 class="gh-game-name">{game.name}</h3><div class="gh-game-meta">{game.genre} · {game.status}</div></div></div></a>)}</div>
+  </main>
+</GameHubLayout>
