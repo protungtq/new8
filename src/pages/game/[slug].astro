@@ -31,9 +31,9 @@ const fmt = (date) => date ? new Date(date).toLocaleDateString("vi-VN") : "";
       <div class="gh-detail-content">
         <img class="gh-detail-icon" src={game.icon} alt={game.name} />
         <div>
-          <span class="gh-eyebrow">{game.platform} · {game.genre}</span>
+          <span class="gh-eyebrow">{(game.platforms || [game.platform]).join(" · ")} · {game.genre}</span>
           <h1 class="gh-detail-title">{game.name}</h1>
-          <div class="gh-detail-meta"><span>Nhà phát triển: {game.developer}</span><span>Nhà phát hành: {game.publisher}</span><span>{game.status}</span></div>
+          <div class="gh-detail-meta">{game.developer && <span>Nhà phát triển: {game.developer}</span>}{game.publisher && <span>Nhà phát hành: {game.publisher}</span>}{game.status && <span>{game.status}</span>}</div>
           <p class="gh-detail-desc">{game.description}</p>
           <a class="gh-cta" href="#latest">Xem nội dung mới ↓</a>
         </div>
@@ -55,13 +55,13 @@ const fmt = (date) => date ? new Date(date).toLocaleDateString("vi-VN") : "";
       </div>
       <aside class="gh-panel">
         <h2>Thông tin game</h2>
-        <div class="gh-article"><div><div class="gh-game-meta">NỀN TẢNG</div><strong>{game.platform}</strong></div></div>
+        <div class="gh-article"><div><div class="gh-game-meta">NỀN TẢNG</div><strong>{(game.platforms || [game.platform]).join(", ")}</strong></div></div>
         <div class="gh-article"><div><div class="gh-game-meta">THỂ LOẠI</div><strong>{game.genre}</strong></div></div>
-        <div class="gh-article"><div><div class="gh-game-meta">NHÀ PHÁT TRIỂN</div><strong>{game.developer}</strong></div></div>
-        <div class="gh-article"><div><div class="gh-game-meta">NHÀ PHÁT HÀNH</div><strong>{game.publisher}</strong></div></div>
-        <div class="gh-article"><div><div class="gh-game-meta">TRẠNG THÁI</div><strong>{game.status}</strong></div></div>
+        {game.developer && <div class="gh-article"><div><div class="gh-game-meta">NHÀ PHÁT TRIỂN</div><strong>{game.developer}</strong></div></div>}
+        {game.publisher && <div class="gh-article"><div><div class="gh-game-meta">NHÀ PHÁT HÀNH</div><strong>{game.publisher}</strong></div></div>}
+        {game.status && <div class="gh-article"><div><div class="gh-game-meta">TRẠNG THÁI</div><strong>{game.status}</strong></div></div>}
         <div class="gh-category-tabs">{game.tags.map((tag) => <span class="gh-tab">{tag}</span>)}</div>
-        <a class="gh-more" href={game.platform === "Mobile" ? "/game/mobile/" : "/game/pc-console/"}>← Xem thêm game cùng nền tảng</a>
+        <a class="gh-more" href={game.category === "mobile" ? "/game/mobile/" : "/game/pc-console/"}>← Xem thêm game cùng nền tảng</a>
       </aside>
     </div>
   </main>
