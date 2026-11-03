@@ -1,7 +1,7 @@
 ---
 import GameHubLayout from "../../../layouts/GameHubLayout.astro";
 import { games } from "../../../data/gamehub";
-const items = games.filter((game) => game.platform === "PC/Console");
+const items = games.filter((game) => game.category === "pc-console");
 ---
 <GameHubLayout title="Game PC / Console – Gamehub" description="Danh sách game PC và console được giới thiệu trên Gamehub." active="pc">
   <main class="gh-shell gh-main">
