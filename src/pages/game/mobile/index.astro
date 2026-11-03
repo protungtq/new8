@@ -1,7 +1,7 @@
 ---
 import GameHubLayout from "../../../layouts/GameHubLayout.astro";
 import { games } from "../../../data/gamehub";
-const items = games.filter((game) => game.platform === "Mobile");
+const items = games.filter((game) => game.category === "mobile");
 ---
 <GameHubLayout title="Game mobile – Gamehub" description="Danh sách game mobile Android và iOS được giới thiệu trên Gamehub." active="mobile">
   <main class="gh-shell gh-main">
