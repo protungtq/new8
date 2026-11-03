@@ -1,0 +1,72 @@
+---
+import "../styles/gamehub.css";
+const { title = "Gamehub | Khám phá thế giới game", description = "Khám phá game mobile, PC và console tại Gamehub.", active = "discover" } = Astro.props;
+const canonical = `https://game8.info/gamehub/${Astro.url.pathname.replace(/^\/gamehub\/?/, "")}`;
+---
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content={description} />
+  <meta name="theme-color" content="#101216" />
+  <link rel="canonical" href={canonical} />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <title>{title}</title>
+  <script is:inline>
+    (() => {
+      try {
+        const saved = localStorage.getItem('gamehub-theme');
+        const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+        document.documentElement.dataset.theme = saved || (prefersLight ? 'light' : 'dark');
+      } catch { document.documentElement.dataset.theme = 'dark'; }
+    })();
+  </script>
+</head>
+<body class="gamehub-body">
+  <header class="gh-header">
+    <div class="gh-shell gh-header-inner">
+      <a class="gh-logo" href="/gamehub/"><span class="gh-logo-mark">G</span> GAMEHUB</a>
+      <nav class="gh-nav" id="gh-nav" aria-label="Điều hướng chính">
+        <a class={active === "discover" ? "active" : ""} href="/gamehub/">Khám phá</a>
+        <a class={active === "mobile" ? "active" : ""} href="/gamehub/mobile/">Mobile</a>
+        <a class={active === "pc" ? "active" : ""} href="/gamehub/pc-console/">PC / Console</a>
+        <a href="/gamehub/#hot">Game hot</a>
+      </nav>
+      <div class="gh-actions">
+        <form action="/gamehub/" method="get" role="search">
+          <input class="gh-search" type="search" name="q" placeholder="Tìm game..." aria-label="Tìm game" />
+        </form>
+        <button class="gh-icon-btn" id="gh-theme" type="button" aria-label="Chuyển giao diện" title="Chuyển giao diện">☼</button>
+        <button class="gh-icon-btn gh-mobile-menu" id="gh-menu" type="button" aria-label="Mở menu" aria-expanded="false">☰</button>
+      </div>
+    </div>
+  </header>
+  <slot />
+  <footer class="gh-footer"><div class="gh-shell">© {new Date().getFullYear()} Gamehub · Khám phá game, cập nhật nội dung và tìm thế giới tiếp theo của bạn.</div></footer>
+  <script is:inline>
+    const themeButton = document.getElementById('gh-theme');
+    themeButton?.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem('gamehub-theme', next); } catch {}
+      themeButton.textContent = next === 'light' ? '☾' : '☼';
+    });
+    const menuButton = document.getElementById('gh-menu');
+    const nav = document.getElementById('gh-nav');
+    menuButton?.addEventListener('click', () => {
+      const open = nav?.classList.toggle('open');
+      menuButton.setAttribute('aria-expanded', String(Boolean(open)));
+    });
+    const search = new URLSearchParams(location.search).get('q');
+    if (search) {
+      const q = search.toLocaleLowerCase('vi');
+      document.querySelectorAll('[data-game-name]').forEach((card) => {
+        card.hidden = !card.getAttribute('data-game-name').toLocaleLowerCase('vi').includes(q);
+      });
+    }
+  </script>
+</body>
+</html>

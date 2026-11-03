@@ -1,0 +1,68 @@
+---
+import GameHubLayout from "../../layouts/GameHubLayout.astro";
+import { games, getGame } from "../../data/gamehub";
+
+const rawPosts = Object.entries(import.meta.glob("../../content/posts/*.md", { eager: true }));
+const posts = rawPosts.map(([path, mod]) => {
+  const slug = path.split("/").pop()?.replace(/\.md$/, "") || "";
+  const frontmatter = mod.frontmatter || mod.metadata || {};
+  return { slug, frontmatter };
+});
+const getRelatedPosts = (game) => posts
+  .filter(({ frontmatter }) => {
+    const values = [frontmatter.game, frontmatter.gameSlug, frontmatter.gameName, ...(Array.isArray(frontmatter.tags) ? frontmatter.tags : []), ...(Array.isArray(frontmatter.keywords) ? frontmatter.keywords : [])]
+      .filter(Boolean).map((value) => String(value).toLocaleLowerCase("vi"));
+    return values.some((value) => value === game.slug || value === game.name.toLocaleLowerCase("vi") || value.includes(game.slug));
+  })
+  .sort((a,b) => new Date(b.frontmatter.date || b.frontmatter.pubDate || 0).getTime() - new Date(a.frontmatter.date || a.frontmatter.pubDate || 0).getTime())
+  .slice(0,8);
+
+export function getStaticPaths() {
+  return games.map((game) => ({ params: { slug: game.slug }, props: { game } }));
+}
+const { game } = Astro.props;
+const relatedPosts = getRelatedPosts(game);
+const fmt = (date) => date ? new Date(date).toLocaleDateString("vi-VN") : "";
+---
+<GameHubLayout title={`${game.name} – Thông tin, trailer và tin mới | Gamehub`} description={game.description}>
+  <main class="gh-shell gh-main">
+    <div class="gh-detail-hero">
+      <img src={game.hero} alt="" />
+      <div class="gh-detail-content">
+        <img class="gh-detail-icon" src={game.icon} alt={game.name} />
+        <div>
+          <span class="gh-eyebrow">{game.platform} · {game.genre}</span>
+          <h1 class="gh-detail-title">{game.name}</h1>
+          <div class="gh-detail-meta"><span>Nhà phát triển: {game.developer}</span><span>Nhà phát hành: {game.publisher}</span><span>{game.status}</span></div>
+          <p class="gh-detail-desc">{game.description}</p>
+          <a class="gh-cta" href="#latest">Xem nội dung mới ↓</a>
+        </div>
+      </div>
+    </div>
+    <div class="gh-detail-layout">
+      <div>
+        <section class="gh-panel">
+          <h2>Trailer game</h2>
+          {game.trailer ? <iframe class="gh-trailer" src={game.trailer} title={`Trailer ${game.name}`} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe> : <div class="gh-empty">Trailer sẽ được cập nhật khi có đường dẫn YouTube.</div>}
+        </section>
+        <section class="gh-panel gh-section" id="latest">
+          <h2>Nội dung mới về {game.name}</h2>
+          {relatedPosts.length ? relatedPosts.map(({ slug, frontmatter }) => <a class="gh-article" href={`/posts/${slug}`}>
+            <img class="gh-article-thumb" src={frontmatter.image || frontmatter.heroImage || game.cover} alt="" loading="lazy" />
+            <div><h3>{frontmatter.title || slug}</h3><time>{fmt(frontmatter.date || frontmatter.pubDate)}</time></div>
+          </a>) : <div class="gh-empty">Chưa có bài viết được gắn với game này. Khi xuất bản bài viết, hãy thêm trường <strong>game: "{game.slug}"</strong> vào frontmatter để tự động hiển thị tại đây.</div>}
+        </section>
+      </div>
+      <aside class="gh-panel">
+        <h2>Thông tin game</h2>
+        <div class="gh-article"><div><div class="gh-game-meta">NỀN TẢNG</div><strong>{game.platform}</strong></div></div>
+        <div class="gh-article"><div><div class="gh-game-meta">THỂ LOẠI</div><strong>{game.genre}</strong></div></div>
+        <div class="gh-article"><div><div class="gh-game-meta">NHÀ PHÁT TRIỂN</div><strong>{game.developer}</strong></div></div>
+        <div class="gh-article"><div><div class="gh-game-meta">NHÀ PHÁT HÀNH</div><strong>{game.publisher}</strong></div></div>
+        <div class="gh-article"><div><div class="gh-game-meta">TRẠNG THÁI</div><strong>{game.status}</strong></div></div>
+        <div class="gh-category-tabs">{game.tags.map((tag) => <span class="gh-tab">{tag}</span>)}</div>
+        <a class="gh-more" href={game.platform === "Mobile" ? "/gamehub/mobile/" : "/gamehub/pc-console/"}>← Xem thêm game cùng nền tảng</a>
+      </aside>
+    </div>
+  </main>
+</GameHubLayout>
