@@ -7,6 +7,6 @@ const items = games.filter((game) => game.category === "mobile");
   <main class="gh-shell gh-main">
     <span class="gh-eyebrow">Khám phá theo nền tảng</span><h1 class="gh-title">Game mobile</h1><p class="gh-subtitle">Tìm những tựa game dành cho điện thoại Android và iOS. Chọn một game để xem thông tin, trailer và các nội dung mới nhất.</p>
     <div class="gh-category-tabs"><a class="gh-tab active" href="/game/mobile/">Tất cả mobile</a><a class="gh-tab" href="/">Khám phá Gamehub</a></div>
-    <div class="gh-listing">{items.map((game) => <a class="gh-game-card" data-game-name={game.name} href={`/game/${game.slug}/`}><div class="gh-game-art"><img src={game.cover} alt={game.name} loading="lazy" /><span class="gh-platform-pill">Mobile</span></div><div class="gh-game-info"><img class="gh-game-icon" src={game.icon} alt="" loading="lazy" /><div><h3 class="gh-game-name">{game.name}</h3><div class="gh-game-meta">{game.genre} · {game.status}</div></div></div></a>)}</div>
+    <div class="gh-listing">{items.map((game) => <a class="gh-game-card" data-game-name={game.name} href={`/game/${game.slug}/`}><div class="gh-game-art"><img src={game.cover} alt={game.name} loading="lazy" /><span class="gh-platform-pill">{(game.platforms || [game.platform]).join(" / ")}</span></div><div class="gh-game-info"><img class="gh-game-icon" src={game.icon} alt="" loading="lazy" /><div><h3 class="gh-game-name">{game.name}</h3><div class="gh-game-meta">{game.genre} · {game.status}</div></div></div></a>)}</div>
   </main>
 </GameHubLayout>
