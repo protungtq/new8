@@ -26,7 +26,7 @@ const visibleGames = q ? games.filter((game) => game.name.toLocaleLowerCase("vi"
     <section class="gh-section" id="hot">
       <div class="gh-section-head"><div><h2 class="gh-section-title">🎮 Danh mục game</h2><p class="gh-section-note">Các tựa game trong dữ liệu Game8</p></div><a class="gh-more" href="/game/mobile/">Khám phá tất cả →</a></div>
       <div class="gh-game-grid">
-        {hot.map((game) => <a class="gh-game-card" data-game-name={game.name} href={`/game/${game.slug}/`}><div class="gh-game-art"><img src={game.cover} alt={game.name} loading="lazy" /><span class="gh-platform-pill">{game.platform}</span></div><div class="gh-game-info"><img class="gh-game-icon" src={game.icon} alt="" loading="lazy" /><div><h3 class="gh-game-name">{game.name}</h3><div class="gh-game-meta">{game.genre}</div></div></div></a>)}
+        {hot.map((game) => <a class="gh-game-card" data-game-name={game.name} href={`/game/${game.slug}/`}><div class="gh-game-art"><img src={game.cover} alt={game.name} loading="lazy" /><span class="gh-platform-pill">{(game.platforms || [game.platform]).join(" / ")}</span></div><div class="gh-game-info"><img class="gh-game-icon" src={game.icon} alt="" loading="lazy" /><div><h3 class="gh-game-name">{game.name}</h3><div class="gh-game-meta">{game.genre}</div></div></div></a>)}
       </div>
     </section>
 
