@@ -1,7 +1,7 @@
 ---
 import "../styles/gamehub.css";
 const { title = "Gamehub | Khám phá thế giới game", description = "Khám phá game mobile, PC và console tại Gamehub.", active = "discover" } = Astro.props;
-const canonical = `https://game8.info/gamehub/${Astro.url.pathname.replace(/^\/gamehub\/?/, "")}`;
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 ---
 <!doctype html>
 <html lang="vi">
@@ -28,15 +28,15 @@ const canonical = `https://game8.info/gamehub/${Astro.url.pathname.replace(/^\/g
 <body class="gamehub-body">
   <header class="gh-header">
     <div class="gh-shell gh-header-inner">
-      <a class="gh-logo" href="/gamehub/"><span class="gh-logo-mark">G</span> GAMEHUB</a>
+      <a class="gh-logo" href="/"><span class="gh-logo-mark">G</span> GAMEHUB</a>
       <nav class="gh-nav" id="gh-nav" aria-label="Điều hướng chính">
         <a class={active === "discover" ? "active" : ""} href="/gamehub/">Khám phá</a>
-        <a class={active === "mobile" ? "active" : ""} href="/gamehub/mobile/">Mobile</a>
-        <a class={active === "pc" ? "active" : ""} href="/gamehub/pc-console/">PC / Console</a>
-        <a href="/gamehub/#hot">Game hot</a>
+        <a class={active === "mobile" ? "active" : ""} href="/game/mobile/">Mobile</a>
+        <a class={active === "pc" ? "active" : ""} href="/game/pc-console/">PC / Console</a>
+        <a href="/#hot">Game hot</a>
       </nav>
       <div class="gh-actions">
-        <form action="/gamehub/" method="get" role="search">
+        <form action="/" method="get" role="search">
           <input class="gh-search" type="search" name="q" placeholder="Tìm game..." aria-label="Tìm game" />
         </form>
         <button class="gh-icon-btn" id="gh-theme" type="button" aria-label="Chuyển giao diện" title="Chuyển giao diện">☼</button>
