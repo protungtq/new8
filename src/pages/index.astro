@@ -2,10 +2,10 @@
 import GameHubLayout from "../layouts/GameHubLayout.astro";
 import { games } from "../data/gamehub";
 
-const featured = games.filter((game) => game.featured);
-const hot = games.filter((game) => game.hot);
-const mobile = games.filter((game) => game.platform === "Mobile");
-const pc = games.filter((game) => game.platform === "PC/Console");
+const featured = games.slice(0, 3);
+const hot = games.slice(0, 8);
+const mobile = games.filter((game) => game.category === "mobile");
+const pc = games.filter((game) => game.category === "pc-console");
 const q = Astro.url.searchParams.get("q")?.trim().toLocaleLowerCase("vi") || "";
 const visibleGames = q ? games.filter((game) => game.name.toLocaleLowerCase("vi").includes(q) || game.tags.join(" ").toLocaleLowerCase("vi").includes(q)) : games;
 ---
@@ -14,7 +14,7 @@ const visibleGames = q ? games.filter((game) => game.name.toLocaleLowerCase("vi"
     <section class="gh-hero">
       <img class="gh-hero-image" src={featured[0]?.hero} alt="" />
       <div class="gh-hero-content">
-        <span class="gh-eyebrow">Game nổi bật · Editor's choice</span>
+        <span class="gh-eyebrow">Khám phá Gamehub</span>
         <h1>{featured[0]?.name || "Khám phá thế giới game"}</h1>
         <p>{featured[0]?.description}</p>
         <a class="gh-cta" href={`/game/${featured[0]?.slug}/`}>Khám phá game <span>→</span></a>
@@ -24,14 +24,14 @@ const visibleGames = q ? games.filter((game) => game.name.toLocaleLowerCase("vi"
     {q && <div class="gh-section"><p class="gh-subtitle">Kết quả tìm kiếm cho: <strong>{q}</strong></p></div>}
 
     <section class="gh-section" id="hot">
-      <div class="gh-section-head"><div><h2 class="gh-section-title">🔥 Game hot</h2><p class="gh-section-note">Những tựa game đang được quan tâm</p></div><a class="gh-more" href="/game/mobile/">Khám phá tất cả →</a></div>
+      <div class="gh-section-head"><div><h2 class="gh-section-title">🎮 Danh mục game</h2><p class="gh-section-note">Các tựa game trong dữ liệu Game8</p></div><a class="gh-more" href="/game/mobile/">Khám phá tất cả →</a></div>
       <div class="gh-game-grid">
         {hot.map((game) => <a class="gh-game-card" data-game-name={game.name} href={`/game/${game.slug}/`}><div class="gh-game-art"><img src={game.cover} alt={game.name} loading="lazy" /><span class="gh-platform-pill">{game.platform}</span></div><div class="gh-game-info"><img class="gh-game-icon" src={game.icon} alt="" loading="lazy" /><div><h3 class="gh-game-name">{game.name}</h3><div class="gh-game-meta">{game.genre}</div></div></div></a>)}
       </div>
     </section>
 
     <section class="gh-section">
-      <div class="gh-section-head"><div><h2 class="gh-section-title">✨ Game nổi bật</h2><p class="gh-section-note">Được đội ngũ Gamehub lựa chọn</p></div></div>
+      <div class="gh-section-head"><div><h2 class="gh-section-title">✨ Khám phá game</h2><p class="gh-section-note">Một số tựa game trong danh mục</p></div></div>
       <div class="gh-feature-grid">
         {featured.slice(0,3).map((game) => <a class="gh-feature" href={`/game/${game.slug}/`}><img src={game.hero} alt="" loading="lazy" /><span class="gh-feature-label">{game.name}</span></a>)}
       </div>
